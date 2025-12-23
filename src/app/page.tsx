@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 // import CollectionsGrid from "@/components/home/CollectionsGrid"; // Removed
-import CollectionsScroll from "@/components/home/CollectionsScroll"; // Added
+import CollectionsScroll from "@/components/home/CollectionsScroll";
+import FAQ from "@/components/home/FAQ";
 
 export default function Home() {
   return (
@@ -78,6 +79,8 @@ export default function Home() {
           </div>
         </div>
       </section>
+      {/* FAQ Section */}
+      <FAQ />
     </div>
   );
 }

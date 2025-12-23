@@ -62,9 +62,13 @@ const generateProducts = (): Product[] => {
 
     collections.forEach((collection) => {
         for (let i = 1; i <= 10; i++) {
-            // Random price generation to make it look realistic
-            const basePrice = Math.floor(Math.random() * (1500 - 800) + 800); // MRP between 800 and 1500
-            const discount = Math.floor(Math.random() * (40 - 10) + 10); // 10% to 40% discount
+            // Deterministic price generation to prevent hydration mismatches
+            // MRP between 800 and 1500 using collection ID and index
+            const basePrice = 800 + ((collection.id * 13 + i * 57) % 700);
+
+            // Discount 10% to 40%
+            const discount = 10 + ((collection.id * 7 + i * 3) % 30);
+
             const sellingPrice = Math.floor(basePrice * (1 - discount / 100));
 
             // Unique ID

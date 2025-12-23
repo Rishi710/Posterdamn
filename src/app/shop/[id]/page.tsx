@@ -5,10 +5,12 @@ import { products, collections } from "@/data/mockData";
 import { ArrowLeft, Check, Heart, Minus, Plus, Share2, Star, Truck } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { useStore } from "@/context/StoreContext";
 
 export default function ProductPage({ params }: { params: Promise<{ id: string }> }) {
     // Unwrap params using React.use() for Next.js 15
     const resolvedParams = use(params);
+    const { toggleWishlist, isInWishlist, addToCart } = useStore();
 
     const product = products.find((p) => p.id === resolvedParams.id);
 
@@ -20,6 +22,8 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
     const [selectedSize, setSelectedSize] = useState(product.sizes[0]);
     const [selectedMaterial, setSelectedMaterial] = useState(product.materials[0]);
     const [quantity, setQuantity] = useState(1);
+
+    const isWishlisted = isInWishlist(product.id);
 
     // Calculate pricing changes based on size (Mock Logic)
     // In a real app, price would come from a variant object
@@ -35,6 +39,18 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
     const currentPrice = Math.round(product.discountedPrice * getPriceMultiplier(selectedSize));
     const originalPrice = Math.round(product.price * getPriceMultiplier(selectedSize));
     const discount = Math.round(((originalPrice - currentPrice) / originalPrice) * 100);
+
+    const handleAddToCart = () => {
+        for (let i = 0; i < quantity; i++) {
+            addToCart({
+                ...product,
+                discountedPrice: currentPrice,
+                price: originalPrice,
+                sizes: [selectedSize],
+                materials: [selectedMaterial]
+            });
+        }
+    };
 
     return (
         <div className="min-h-screen bg-white dark:bg-black">
@@ -53,7 +69,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                 <div className="lg:grid lg:grid-cols-2 lg:gap-x-12 xl:gap-x-16">
                     {/* Left Column: Image Gallery */}
                     <div className="product-image-container relative">
-                        <div className="aspect-[3/4] w-full overflow-hidden rounded-2xl bg-gray-100 dark:bg-zinc-800">
+                        <div className="aspect-[3/4] w-full overflow-hidden rounded-2xl bg-gray-100 dark:bg-zinc-800 border border-zinc-100 dark:border-zinc-800">
                             {/* eslint-disable-next-line @next/next/no-img-element */}
                             <img
                                 src={product.image}
@@ -61,19 +77,28 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                                 className="h-full w-full object-cover"
                             />
                         </div>
-                        <button className="absolute right-4 top-4 rounded-full bg-white p-3 shadow-lg transition-transform hover:scale-110 active:scale-95 dark:bg-zinc-800 dark:text-white">
-                            <Heart className="h-6 w-6" />
+                        <button
+                            onClick={() => toggleWishlist(product)}
+                            className="absolute right-4 top-4 rounded-full bg-white p-3 shadow-lg transition-transform hover:scale-110 active:scale-95 dark:bg-zinc-800 dark:text-white border border-zinc-100 dark:border-zinc-700"
+                            aria-label="Toggle wishlist"
+                        >
+                            <Heart className={`h-6 w-6 ${isWishlisted ? "fill-red-500 text-red-500" : ""}`} />
                         </button>
                     </div>
 
                     {/* Right Column: Key Details */}
                     <div className="mt-10 px-0 sm:mt-16 sm:px-0 lg:mt-0">
                         {/* Title & Reviews */}
-                        <h1 className="text-3xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-4xl">
+                        <div className="mb-2">
+                            <p className="text-xs font-black uppercase tracking-[0.2em] text-zinc-400">
+                                {product.id.split('-')[0].replace(/-/g, ' ')}
+                            </p>
+                        </div>
+                        <h1 className="text-4xl font-black italic tracking-tighter uppercase text-black dark:text-white lg:text-5xl leading-none">
                             {product.title}
                         </h1>
 
-                        <div className="mt-3 flex items-center gap-4">
+                        <div className="mt-4 flex items-center gap-4">
                             <div className="flex items-center text-yellow-400">
                                 <Star className="h-4 w-4 fill-current" />
                                 <Star className="h-4 w-4 fill-current" />
@@ -81,37 +106,37 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                                 <Star className="h-4 w-4 fill-current" />
                                 <Star className="h-4 w-4 fill-current" />
                             </div>
-                            <span className="text-sm text-gray-500 dark:text-gray-400">4.9 (128 Reviews)</span>
+                            <span className="text-sm font-bold text-zinc-500">4.9 (128 Reviews)</span>
                         </div>
 
                         {/* Pricing */}
                         <div className="mt-8 flex items-baseline gap-4">
-                            <span className="text-4xl font-black text-gray-900 dark:text-white">
+                            <span className="text-5xl font-black tracking-tighter text-black dark:text-white">
                                 ₹{currentPrice}
                             </span>
-                            <span className="text-xl text-gray-400 line-through">
+                            <span className="text-2xl text-zinc-400 line-through font-bold">
                                 ₹{originalPrice}
                             </span>
-                            <span className="rounded-full bg-red-100 px-3 py-1 text-xs font-bold text-red-600 dark:bg-red-900/30 dark:text-red-400">
+                            <span className="bg-black px-3 py-1 text-[10px] font-black uppercase tracking-widest text-white dark:bg-white dark:text-black">
                                 {discount}% OFF
                             </span>
                         </div>
-                        <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">Inclusive of all taxes</p>
+                        <p className="mt-2 text-xs font-bold uppercase tracking-widest text-zinc-500">Inclusive of all taxes</p>
 
                         {/* Selectors */}
-                        <div className="mt-10 space-y-8">
+                        <div className="mt-10 space-y-10">
                             {/* Size Selector */}
                             <div>
-                                <div className="flex items-center justify-between">
-                                    <h3 className="text-sm font-medium text-gray-900 dark:text-white">Select Size</h3>
-                                    <button className="text-sm font-medium text-blue-600 hover:underline">Size Guide</button>
+                                <div className="flex items-center justify-between mb-4">
+                                    <h3 className="text-xs font-black uppercase tracking-widest text-zinc-400">Select Size</h3>
+                                    <button className="text-[10px] font-black uppercase tracking-widest text-zinc-400 hover:text-black dark:hover:text-white transition-colors border-b border-zinc-400">Size Guide</button>
                                 </div>
-                                <div className="mt-3 grid grid-cols-4 gap-3 sm:grid-cols-6">
+                                <div className="grid grid-cols-4 gap-3 sm:grid-cols-4">
                                     {product.sizes.map((size) => (
                                         <button
                                             key={size}
                                             onClick={() => setSelectedSize(size)}
-                                            className={`flex items-center justify-center rounded-lg border py-3 text-sm font-bold uppercase sm:flex-1 ${selectedSize === size ? 'border-black bg-black text-white dark:border-white dark:bg-white dark:text-black' : 'border-gray-200 text-gray-900 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-100 dark:hover:bg-zinc-800'}`}
+                                            className={`flex items-center justify-center border py-4 text-xs font-black uppercase tracking-widest transition-all ${selectedSize === size ? 'border-black bg-black text-white dark:border-white dark:bg-white dark:text-black shadow-xl shadow-black/10 dark:shadow-white/5' : 'border-zinc-200 text-zinc-500 hover:border-black hover:text-black dark:border-zinc-800 dark:hover:border-white dark:hover:text-white'}`}
                                         >
                                             {size}
                                         </button>
@@ -121,18 +146,18 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
 
                             {/* Material Selector */}
                             <div>
-                                <h3 className="text-sm font-medium text-gray-900 dark:text-white">Material</h3>
-                                <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
+                                <h3 className="text-xs font-black uppercase tracking-widest text-zinc-400 mb-4">Material</h3>
+                                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                                     {product.materials.map((material) => (
                                         <button
                                             key={material}
                                             onClick={() => setSelectedMaterial(material)}
-                                            className={`flex w-full items-center justify-between rounded-lg border px-4 py-3 ${selectedMaterial === material ? 'border-blue-600 ring-1 ring-blue-600 dark:border-blue-500 dark:ring-blue-500' : 'border-gray-200 hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-zinc-800'}`}
+                                            className={`flex w-full items-center justify-between border px-6 py-4 transition-all ${selectedMaterial === material ? 'border-black bg-black/5 dark:border-white dark:bg-white/5 ring-1 ring-black dark:ring-white' : 'border-zinc-200 hover:border-black dark:border-zinc-800 dark:hover:border-white'}`}
                                         >
-                                            <span className={`text-sm ${selectedMaterial === material ? 'font-bold text-blue-600 dark:text-blue-400' : 'font-medium text-gray-900 dark:text-gray-100'}`}>
+                                            <span className={`text-[10px] uppercase tracking-widest font-black ${selectedMaterial === material ? 'text-black dark:text-white' : 'text-zinc-500'}`}>
                                                 {material}
                                             </span>
-                                            {selectedMaterial === material && <Check className="h-4 w-4 text-blue-600" />}
+                                            {selectedMaterial === material && <Check className="h-4 w-4 text-black dark:text-white" strokeWidth={3} />}
                                         </button>
                                     ))}
                                 </div>
@@ -140,27 +165,30 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                         </div>
 
                         {/* Actions */}
-                        <div className="mt-10 flex flex-col gap-4 sm:flex-row">
+                        <div className="mt-12 flex flex-col gap-4 sm:flex-row">
                             {/* Quantity */}
-                            <div className="flex items-center rounded-full border border-gray-200 dark:border-gray-700">
+                            <div className="flex items-center border border-zinc-200 dark:border-zinc-800 px-2 py-1">
                                 <button
                                     onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                                    className="p-4 hover:text-blue-600 disabled:opacity-50"
+                                    className="p-4 text-black dark:text-white hover:bg-zinc-100 dark:hover:bg-zinc-900 transition-colors disabled:opacity-50"
                                     disabled={quantity <= 1}
                                 >
-                                    <Minus className="h-4 w-4" />
+                                    <Minus className="h-4 w-4" strokeWidth={3} />
                                 </button>
-                                <span className="w-12 text-center font-bold text-gray-900 dark:text-white">{quantity}</span>
+                                <span className="w-12 text-center text-lg font-black tracking-tight text-black dark:text-white">{quantity}</span>
                                 <button
                                     onClick={() => setQuantity(quantity + 1)}
-                                    className="p-4 hover:text-blue-600"
+                                    className="p-4 text-black dark:text-white hover:bg-zinc-100 dark:hover:bg-zinc-900 transition-colors"
                                 >
-                                    <Plus className="h-4 w-4" />
+                                    <Plus className="h-4 w-4" strokeWidth={3} />
                                 </button>
                             </div>
 
-                            <button className="flex-1 rounded-full bg-black px-8 py-4 text-base font-bold text-white shadow-lg transition-transform hover:-translate-y-1 hover:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 dark:bg-white dark:text-black dark:hover:bg-gray-200">
-                                Add {quantity} to Cart - ₹{currentPrice * quantity}
+                            <button
+                                onClick={handleAddToCart}
+                                className="flex-1 bg-black px-8 py-5 text-xs font-black uppercase tracking-[0.2em] text-white shadow-2xl transition-all hover:bg-zinc-800 active:scale-95 dark:bg-white dark:text-black dark:hover:bg-zinc-200"
+                            >
+                                Add to Cart - ₹{currentPrice * quantity}
                             </button>
                         </div>
 

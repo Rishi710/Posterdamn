@@ -6,10 +6,10 @@ import { collections } from "@/data/mockData";
 
 export default function CollectionsGrid() {
     return (
-        <section className="bg-gray-50 py-12 dark:bg-white">
+        <section className="bg-gray-50 py-12 dark:bg-black">
             <div className="mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8">
                 <div className="mb-12 text-center">
-                    <h2 className="text-4xl font-black tracking-tight text-gray-900 dark:text-black sm:text-6xl">
+                    <h2 className="text-4xl font-black tracking-tight text-gray-900 dark:text-white sm:text-6xl">
                         The Infinite <span className="text-blue-600">Wall</span>
                     </h2>
                     <p className="mt-4 text-lg text-gray-500 dark:text-gray-400">

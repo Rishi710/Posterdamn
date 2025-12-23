@@ -6,6 +6,7 @@ const config: Config = {
         "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
         "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
     ],
+    darkMode: "class",
     theme: {
         extend: {
             colors: {
@@ -14,6 +15,7 @@ const config: Config = {
             },
             animation: {
                 'marquee': 'marquee 120s linear infinite',
+                'marquee-slow': 'marquee 40s linear infinite',
                 'marquee-reverse': 'marquee-reverse 120s linear infinite',
             },
             keyframes: {
