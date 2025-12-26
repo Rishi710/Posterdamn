@@ -9,10 +9,11 @@ export default function CollectionsGrid() {
         <section className="bg-gray-50 py-12 dark:bg-black">
             <div className="mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8">
                 <div className="mb-12 text-center">
-                    <h2 className="text-4xl font-black tracking-tight text-gray-900 dark:text-white sm:text-6xl">
-                        The Infinite <span className="text-blue-600">Wall</span>
+                    <span className="text-[10px] font-black uppercase tracking-[0.5em] text-zinc-400">Curated Archives</span>
+                    <h2 className="mt-4 text-4xl font-black uppercase tracking-tighter text-black dark:text-white sm:text-7xl">
+                        The Infinite <span className="text-zinc-500 italic">Wall</span>
                     </h2>
-                    <p className="mt-4 text-lg text-gray-500 dark:text-gray-400">
+                    <p className="mt-4 text-lg font-medium text-zinc-500 dark:text-zinc-400">
                         Dive into 40+ unique worlds. Find your vibe.
                     </p>
                 </div>

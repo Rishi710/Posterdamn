@@ -2,17 +2,32 @@
 
 import ProductCard from "@/components/shop/ProductCard";
 import { products, collections } from "@/data/mockData";
-import { ChevronDown, Filter } from "lucide-react";
-import { useState, useEffect, useRef } from "react";
+import { ChevronDown, Filter, Search as SearchIcon, X } from "lucide-react";
+import { useState, useEffect, useRef, Suspense } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 
 const ITEMS_PER_PAGE = 40;
 
 export default function ShopPage() {
+    return (
+        <Suspense fallback={<div className="min-h-screen bg-white dark:bg-black p-8 text-center">Loading Shop...</div>}>
+            <ShopContent />
+        </Suspense>
+    );
+}
+
+function ShopContent() {
+    const searchParams = useSearchParams();
+    const router = useRouter();
+    const searchQuery = searchParams.get("q") || "";
+
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
     // Filter State
     const [selectedCollectionIds, setSelectedCollectionIds] = useState<number[]>([]);
     const [priceRange, setPriceRange] = useState<string>("all");
+    const [sortBy, setSortBy] = useState<string>("recommended");
+    const [isSortOpen, setIsSortOpen] = useState(false);
 
     // Pagination State
     const [visibleCount, setVisibleCount] = useState(ITEMS_PER_PAGE);
@@ -27,10 +42,22 @@ export default function ShopPage() {
         if (selectedCollectionIds.length > 0 && topRef.current) {
             topRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
-    }, [selectedCollectionIds, priceRange]);
+    }, [selectedCollectionIds, priceRange, sortBy]);
 
-    // Filtering Logic
+    // Filtering & Sorting Logic
     const filteredProducts = products.filter((product) => {
+        // 0. Search Filter
+        if (searchQuery) {
+            const query = searchQuery.toLowerCase();
+            const matchesTitle = product.title.toLowerCase().includes(query);
+            const matchesTags = product.tags?.some(tag => tag.toLowerCase().includes(query));
+            const matchesCollection = collections.find(c => c.id === product.collectionId)?.name.toLowerCase().includes(query);
+
+            if (!matchesTitle && !matchesTags && !matchesCollection) {
+                return false;
+            }
+        }
+
         // 1. Collection Filter
         if (selectedCollectionIds.length > 0 && !selectedCollectionIds.includes(product.collectionId)) {
             return false;
@@ -47,8 +74,15 @@ export default function ShopPage() {
         return true;
     });
 
-    const displayProducts = filteredProducts.slice(0, visibleCount);
-    const hasMore = visibleCount < filteredProducts.length;
+    const sortedProducts = [...filteredProducts].sort((a, b) => {
+        if (sortBy === "price-low") return a.discountedPrice - b.discountedPrice;
+        if (sortBy === "price-high") return b.discountedPrice - a.discountedPrice;
+        if (sortBy === "newest") return b.id.localeCompare(a.id); // Mock "newest" by ID
+        return 0; // "recommended"
+    });
+
+    const displayProducts = sortedProducts.slice(0, visibleCount);
+    const hasMore = visibleCount < sortedProducts.length;
 
     const toggleCollection = (id: number) => {
         setSelectedCollectionIds(prev =>
@@ -69,11 +103,19 @@ export default function ShopPage() {
                 <div className="mx-auto flex h-16 max-w-[1440px] items-center justify-between px-4 sm:px-6 lg:px-8">
                     <div className="flex items-center gap-4">
                         <h1 className="text-xl font-bold uppercase tracking-wide text-black dark:text-white">
-                            All Posters
+                            {searchQuery ? `Results for "${searchQuery}"` : "All Posters"}
                         </h1>
                         <span className="rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-600 dark:bg-zinc-800 dark:text-gray-400">
                             {filteredProducts.length} Items
                         </span>
+                        {searchQuery && (
+                            <button
+                                onClick={() => router.push("/shop")}
+                                className="flex items-center gap-1 text-[10px] font-black uppercase tracking-widest text-zinc-400 hover:text-black dark:hover:text-white"
+                            >
+                                <X className="h-3 w-3" /> Clear Search
+                            </button>
+                        )}
                     </div>
 
                     <div className="flex items-center gap-4">
@@ -85,12 +127,36 @@ export default function ShopPage() {
                             <Filter className="h-4 w-4" /> Filters
                         </button>
 
-                        {/* Sort Dropdown (Visual Only) */}
-                        <div className="hidden items-center gap-2 text-sm text-gray-500 sm:flex dark:text-gray-400">
-                            <span>Sort by:</span>
-                            <button className="flex items-center gap-1 font-medium text-black dark:text-white">
-                                Recommended <ChevronDown className="h-4 w-4" />
-                            </button>
+                        {/* Sort Dropdown */}
+                        <div className="relative">
+                            <div className="hidden items-center gap-2 text-sm text-gray-500 sm:flex dark:text-gray-400">
+                                <span>Sort by:</span>
+                                <button
+                                    onClick={() => setIsSortOpen(!isSortOpen)}
+                                    className="flex items-center gap-1 font-bold text-black dark:text-white"
+                                >
+                                    {sortBy === 'recommended' && 'Recommended'}
+                                    {sortBy === 'newest' && 'Newest'}
+                                    {sortBy === 'price-low' && 'Price: Low to High'}
+                                    {sortBy === 'price-high' && 'Price: High to Low'}
+                                    <ChevronDown className={`h-4 w-4 transition-transform ${isSortOpen ? 'rotate-180' : ''}`} />
+                                </button>
+                            </div>
+
+                            {isSortOpen && (
+                                <>
+                                    <div
+                                        className="fixed inset-0 z-40 bg-transparent"
+                                        onClick={() => setIsSortOpen(false)}
+                                    />
+                                    <div className="absolute right-0 top-full z-50 mt-2 w-48 rounded-xl border border-gray-100 bg-white p-1 shadow-2xl dark:border-zinc-800 dark:bg-zinc-900">
+                                        <SortOption label="Recommended" value="recommended" current={sortBy} onClick={setSortBy} setOpen={setIsSortOpen} />
+                                        <SortOption label="Newest" value="newest" current={sortBy} onClick={setSortBy} setOpen={setIsSortOpen} />
+                                        <SortOption label="Price: Low to High" value="price-low" current={sortBy} onClick={setSortBy} setOpen={setIsSortOpen} />
+                                        <SortOption label="Price: High to Low" value="price-high" current={sortBy} onClick={setSortBy} setOpen={setIsSortOpen} />
+                                    </div>
+                                </>
+                            )}
                         </div>
                     </div>
                 </div>
@@ -248,4 +314,18 @@ function PriceRadio({ label, value, current, onChange }: { label: string, value:
             </span>
         </label>
     )
+}
+
+function SortOption({ label, value, current, onClick, setOpen }: { label: string, value: string, current: string, onClick: (val: string) => void, setOpen: (val: boolean) => void }) {
+    return (
+        <button
+            onClick={() => {
+                onClick(value);
+                setOpen(false);
+            }}
+            className={`flex w-full items-center px-4 py-2.5 text-sm font-medium transition-colors hover:bg-gray-50 dark:hover:bg-zinc-800 ${current === value ? 'text-black dark:text-white bg-gray-50 dark:bg-zinc-800' : 'text-gray-500 dark:text-gray-400'}`}
+        >
+            {label}
+        </button>
+    );
 }
