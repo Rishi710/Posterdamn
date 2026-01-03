@@ -85,6 +85,7 @@ export default function Navbar() {
                     <NavItem href="/retro" label="Retro" />
                     <NavItem href="/stickers" label="Stickers" />
                     <NavItem href="/custom" label="Custom" />
+                    <NavItem href="/contact" label="Contact" />
                 </div>
 
                 {/* Right Icons */}
@@ -101,7 +102,7 @@ export default function Navbar() {
                     <button
                         onClick={() => setIsSearchOpen(true)}
                         aria-label="Search"
-                        className="hidden rounded-full p-2 text-gray-700 transition-colors hover:bg-gray-100 hover:text-black dark:text-gray-300 dark:hover:bg-zinc-800 dark:hover:text-white sm:block"
+                        className="rounded-full p-2 text-gray-700 transition-colors hover:bg-gray-100 hover:text-black dark:text-gray-300 dark:hover:bg-zinc-800 dark:hover:text-white"
                     >
                         <Search className="h-5 w-5" strokeWidth={1.5} />
                     </button>
@@ -157,12 +158,51 @@ export default function Navbar() {
 
             {/* Mobile Navigation Menu */}
             {isMenuOpen && (
-                <div className="absolute top-20 left-0 w-full border-b border-gray-200 bg-white px-4 py-8 shadow-2xl dark:border-gray-800 dark:bg-black md:hidden animate-in slide-in-from-top duration-300">
-                    <div className="flex flex-col space-y-6">
-                        <MobileLink href="/shop" onClick={() => setIsMenuOpen(false)}>Shop Posters</MobileLink>
-                        <MobileLink href="/collections" onClick={() => setIsMenuOpen(false)}>Collections</MobileLink>
-                        <MobileLink href="/custom" onClick={() => setIsMenuOpen(false)}>Custom Orders</MobileLink>
-                        <MobileLink href="/help" onClick={() => setIsMenuOpen(false)}>Help Center</MobileLink>
+                <div className="fixed inset-0 z-40 md:hidden">
+                    {/* Backdrop */}
+                    <div className="absolute inset-0 bg-black/20 backdrop-blur-sm" onClick={() => setIsMenuOpen(false)}></div>
+
+                    {/* Menu Content */}
+                    <div className="absolute right-0 top-0 h-screen w-[80%] max-w-sm bg-white p-8 shadow-2xl animate-in slide-in-from-right duration-500 ease-out dark:bg-black">
+                        <div className="flex flex-col h-full">
+                            <div className="flex items-center justify-between mb-12">
+                                <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-zinc-400">Navigation</h3>
+                                <button onClick={() => setIsMenuOpen(false)} className="rounded-full p-2 hover:bg-zinc-100 dark:hover:bg-zinc-800">
+                                    <X className="h-5 w-5" />
+                                </button>
+                            </div>
+
+                            <div className="flex flex-col space-y-8">
+                                <MobileLink href="/shop" onClick={() => setIsMenuOpen(false)}>Shop</MobileLink>
+                                <MobileLink href="/collection" onClick={() => setIsMenuOpen(false)}>Collections</MobileLink>
+                                <MobileLink href="/retro" onClick={() => setIsMenuOpen(false)}>Retro Arc</MobileLink>
+                                <MobileLink href="/stickers" onClick={() => setIsMenuOpen(false)}>Stickers</MobileLink>
+                                <MobileLink href="/custom" onClick={() => setIsMenuOpen(false)}>Customs</MobileLink>
+                                <MobileLink href="/contact" onClick={() => setIsMenuOpen(false)}>Contact</MobileLink>
+                            </div>
+
+                            <div className="mt-auto pt-12 border-t border-zinc-100 dark:border-zinc-800 space-y-6">
+                                <div className="flex items-center gap-4">
+                                    <div className="h-10 w-10 overflow-hidden rounded-full bg-zinc-100 dark:bg-zinc-900 flex items-center justify-center">
+                                        <User className="h-5 w-5 text-zinc-400" />
+                                    </div>
+                                    <div>
+                                        <p className="text-sm font-black uppercase tracking-tight text-black dark:text-white">Rishi</p>
+                                        <p className="text-[10px] font-bold text-zinc-400">Premium Member</p>
+                                    </div>
+                                </div>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <Link href="/account/orders" onClick={() => setIsMenuOpen(false)} className="flex flex-col items-center justify-center rounded-xl bg-zinc-50 p-4 dark:bg-zinc-900 border border-transparent hover:border-black dark:hover:border-white transition-all">
+                                        <Package className="h-5 w-5 mb-2" />
+                                        <span className="text-[10px] font-black uppercase tracking-widest">Orders</span>
+                                    </Link>
+                                    <Link href="/account/wishlist" onClick={() => setIsMenuOpen(false)} className="flex flex-col items-center justify-center rounded-xl bg-zinc-50 p-4 dark:bg-zinc-900 border border-transparent hover:border-black dark:hover:border-white transition-all">
+                                        <Heart className="h-5 w-5 mb-2" />
+                                        <span className="text-[10px] font-black uppercase tracking-widest">Saved</span>
+                                    </Link>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             )}

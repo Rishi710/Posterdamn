@@ -119,29 +119,19 @@ function ShopContent() {
                     </div>
 
                     <div className="flex items-center gap-4">
-                        {/* Mobile Filter Toggle */}
-                        <button
-                            className="flex items-center gap-2 text-sm font-medium text-gray-600 lg:hidden dark:text-gray-300"
-                            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-                        >
-                            <Filter className="h-4 w-4" /> Filters
-                        </button>
-
                         {/* Sort Dropdown */}
                         <div className="relative">
-                            <div className="hidden items-center gap-2 text-sm text-gray-500 sm:flex dark:text-gray-400">
-                                <span>Sort by:</span>
-                                <button
-                                    onClick={() => setIsSortOpen(!isSortOpen)}
-                                    className="flex items-center gap-1 font-bold text-black dark:text-white"
-                                >
-                                    {sortBy === 'recommended' && 'Recommended'}
-                                    {sortBy === 'newest' && 'Newest'}
-                                    {sortBy === 'price-low' && 'Price: Low to High'}
-                                    {sortBy === 'price-high' && 'Price: High to Low'}
-                                    <ChevronDown className={`h-4 w-4 transition-transform ${isSortOpen ? 'rotate-180' : ''}`} />
-                                </button>
-                            </div>
+                            <button
+                                onClick={() => setIsSortOpen(!isSortOpen)}
+                                className="flex items-center gap-1 text-sm font-black uppercase tracking-widest text-black dark:text-white"
+                            >
+                                <span className="hidden sm:inline text-gray-500 font-medium normal-case tracking-normal mr-2">Sort by:</span>
+                                {sortBy === 'recommended' && 'Recommended'}
+                                {sortBy === 'newest' && 'Newest'}
+                                {sortBy === 'price-low' && 'Price: Low to High'}
+                                {sortBy === 'price-high' && 'Price: High to Low'}
+                                <ChevronDown className={`h-4 w-4 transition-transform ${isSortOpen ? 'rotate-180' : ''}`} />
+                            </button>
 
                             {isSortOpen && (
                                 <>
@@ -164,23 +154,33 @@ function ShopContent() {
 
             <div className="mx-auto max-w-[1440px] px-4 py-8 sm:px-6 lg:px-8" ref={topRef}>
                 <div className="flex flex-col lg:flex-row lg:gap-12">
-                    {/* Sticky Sidebar */}
-                    <aside className={`fixed inset-y-0 left-0 z-40 w-80 transform bg-white p-6 transition-transform duration-300 ease-in-out lg:static lg:block lg:w-64 lg:transform-none lg:bg-transparent lg:p-0 dark:bg-black 
+                    {/* Filter Sidebar */}
+                    <aside className={`fixed inset-y-0 left-0 z-40 w-80 transform bg-white p-6 transition-transform duration-300 ease-in-out overflow-y-auto lg:overflow-visible lg:static lg:block lg:w-64 lg:transform-none lg:bg-transparent lg:p-0 dark:bg-black 
                         ${isSidebarOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full lg:translate-x-0'}`}>
 
-                        <div className="flex items-center justify-between lg:hidden mb-8">
-                            <span className="text-lg font-bold dark:text-white">Filters</span>
-                            <button onClick={() => setIsSidebarOpen(false)}>
-                                <span className="text-2xl">×</span>
+                        <div className="flex items-center justify-between lg:hidden mb-12">
+                            <h2 className="text-2xl font-black italic uppercase tracking-tighter dark:text-white">Filters</h2>
+                            <button onClick={() => setIsSidebarOpen(false)} className="rounded-full p-2 hover:bg-zinc-100 dark:hover:bg-zinc-800">
+                                <X className="h-6 w-6" />
                             </button>
                         </div>
 
-                        <div className="sticky top-40 space-y-10">
+                        <div className="lg:sticky lg:top-40 space-y-10">
                             {/* Categories (Collections) */}
                             <div className="space-y-4">
-                                <h3 className="text-sm font-bold uppercase tracking-widest text-gray-900 dark:text-white">
-                                    Collections
-                                </h3>
+                                <div className="flex items-center justify-between">
+                                    <h3 className="text-sm font-bold uppercase tracking-widest text-gray-900 dark:text-white">
+                                        Collections
+                                    </h3>
+                                    {(selectedCollectionIds.length > 0 || priceRange !== 'all') && (
+                                        <button
+                                            onClick={() => { setSelectedCollectionIds([]); setPriceRange('all'); }}
+                                            className="text-[10px] font-black uppercase tracking-widest text-zinc-400 hover:text-black dark:hover:text-white underline underline-offset-4"
+                                        >
+                                            Clear All
+                                        </button>
+                                    )}
+                                </div>
                                 {/* Scrollable area for many collections */}
                                 <div className="space-y-3 max-h-[400px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-200 dark:scrollbar-thumb-gray-800">
                                     {collections.map((collection) => (
@@ -241,7 +241,7 @@ function ShopContent() {
 
                     {/* Product Grid */}
                     <div className="flex-1">
-                        <div className="grid grid-cols-2 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4">
+                        <div className="grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4">
                             {displayProducts.map((product) => (
                                 <ProductCard key={product.id} product={product} />
                             ))}
@@ -284,6 +284,17 @@ function ShopContent() {
                 </div>
             </div>
 
+            {/* Floating Filter Button for Mobile */}
+            <button
+                onClick={() => setIsSidebarOpen(true)}
+                className="fixed bottom-8 right-6 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-black text-white shadow-2xl transition-transform active:scale-90 lg:hidden dark:bg-white dark:text-black"
+            >
+                <Filter className="h-6 w-6" />
+                <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white">
+                    {selectedCollectionIds.length + (priceRange !== 'all' ? 1 : 0)}
+                </span>
+            </button>
+
             {/* Backdrop for mobile menu */}
             {isSidebarOpen && (
                 <div
@@ -295,7 +306,7 @@ function ShopContent() {
     );
 }
 
-// Helper Component for Price Radio Buttons
+// Helper Components
 function PriceRadio({ label, value, current, onChange }: { label: string, value: string, current: string, onChange: (val: string) => void }) {
     return (
         <label className="flex items-center gap-3 group cursor-pointer">
@@ -313,7 +324,7 @@ function PriceRadio({ label, value, current, onChange }: { label: string, value:
                 {label}
             </span>
         </label>
-    )
+    );
 }
 
 function SortOption({ label, value, current, onClick, setOpen }: { label: string, value: string, current: string, onClick: (val: string) => void, setOpen: (val: boolean) => void }) {

@@ -57,7 +57,7 @@ export default function ProductCard({ product }: { product: ProductProps }) {
             </div>
 
             {/* Content / Footer */}
-            <div className="flex flex-1 flex-col p-6">
+            <div className="flex flex-1 flex-col p-4 sm:p-6">
                 <div className="mb-4">
                     <span className="text-[10px] font-black uppercase tracking-widest text-zinc-400">
                         {category}

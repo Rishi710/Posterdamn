@@ -19,17 +19,17 @@ export default function Home() {
         </div>
 
         <div className="relative z-10 mx-auto max-w-[1440px] px-6 text-center">
-          <span className="mb-4 inline-block text-[10px] font-black uppercase tracking-[0.5em] text-zinc-400">
+          <span className="mb-4 inline-block text-[10px] font-black uppercase tracking-[0.4em] text-zinc-400 sm:tracking-[0.5em]">
             Premium Poster Boutique
           </span>
-          <h1 className="mb-6 text-6xl font-black uppercase tracking-tighter sm:text-8xl lg:text-9xl">
+          <h1 className="mb-6 text-5xl font-black uppercase tracking-tighter sm:text-8xl lg:text-9xl leading-[0.9]">
             OWN THE <br /> <span className="text-zinc-500">AESTHETIC.</span>
           </h1>
-          <p className="mx-auto mb-10 max-w-2xl text-lg font-medium text-zinc-300 sm:text-xl">
+          <p className="mx-auto mb-10 max-w-xl text-base font-medium text-zinc-300 sm:text-xl">
             Museum-quality prints for the modern curator. <br className="hidden sm:block" />
             Curated collections that turn your space into a gallery.
           </p>
-          <div className="flex flex-col items-center justify-center gap-6 sm:flex-row">
+          <div className="flex flex-col items-center justify-center gap-4 sm:flex-row sm:gap-6">
             <Link
               href="/shop"
               className="group relative overflow-hidden bg-white px-10 py-4 text-sm font-black uppercase tracking-widest text-black transition-all hover:bg-zinc-200"
@@ -98,7 +98,7 @@ export default function Home() {
             </Link>
           </div>
 
-          <div className="grid grid-cols-2 gap-6 sm:grid-cols-2 lg:grid-cols-4 lg:gap-8">
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4 lg:gap-8">
             {trendingProducts.map((product) => (
               <ProductCard key={product.id} product={product} />
             ))}

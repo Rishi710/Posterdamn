@@ -12,9 +12,23 @@ interface Product {
     materials?: string[];
 }
 
+export interface Address {
+    id: string;
+    name: string;
+    line1: string;
+    line2?: string;
+    city: string;
+    state: string;
+    zip: string;
+    phone: string;
+    isDefault?: boolean;
+}
+
 interface StoreContextType {
     wishlist: Product[];
     cart: Product[];
+    addresses: Address[];
+    selectedAddressId: string | null;
     toggleWishlist: (product: Product) => void;
     isInWishlist: (id: string | number) => boolean;
     addToCart: (product: Product) => void;
@@ -22,6 +36,12 @@ interface StoreContextType {
     updateCartItem: (index: number, updates: Partial<Product>) => void;
     removeFromWishlist: (id: string | number) => void;
     moveToWishlist: (product: Product, index?: number) => void;
+
+    // Address Actions
+    addAddress: (address: Omit<Address, "id">) => void;
+    updateAddress: (id: string, updates: Partial<Address>) => void;
+    deleteAddress: (id: string) => void;
+    selectAddress: (id: string) => void;
 }
 
 const StoreContext = createContext<StoreContextType | undefined>(undefined);
@@ -29,13 +49,20 @@ const StoreContext = createContext<StoreContextType | undefined>(undefined);
 export function StoreProvider({ children }: { children: React.ReactNode }) {
     const [wishlist, setWishlist] = useState<Product[]>([]);
     const [cart, setCart] = useState<Product[]>([]);
+    const [addresses, setAddresses] = useState<Address[]>([]);
+    const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null);
 
     // Persist to localStorage
     useEffect(() => {
         const savedWishlist = localStorage.getItem("wishlist");
         const savedCart = localStorage.getItem("cart");
+        const savedAddresses = localStorage.getItem("addresses");
+        const savedSelectedId = localStorage.getItem("selectedAddressId");
+
         if (savedWishlist) setWishlist(JSON.parse(savedWishlist));
         if (savedCart) setCart(JSON.parse(savedCart));
+        if (savedAddresses) setAddresses(JSON.parse(savedAddresses));
+        if (savedSelectedId) setSelectedAddressId(savedSelectedId);
     }, []);
 
     useEffect(() => {
@@ -45,6 +72,16 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     useEffect(() => {
         localStorage.setItem("cart", JSON.stringify(cart));
     }, [cart]);
+
+    useEffect(() => {
+        localStorage.setItem("addresses", JSON.stringify(addresses));
+    }, [addresses]);
+
+    useEffect(() => {
+        if (selectedAddressId) {
+            localStorage.setItem("selectedAddressId", selectedAddressId);
+        }
+    }, [selectedAddressId]);
 
     const toggleWishlist = (product: Product) => {
         setWishlist((prev) => {
@@ -75,7 +112,6 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
                 newCart.splice(index, 1);
                 return newCart;
             }
-            // Fallback for when index isn't provided
             const firstIndex = prev.findIndex((p) => p.id === id);
             if (firstIndex > -1) {
                 const newCart = [...prev];
@@ -105,17 +141,46 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         });
     };
 
+    // Address Management
+    const addAddress = (addressData: Omit<Address, "id">) => {
+        const newAddress: Address = {
+            ...addressData,
+            id: Math.random().toString(36).substr(2, 9)
+        };
+        setAddresses(prev => [...prev, newAddress]);
+        if (!selectedAddressId) setSelectedAddressId(newAddress.id);
+    };
+
+    const updateAddress = (id: string, updates: Partial<Address>) => {
+        setAddresses(prev => prev.map(addr => addr.id === id ? { ...addr, ...updates } : addr));
+    };
+
+    const deleteAddress = (id: string) => {
+        setAddresses(prev => prev.filter(addr => addr.id !== id));
+        if (selectedAddressId === id) setSelectedAddressId(null);
+    };
+
+    const selectAddress = (id: string) => {
+        setSelectedAddressId(id);
+    };
+
     return (
         <StoreContext.Provider value={{
             wishlist,
             cart,
+            addresses,
+            selectedAddressId,
             toggleWishlist,
             isInWishlist,
             addToCart,
             removeFromCart,
             updateCartItem,
             removeFromWishlist,
-            moveToWishlist
+            moveToWishlist,
+            addAddress,
+            updateAddress,
+            deleteAddress,
+            selectAddress
         }}>
             {children}
         </StoreContext.Provider>

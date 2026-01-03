@@ -78,8 +78,8 @@ export default function CartPage() {
                 {/* Cart Items */}
                 <div className="lg:col-span-8 space-y-8">
                     {cart.map((item, index) => (
-                        <div key={`${item.id}-${index}`} className="group flex flex-col gap-6 border-b border-zinc-50 pb-8 dark:border-zinc-900 sm:flex-row">
-                            <Link href={`/shop/${item.id}`} className="relative aspect-[2/3] w-32 flex-shrink-0 overflow-hidden bg-zinc-100 dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800">
+                        <div key={`${item.id}-${index}`} className="group flex gap-4 border-b border-zinc-100 pb-8 dark:border-zinc-900 sm:gap-6">
+                            <Link href={`/shop/${item.id}`} className="relative aspect-[2/3] w-20 flex-shrink-0 overflow-hidden bg-zinc-100 dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800 sm:w-32">
                                 {/* eslint-disable-next-line @next/next/no-img-element */}
                                 <img
                                     src={item.image}
@@ -90,63 +90,47 @@ export default function CartPage() {
 
                             <div className="flex flex-1 flex-col justify-between py-1">
                                 <div className="space-y-4">
-                                    <div className="flex justify-between items-start">
-                                        <div>
+                                    <div className="flex justify-between items-start gap-2">
+                                        <div className="min-w-0">
                                             <Link href={`/shop/${item.id}`} className="hover:opacity-70 transition-opacity">
-                                                <h3 className="text-xl font-black tracking-tighter uppercase text-black dark:text-white leading-none">
+                                                <h3 className="text-base font-black tracking-tighter uppercase text-black dark:text-white leading-tight sm:text-xl truncate">
                                                     {item.title}
                                                 </h3>
                                             </Link>
-                                            <p className="mt-2 text-[10px] font-black uppercase tracking-widest text-zinc-400">
+                                            <p className="mt-1 text-[9px] font-black uppercase tracking-widest text-zinc-400 sm:text-[10px]">
                                                 {typeof item.id === 'string' ? item.id.split('-')[0].replace(/-/g, ' ') : "POSTERDAMN"}
                                             </p>
                                         </div>
-                                        <p className="text-xl font-black tracking-tight text-black dark:text-white">
+                                        <p className="text-sm font-black tracking-tight text-black dark:text-white sm:text-xl flex-shrink-0">
                                             ₹{item.discountedPrice}
                                         </p>
                                     </div>
 
-                                    <div className="flex flex-wrap gap-4">
+                                    <div className="flex flex-wrap gap-x-6 gap-y-2">
                                         <div className="flex flex-col gap-1">
-                                            <span className="text-[10px] font-black uppercase tracking-widest text-zinc-400">Size</span>
-                                            <select
-                                                value={item.sizes?.[0]}
-                                                onChange={(e) => updateCartItem(index, { sizes: [e.target.value] })}
-                                                className="text-xs font-bold uppercase text-black dark:text-white bg-zinc-100 dark:bg-zinc-800 px-2 py-1 outline-none border-none focus:ring-1 focus:ring-black dark:focus:ring-white transition-all cursor-pointer"
-                                            >
-                                                {['A4', 'A3', 'A2'].map((size) => (
-                                                    <option key={size} value={size}>{size}</option>
-                                                ))}
-                                            </select>
+                                            <span className="text-[9px] font-black uppercase tracking-widest text-zinc-400 sm:text-[10px]">Size</span>
+                                            <p className="text-[10px] font-bold uppercase text-black dark:text-white sm:text-xs">A3 (Standard)</p>
                                         </div>
                                         <div className="flex flex-col gap-1">
-                                            <span className="text-[10px] font-black uppercase tracking-widest text-zinc-400">Material</span>
-                                            <select
-                                                value={item.materials?.[0]}
-                                                onChange={(e) => updateCartItem(index, { materials: [e.target.value] })}
-                                                className="text-xs font-bold uppercase text-black dark:text-white bg-zinc-100 dark:bg-zinc-800 px-2 py-1 outline-none border-none focus:ring-1 focus:ring-black dark:focus:ring-white transition-all cursor-pointer"
-                                            >
-                                                {['300 GSM Matte', '200 GSM Gloss', 'Sunboard', 'Premium Canvas'].map((material) => (
-                                                    <option key={material} value={material}>{material}</option>
-                                                ))}
-                                            </select>
+                                            <span className="text-[9px] font-black uppercase tracking-widest text-zinc-400 sm:text-[10px]">Type</span>
+                                            <p className="text-[10px] font-bold uppercase text-black dark:text-white sm:text-xs">300 GSM Matte</p>
                                         </div>
                                     </div>
                                 </div>
 
-                                <div className="mt-6 flex items-center gap-6">
+                                <div className="mt-4 flex flex-wrap items-center gap-4 sm:mt-6 sm:gap-6">
                                     <button
                                         onClick={() => moveToWishlist(item, index)}
-                                        className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-zinc-400 transition-colors hover:text-black dark:hover:text-white"
+                                        className="flex items-center gap-1.5 text-[9px] font-black uppercase tracking-widest text-zinc-400 transition-colors hover:text-black dark:hover:text-white sm:text-[10px]"
                                     >
-                                        <Heart className="h-3 w-3" />
-                                        Move to Wishlist
+                                        <Heart className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
+                                        Save
                                     </button>
                                     <button
                                         onClick={() => removeFromCart(item.id, index)}
-                                        className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-zinc-400 transition-colors hover:text-red-500"
+                                        className="flex items-center gap-1.5 text-[9px] font-black uppercase tracking-widest text-zinc-400 transition-colors hover:text-red-500 sm:text-[10px]"
                                     >
-                                        <Trash2 className="h-3 w-3" />
+                                        <Trash2 className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
                                         Remove
                                     </button>
                                 </div>
@@ -224,10 +208,13 @@ export default function CartPage() {
                             <span className="text-black dark:text-white">₹{Math.round(total)}</span>
                         </div>
 
-                        <button className="flex w-full items-center justify-center gap-2 bg-black py-5 text-sm font-black uppercase tracking-[0.2em] text-white transition-all hover:bg-zinc-800 dark:bg-white dark:text-black dark:hover:bg-zinc-200">
+                        <Link
+                            href="/checkout"
+                            className="flex w-full items-center justify-center gap-2 bg-black py-5 text-sm font-black uppercase tracking-[0.2em] text-white transition-all hover:bg-zinc-800 dark:bg-white dark:text-black dark:hover:bg-zinc-200"
+                        >
                             Checkout
                             <ChevronRight className="h-4 w-4" strokeWidth={3} />
-                        </button>
+                        </Link>
 
                         <div className="pt-4">
                             <p className="text-[10px] font-medium text-zinc-500 leading-relaxed text-center">
