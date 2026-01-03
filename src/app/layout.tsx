@@ -21,6 +21,7 @@ export const metadata: Metadata = {
 };
 
 import { Providers } from "./providers";
+import LayoutWrapper from "@/components/layout/LayoutWrapper";
 
 export default function RootLayout({
   children,
@@ -34,10 +35,9 @@ export default function RootLayout({
         suppressHydrationWarning
       >
         <Providers>
-          <Banner />
-          <Navbar />
-          <main className="flex-1">{children}</main>
-          <Footer />
+          <LayoutWrapper>
+            {children}
+          </LayoutWrapper>
         </Providers>
       </body>
     </html>

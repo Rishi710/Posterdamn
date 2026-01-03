@@ -13,7 +13,7 @@ export default function Navbar() {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const { theme, setTheme } = useTheme();
     const [mounted, setMounted] = useState(false);
-    const { wishlist, cart } = useStore();
+    const { wishlist, cart, user, logout } = useStore();
     const router = useRouter();
 
     // Search State
@@ -107,30 +107,40 @@ export default function Navbar() {
                         <Search className="h-5 w-5" strokeWidth={1.5} />
                     </button>
 
-                    {/* User Profile Dropdown */}
-                    <div className="relative group z-50">
-                        <button className="flex items-center gap-1.5 rounded-full border border-gray-200 bg-white px-3 py-1.5 text-gray-900 transition-colors hover:bg-black hover:text-white dark:border-gray-800 dark:bg-black dark:text-white dark:hover:bg-white dark:hover:text-black">
-                            <User className="h-4 w-4" />
-                            <span className="text-xs font-bold uppercase tracking-tight hidden sm:inline">Rishi</span>
-                            <ChevronDown className="h-3 w-3 transition-transform group-hover:rotate-180" />
-                        </button>
+                    {/* User Profile */}
+                    {user ? (
+                        <div className="relative group z-50">
+                            <button className="flex items-center gap-1.5 rounded-full border border-gray-200 bg-white px-3 py-1.5 text-gray-900 transition-colors hover:bg-black hover:text-white dark:border-gray-800 dark:bg-black dark:text-white dark:hover:bg-white dark:hover:text-black">
+                                <User className="h-4 w-4" />
+                                <span className="text-xs font-bold uppercase tracking-tight hidden sm:inline">{user.name}</span>
+                                <ChevronDown className="h-3 w-3 transition-transform group-hover:rotate-180" />
+                            </button>
 
-                        <div className="absolute right-0 top-full pt-2 w-64 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform origin-top-right scale-95 group-hover:scale-100">
-                            <div className="rounded-xl border border-gray-100 bg-white p-1 shadow-2xl ring-1 ring-black ring-opacity-5 dark:border-zinc-800 dark:bg-zinc-900">
-                                <DropdownItem href="/account" icon={User} label="My Profile" />
-                                <DropdownItem href="/account/orders" icon={Package} label="Orders" />
-                                <DropdownItem href="/account/wishlist" icon={Heart} label="Wishlist" badge={wishlist.length > 0 ? wishlist.length.toString() : undefined} />
-                                <DropdownItem href="/account/coupons" icon={Tag} label="Coupons" />
-                                <DropdownItem href="/account/gift-cards" icon={CreditCard} label="Gift Cards" />
-                                <DropdownItem href="/account/notifications" icon={Bell} label="Notifications" />
-                                <div className="my-1 border-t border-gray-100 dark:border-zinc-800"></div>
-                                <button className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-red-600 transition-colors hover:bg-red-50 dark:hover:bg-red-900/10">
-                                    <LogOut className="h-4 w-4" />
-                                    Logout
-                                </button>
+                            <div className="absolute right-0 top-full pt-2 w-64 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform origin-top-right scale-95 group-hover:scale-100">
+                                <div className="rounded-xl border border-gray-100 bg-white p-1 shadow-2xl ring-1 ring-black ring-opacity-5 dark:border-zinc-800 dark:bg-zinc-900">
+                                    <DropdownItem href="/account" icon={User} label="My Profile" />
+                                    <DropdownItem href="/account/orders" icon={Package} label="Orders" />
+                                    <DropdownItem href="/account/wishlist" icon={Heart} label="Wishlist" badge={wishlist.length > 0 ? wishlist.length.toString() : undefined} />
+                                    <DropdownItem href="/account/coupons" icon={Tag} label="Coupons" />
+                                    <DropdownItem href="/account/gift-cards" icon={CreditCard} label="Gift Cards" />
+                                    <DropdownItem href="/account/notifications" icon={Bell} label="Notifications" />
+                                    <div className="my-1 border-t border-gray-100 dark:border-zinc-800"></div>
+                                    <button
+                                        onClick={logout}
+                                        className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-red-600 transition-colors hover:bg-red-50 dark:hover:bg-red-900/10"
+                                    >
+                                        <LogOut className="h-4 w-4" />
+                                        Logout
+                                    </button>
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    ) : (
+                        <Link href="/login" className="flex items-center gap-1.5 rounded-full border border-gray-200 bg-white px-3 py-1.5 text-gray-900 transition-colors hover:bg-black hover:text-white dark:border-gray-800 dark:bg-black dark:text-white dark:hover:bg-white dark:hover:text-black">
+                            <User className="h-4 w-4" />
+                            <span className="text-xs font-black uppercase tracking-widest hidden sm:inline">Login</span>
+                        </Link>
+                    )}
 
                     <Link
                         href="/cart"
@@ -182,25 +192,48 @@ export default function Navbar() {
                             </div>
 
                             <div className="mt-auto pt-12 border-t border-zinc-100 dark:border-zinc-800 space-y-6">
-                                <div className="flex items-center gap-4">
-                                    <div className="h-10 w-10 overflow-hidden rounded-full bg-zinc-100 dark:bg-zinc-900 flex items-center justify-center">
-                                        <User className="h-5 w-5 text-zinc-400" />
-                                    </div>
-                                    <div>
-                                        <p className="text-sm font-black uppercase tracking-tight text-black dark:text-white">Rishi</p>
-                                        <p className="text-[10px] font-bold text-zinc-400">Premium Member</p>
-                                    </div>
-                                </div>
-                                <div className="grid grid-cols-2 gap-4">
-                                    <Link href="/account/orders" onClick={() => setIsMenuOpen(false)} className="flex flex-col items-center justify-center rounded-xl bg-zinc-50 p-4 dark:bg-zinc-900 border border-transparent hover:border-black dark:hover:border-white transition-all">
-                                        <Package className="h-5 w-5 mb-2" />
-                                        <span className="text-[10px] font-black uppercase tracking-widest">Orders</span>
+                                {user ? (
+                                    <>
+                                        <div className="flex items-center gap-4">
+                                            <div className="h-10 w-10 overflow-hidden rounded-full bg-zinc-100 dark:bg-zinc-900 flex items-center justify-center">
+                                                <User className="h-5 w-5 text-zinc-400" />
+                                            </div>
+                                            <div>
+                                                <p className="text-sm font-black uppercase tracking-tight text-black dark:text-white">{user.name}</p>
+                                                <p className="text-[10px] font-bold text-zinc-400">Premium Member</p>
+                                            </div>
+                                        </div>
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <Link href="/account/orders" onClick={() => setIsMenuOpen(false)} className="flex flex-col items-center justify-center rounded-xl bg-zinc-50 p-4 dark:bg-zinc-900 border border-transparent hover:border-black dark:hover:border-white transition-all">
+                                                <Package className="h-5 w-5 mb-2" />
+                                                <span className="text-[10px] font-black uppercase tracking-widest">Orders</span>
+                                            </Link>
+                                            <Link href="/account/wishlist" onClick={() => setIsMenuOpen(false)} className="flex flex-col items-center justify-center rounded-xl bg-zinc-50 p-4 dark:bg-zinc-900 border border-transparent hover:border-black dark:hover:border-white transition-all">
+                                                <Heart className="h-5 w-5 mb-2" />
+                                                <span className="text-[10px] font-black uppercase tracking-widest">Saved</span>
+                                            </Link>
+                                        </div>
+                                        <button
+                                            onClick={() => {
+                                                logout();
+                                                setIsMenuOpen(false);
+                                            }}
+                                            className="w-full flex items-center justify-center gap-2 py-4 text-[10px] font-black uppercase tracking-widest text-red-500 bg-red-50 dark:bg-red-950/20 rounded-xl"
+                                        >
+                                            <LogOut className="h-4 w-4" />
+                                            Terminate Session
+                                        </button>
+                                    </>
+                                ) : (
+                                    <Link
+                                        href="/login"
+                                        onClick={() => setIsMenuOpen(false)}
+                                        className="flex items-center justify-center gap-3 w-full bg-black text-white dark:bg-white dark:text-black py-5 rounded-xl text-xs font-black uppercase tracking-[0.2em]"
+                                    >
+                                        <User className="h-5 w-5" />
+                                        Authenticate
                                     </Link>
-                                    <Link href="/account/wishlist" onClick={() => setIsMenuOpen(false)} className="flex flex-col items-center justify-center rounded-xl bg-zinc-50 p-4 dark:bg-zinc-900 border border-transparent hover:border-black dark:hover:border-white transition-all">
-                                        <Heart className="h-5 w-5 mb-2" />
-                                        <span className="text-[10px] font-black uppercase tracking-widest">Saved</span>
-                                    </Link>
-                                </div>
+                                )}
                             </div>
                         </div>
                     </div>
