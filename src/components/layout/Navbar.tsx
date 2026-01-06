@@ -7,7 +7,7 @@ import { useState, useEffect, useRef } from "react";
 import Logo from "@/components/common/Logo";
 import { useStore } from "@/context/StoreContext";
 import { products } from "@/data/mockData";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 
 export default function Navbar() {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -15,6 +15,7 @@ export default function Navbar() {
     const [mounted, setMounted] = useState(false);
     const { wishlist, cart, user, logout } = useStore();
     const router = useRouter();
+    const pathname = usePathname();
 
     // Search State
     const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -112,7 +113,9 @@ export default function Navbar() {
                         <div className="relative group z-50">
                             <button className="flex items-center gap-1.5 rounded-full border border-gray-200 bg-white px-3 py-1.5 text-gray-900 transition-colors hover:bg-black hover:text-white dark:border-gray-800 dark:bg-black dark:text-white dark:hover:bg-white dark:hover:text-black">
                                 <User className="h-4 w-4" />
-                                <span className="text-xs font-bold uppercase tracking-tight hidden sm:inline">{user.name}</span>
+                                <span className="text-xs font-bold uppercase tracking-tight hidden sm:inline">
+                                    {user.user_metadata?.full_name?.split(' ')[0] || user.email?.split('@')[0] || "Agent"}
+                                </span>
                                 <ChevronDown className="h-3 w-3 transition-transform group-hover:rotate-180" />
                             </button>
 
@@ -136,7 +139,7 @@ export default function Navbar() {
                             </div>
                         </div>
                     ) : (
-                        <Link href="/login" className="flex items-center gap-1.5 rounded-full border border-gray-200 bg-white px-3 py-1.5 text-gray-900 transition-colors hover:bg-black hover:text-white dark:border-gray-800 dark:bg-black dark:text-white dark:hover:bg-white dark:hover:text-black">
+                        <Link href={`/login?next=${pathname}`} className="flex items-center gap-1.5 rounded-full border border-gray-200 bg-white px-3 py-1.5 text-gray-900 transition-colors hover:bg-black hover:text-white dark:border-gray-800 dark:bg-black dark:text-white dark:hover:bg-white dark:hover:text-black">
                             <User className="h-4 w-4" />
                             <span className="text-xs font-black uppercase tracking-widest hidden sm:inline">Login</span>
                         </Link>
@@ -199,7 +202,9 @@ export default function Navbar() {
                                                 <User className="h-5 w-5 text-zinc-400" />
                                             </div>
                                             <div>
-                                                <p className="text-sm font-black uppercase tracking-tight text-black dark:text-white">{user.name}</p>
+                                                <p className="text-sm font-black uppercase tracking-tight text-black dark:text-white">
+                                                    {user.user_metadata?.full_name || user.email?.split('@')[0] || "Agent"}
+                                                </p>
                                                 <p className="text-[10px] font-bold text-zinc-400">Premium Member</p>
                                             </div>
                                         </div>

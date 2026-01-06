@@ -1,6 +1,8 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect } from "react";
+import { supabase } from "@/lib/supabase";
+import { User, Session } from "@supabase/supabase-js";
 
 interface Product {
     id: string | number;
@@ -12,19 +14,15 @@ interface Product {
     materials?: string[];
 }
 
-interface User {
-    id: string;
-    name: string;
-    email: string;
-}
-
 export interface Address {
     id: string;
     name: string;
     line1: string;
     line2?: string;
+    landmark?: string;
     city: string;
     state: string;
+    country: string;
     zip: string;
     phone: string;
     isDefault?: boolean;
@@ -49,10 +47,10 @@ interface StoreContextType {
     deleteAddress: (id: string) => void;
     selectAddress: (id: string) => void;
 
-    // Auth Actions (Mock)
+    // Auth Actions
     user: User | null;
-    login: (name: string) => void;
-    logout: () => void;
+    session: Session | null;
+    logout: () => Promise<void>;
 }
 
 const StoreContext = createContext<StoreContextType | undefined>(undefined);
@@ -63,6 +61,24 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     const [addresses, setAddresses] = useState<Address[]>([]);
     const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null);
     const [user, setUser] = useState<User | null>(null);
+    const [session, setSession] = useState<Session | null>(null);
+
+    // Initial session and auth listener
+    useEffect(() => {
+        // Get initial session
+        supabase.auth.getSession().then(({ data: { session } }) => {
+            setSession(session);
+            setUser(session?.user ?? null);
+        });
+
+        // Listen for changes
+        const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+            setSession(session);
+            setUser(session?.user ?? null);
+        });
+
+        return () => subscription.unsubscribe();
+    }, []);
 
     // Persist to localStorage
     useEffect(() => {
@@ -70,13 +86,11 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         const savedCart = localStorage.getItem("cart");
         const savedAddresses = localStorage.getItem("addresses");
         const savedSelectedId = localStorage.getItem("selectedAddressId");
-        const savedUser = localStorage.getItem("user");
 
         if (savedWishlist) setWishlist(JSON.parse(savedWishlist));
         if (savedCart) setCart(JSON.parse(savedCart));
         if (savedAddresses) setAddresses(JSON.parse(savedAddresses));
         if (savedSelectedId) setSelectedAddressId(savedSelectedId);
-        if (savedUser) setUser(JSON.parse(savedUser));
     }, []);
 
     useEffect(() => {
@@ -96,14 +110,6 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
             localStorage.setItem("selectedAddressId", selectedAddressId);
         }
     }, [selectedAddressId]);
-
-    useEffect(() => {
-        if (user) {
-            localStorage.setItem("user", JSON.stringify(user));
-        } else {
-            localStorage.removeItem("user");
-        }
-    }, [user]);
 
     const toggleWishlist = (product: Product) => {
         setWishlist((prev) => {
@@ -186,17 +192,9 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         setSelectedAddressId(id);
     };
 
-    const login = (name: string) => {
-        const mockUser: User = {
-            id: "1",
-            name: name,
-            email: "user@example.com"
-        };
-        setUser(mockUser);
-    };
-
-    const logout = () => {
-        setUser(null);
+    const logout = async () => {
+        await supabase.auth.signOut();
+        window.location.href = "/";
     };
 
     return (
@@ -217,7 +215,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
             deleteAddress,
             selectAddress,
             user,
-            login,
+            session,
             logout
         }}>
             {children}

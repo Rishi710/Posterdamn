@@ -1,21 +1,81 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
-import { ArrowLeft, Mail, Smartphone, ArrowRight, ShieldCheck } from "lucide-react";
+import { useState, useEffect, Suspense } from "react";
+import { ArrowLeft, Mail, Smartphone, ArrowRight, ShieldCheck, AlertCircle, Eye, EyeOff } from "lucide-react";
+import { supabase } from "@/lib/supabase";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useStore } from "@/context/StoreContext";
-import { useRouter } from "next/navigation";
 
-export default function LoginPage() {
-    const [authMethod, setAuthMethod] = useState<"email" | "phone">("email");
-    const { login } = useStore();
+function LoginContent() {
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [showPassword, setShowPassword] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
     const router = useRouter();
+    const searchParams = useSearchParams();
+    const { user } = useStore();
 
-    const handleSubmit = (e: React.FormEvent) => {
+    // Get redirect path or default to home, preventing loops
+    let next = searchParams.get('next') || '/';
+    if (next.includes('/login') || next.includes('/auth')) {
+        next = '/';
+    }
+
+    useEffect(() => {
+        if (user) {
+            router.replace(next);
+        }
+    }, [user, router, next]);
+
+
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        // Mock login
-        login("Rishi");
-        router.push("/");
+        setLoading(true);
+        setError(null);
+
+        try {
+            const { error } = await supabase.auth.signInWithPassword({
+                email,
+                password,
+            });
+
+            if (error) {
+                setError(error.message);
+                setLoading(false);
+            } else {
+                router.push(next);
+            }
+        } catch (err: any) {
+            console.error("LOGIN_FETCH_ERROR:", err);
+            setError(err.message === "Failed to fetch"
+                ? "Connection Failed: Unable to reach the authentication server. Please check your internet or Supabase status."
+                : err.message || "An unexpected error occurred.");
+            setLoading(false);
+        }
+    };
+
+    const handleGoogleSignIn = async () => {
+        setLoading(true);
+        try {
+            const { error } = await supabase.auth.signInWithOAuth({
+                provider: 'google',
+                options: {
+                    redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}`,
+                }
+            });
+            if (error) {
+                setError(error.message);
+                setLoading(false);
+            }
+        } catch (err: any) {
+            console.error("GOOGLE_SIGNIN_FETCH_ERROR:", err);
+            setError(err.message === "Failed to fetch"
+                ? "Connection Failed: Could not initialize Google Sign-in. Please ensure you are online."
+                : err.message || "OAuth initialization failed.");
+            setLoading(false);
+        }
     };
 
     return (
@@ -68,71 +128,62 @@ export default function LoginPage() {
                         <div className="mb-12">
                             <h1 className="text-5xl font-black italic tracking-tighter text-black dark:text-white uppercase">Sign In</h1>
                             <p className="mt-4 text-xs font-bold uppercase tracking-widest text-zinc-400">
-                                New Courier? <Link href="/signup" className="text-black dark:text-white underline underline-offset-4 hover:opacity-50">Create Identity</Link>
+                                New User? <Link href="/signup" className="text-black dark:text-white underline underline-offset-4 hover:opacity-50">Create Identity</Link>
                             </p>
                         </div>
 
-                        {/* Auth Method Switch */}
-                        <div className="mb-8 flex border border-zinc-100 dark:border-zinc-800 p-1">
-                            <button
-                                onClick={() => setAuthMethod("email")}
-                                className={`flex flex-1 items-center justify-center gap-2 py-3 text-[10px] font-black uppercase tracking-widest transition-all ${authMethod === "email" ? "bg-black text-white dark:bg-white dark:text-black" : "text-zinc-400 hover:text-black dark:hover:text-white"}`}
-                            >
-                                Email
-                            </button>
-                            <button
-                                onClick={() => setAuthMethod("phone")}
-                                className={`flex flex-1 items-center justify-center gap-2 py-3 text-[10px] font-black uppercase tracking-widest transition-all ${authMethod === "phone" ? "bg-black text-white dark:bg-white dark:text-black" : "text-zinc-400 hover:text-black dark:hover:text-white"}`}
-                            >
-                                OTP
-                            </button>
-                        </div>
+                        {/* Error Message */}
+                        {error && (
+                            <div className="mb-6 flex items-center gap-2 rounded-lg bg-red-50 p-4 text-[10px] font-black uppercase tracking-widest text-red-600 dark:bg-red-950/20">
+                                <AlertCircle className="h-4 w-4" />
+                                {error}
+                            </div>
+                        )}
 
-                        {authMethod === "email" ? (
-                            <form onSubmit={handleSubmit} className="space-y-6">
-                                <div className="space-y-1">
-                                    <label className="text-[10px] font-black uppercase tracking-widest text-zinc-400">Terminal ID (Email)</label>
+                        <form onSubmit={handleSubmit} className="space-y-6">
+                            <div className="space-y-1">
+                                <label className="text-[10px] font-black uppercase tracking-widest text-zinc-400">Terminal ID (Email)</label>
+                                <input
+                                    type="email"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                    required
+                                    className="w-full border-b-2 border-zinc-100 bg-transparent py-4 text-sm font-bold outline-none focus:border-black dark:border-zinc-800 dark:text-white dark:focus:border-white transition-colors"
+                                    placeholder=""
+                                />
+                            </div>
+                            <div className="space-y-1 relative">
+                                <label className="text-[10px] font-black uppercase tracking-widest text-zinc-400">Access Key (Password)</label>
+                                <div className="relative">
                                     <input
-                                        type="email"
-                                        className="w-full border-b-2 border-zinc-100 bg-transparent py-4 text-sm font-bold outline-none focus:border-black dark:border-zinc-800 dark:text-white dark:focus:border-white transition-colors"
-                                        placeholder="courier@posterdamn.xyz"
+                                        type={showPassword ? "text" : "password"}
+                                        value={password}
+                                        onChange={(e) => setPassword(e.target.value)}
+                                        required
+                                        className="w-full border-b-2 border-zinc-100 bg-transparent py-4 text-sm font-bold outline-none focus:border-black dark:border-zinc-800 dark:text-white dark:focus:border-white transition-colors pr-10"
+                                        placeholder=""
                                     />
-                                </div>
-                                <div className="space-y-1">
-                                    <label className="text-[10px] font-black uppercase tracking-widest text-zinc-400">Access Key (Password)</label>
-                                    <input
-                                        type="password"
-                                        className="w-full border-b-2 border-zinc-100 bg-transparent py-4 text-sm font-bold outline-none focus:border-black dark:border-zinc-800 dark:text-white dark:focus:border-white transition-colors"
-                                        placeholder="••••••••"
-                                    />
-                                </div>
-                                <div className="flex justify-end">
-                                    <button type="button" className="text-[10px] font-black uppercase tracking-widest text-zinc-400 hover:text-black dark:hover:text-white underline underline-offset-4">
-                                        Lost Password?
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowPassword(!showPassword)}
+                                        className="absolute right-0 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-black dark:hover:text-white"
+                                    >
+                                        {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                                     </button>
                                 </div>
-                                <button className="w-full bg-black py-5 text-xs font-black uppercase tracking-[0.2em] text-white shadow-2xl transition-all hover:bg-zinc-800 active:scale-95 dark:bg-white dark:text-black dark:hover:bg-zinc-200">
-                                    Authenticate
-                                </button>
-                            </form>
-                        ) : (
-                            <form onSubmit={handleSubmit} className="space-y-6">
-                                <div className="space-y-1">
-                                    <label className="text-[10px] font-black uppercase tracking-widest text-zinc-400">Secure Line (Phone)</label>
-                                    <div className="flex items-center border-b-2 border-zinc-100 dark:border-zinc-800 focus-within:border-black dark:focus-within:border-white transition-colors">
-                                        <span className="pr-4 text-xs font-bold text-zinc-400">IN +91</span>
-                                        <input
-                                            type="tel"
-                                            className="flex-1 bg-transparent py-4 text-sm font-bold outline-none dark:text-white"
-                                            placeholder="98765 43210"
-                                        />
-                                    </div>
-                                </div>
-                                <button className="flex w-full items-center justify-center gap-3 bg-black py-5 text-xs font-black uppercase tracking-[0.2em] text-white shadow-2xl transition-all hover:bg-zinc-800 active:scale-95 dark:bg-white dark:text-black dark:hover:bg-zinc-200">
-                                    Transmit OTP <ArrowRight className="h-4 w-4" />
-                                </button>
-                            </form>
-                        )}
+                            </div>
+                            <div className="flex justify-end">
+                                <Link href="/forgot-password" title="Recover Access Key" className="text-[10px] font-black uppercase tracking-widest text-zinc-400 hover:text-black dark:hover:text-white underline underline-offset-4 transition-colors">
+                                    Lost Password?
+                                </Link>
+                            </div>
+                            <button
+                                disabled={loading}
+                                className="w-full bg-black py-5 text-xs font-black uppercase tracking-[0.2em] text-white shadow-2xl transition-all hover:bg-zinc-800 active:scale-95 disabled:opacity-50 dark:bg-white dark:text-black dark:hover:bg-zinc-200"
+                            >
+                                {loading ? "Transmitting..." : "Authenticate"}
+                            </button>
+                        </form>
 
                         {/* Socials */}
                         <div className="mt-12">
@@ -142,8 +193,9 @@ export default function LoginPage() {
                                 <div className="flex-grow border-t border-zinc-100 dark:border-zinc-800"></div>
                             </div>
                             <button
-                                onClick={handleSubmit}
-                                className="flex w-full items-center justify-center gap-4 border border-zinc-100 py-4 text-[10px] font-black uppercase tracking-widest text-black transition-all hover:bg-zinc-50 dark:border-zinc-800 dark:text-white dark:hover:bg-zinc-900"
+                                onClick={handleGoogleSignIn}
+                                disabled={loading}
+                                className="flex w-full items-center justify-center gap-4 border border-zinc-100 py-4 text-[10px] font-black uppercase tracking-widest text-black transition-all hover:bg-zinc-50 disabled:opacity-50 dark:border-zinc-800 dark:text-white dark:hover:bg-zinc-900"
                             >
                                 <svg className="h-4 w-4" viewBox="0 0 24 24">
                                     <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
@@ -171,3 +223,12 @@ export default function LoginPage() {
         </div>
     );
 }
+
+export default function LoginPage() {
+    return (
+        <Suspense fallback={<div>Loading...</div>}>
+            <LoginContent />
+        </Suspense>
+    );
+}
+
