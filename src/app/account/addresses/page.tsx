@@ -270,13 +270,62 @@ export default function AddressesPage() {
 
         setIsCheckingZip(true);
         setZipError(false);
-        try {
-            // Encode parameters to prevent malformed URLs
-            const safeCountry = encodeURIComponent(country.toLowerCase());
-            const safeZip = encodeURIComponent(zip.trim());
 
-            const response = await fetch(`https://api.zippopotam.us/${safeCountry}/${safeZip}`, {
-                // Add a timeout or signal if needed, but for now just basic fetch
+        try {
+            const safeZip = zip.trim();
+
+            // For Indian PIN codes (6 digits), use India Post API
+            if (country === 'IN' && /^\d{6}$/.test(safeZip)) {
+                try {
+                    const response = await fetch(`https://api.postalpincode.in/pincode/${safeZip}`);
+                    const data = await response.json();
+
+                    if (data && data[0] && data[0].Status === 'Success' && data[0].PostOffice && data[0].PostOffice.length > 0) {
+                        const postOffice = data[0].PostOffice[0];
+                        const stateName = postOffice.State;
+                        const cityName = postOffice.District || postOffice.Name;
+
+                        // Find matching state
+                        const allStates = State.getStatesOfCountry('IN');
+                        const matchedState = allStates.find(s =>
+                            s.name.toLowerCase() === stateName.toLowerCase()
+                        );
+
+                        const stateCode = matchedState ? matchedState.isoCode : stateName;
+
+                        setFormData(prev => ({
+                            ...prev,
+                            city: cityName,
+                            state: stateCode
+                        }));
+
+                        // Load cities for the state
+                        if (matchedState) {
+                            const newCities = City.getCitiesOfState('IN', matchedState.isoCode);
+                            setCities(newCities);
+                        }
+
+                        setZipError(false);
+                        setIsCheckingZip(false);
+                        return;
+                    } else {
+                        setZipError(true);
+                        setIsCheckingZip(false);
+                        return;
+                    }
+                } catch (err) {
+                    console.warn('India Post API error:', err);
+                    setZipError(true);
+                    setIsCheckingZip(false);
+                    return;
+                }
+            }
+
+            // Fallback to Zippopotam for other countries
+            const safeCountry = encodeURIComponent(country.toLowerCase());
+            const encodedZip = encodeURIComponent(safeZip);
+
+            const response = await fetch(`https://api.zippopotam.us/${safeCountry}/${encodedZip}`, {
                 method: 'GET',
                 mode: 'cors',
             });
@@ -312,7 +361,6 @@ export default function AddressesPage() {
                 setZipError(true);
             }
         } catch (err) {
-            // Silently catch network errors to avoid crashing the UI
             console.warn("ZIP Lookup Network Error:", err);
             setZipError(true);
         } finally {

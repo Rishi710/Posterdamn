@@ -1,49 +1,262 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import Link from "next/link";
-import { ChevronLeft, Plus, MapPin, Edit2, Check, Trash2 } from "lucide-react";
+import { ChevronLeft, Plus, MapPin, Edit2, Trash2 } from "lucide-react";
 import { useStore, Address } from "@/context/StoreContext";
+import { Country, State, City } from "country-state-city";
+import SearchableSelect from "@/components/ui/SearchableSelect";
 
 export default function CheckoutPage() {
-    const { cart, addresses, selectedAddressId, addAddress, updateAddress, deleteAddress, selectAddress } = useStore();
+    const {
+        cart,
+        addresses,
+        selectedAddressId,
+        addAddress,
+        updateAddress,
+        deleteAddress,
+        selectAddress,
+        placeOrder,
+        user
+    } = useStore();
+
     const [isAddingNew, setIsAddingNew] = useState(false);
     const [editingAddressId, setEditingAddressId] = useState<string | null>(null);
+    const [isPlacing, setIsPlacing] = useState(false);
+    const [countries] = useState(Country.getAllCountries());
+    const [states, setStates] = useState<any[]>([]);
+    const [cities, setCities] = useState<any[]>([]);
+    const [isCheckingZip, setIsCheckingZip] = useState(false);
+    const [zipError, setZipError] = useState(false);
+    const lookupTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-    // Form State
-    const [formData, setFormData] = useState<Omit<Address, "id">>({
-        name: "",
-        line1: "",
-        line2: "",
+    // Form State - matching account/addresses structure
+    const [formData, setFormData] = useState({
+        type: "Home",
+        firstName: "",
+        lastName: "",
+        street: "",
+        landmark: "",
         city: "",
         state: "",
+        country: "IN", // ISO code
         zip: "",
         phone: ""
     });
 
+    // Initialize states when country is set
+    React.useEffect(() => {
+        if (formData.country) {
+            const countryStates = State.getStatesOfCountry(formData.country);
+            setStates(countryStates);
+
+            // If state is set, load cities
+            if (formData.state) {
+                const stateObj = countryStates.find(s => s.name === formData.state);
+                if (stateObj) {
+                    setCities(City.getCitiesOfState(formData.country, stateObj.isoCode));
+                }
+            }
+        }
+    }, [formData.country, formData.state]);
+
     const subtotal = cart.reduce((acc, item) => acc + item.discountedPrice, 0);
-    // Note: Re-calculating discount logic here since it's locally handled in Cart. 
-    // In a real app, this should be in context. For this demo, we'll assume POST10 is applied if valid.
     const discount = 0; // Placeholder
     const shipping = subtotal > 1500 ? 0 : 99;
     const total = subtotal - discount + shipping;
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+
+        // Convert form data to Address format
+        const addressData = {
+            name: `${formData.firstName} ${formData.lastName}`.trim(),
+            street: formData.street,
+            landmark: formData.landmark,
+            city: formData.city,
+            state: formData.state,
+            country: formData.country,
+            zip: formData.zip,
+            phone: formData.phone
+        };
+
         if (editingAddressId) {
-            updateAddress(editingAddressId, formData);
+            await updateAddress(editingAddressId, addressData);
             setEditingAddressId(null);
         } else {
-            addAddress(formData);
+            const newId = await addAddress(addressData);
+            selectAddress(newId);
             setIsAddingNew(false);
         }
-        setFormData({ name: "", line1: "", line2: "", city: "", state: "", zip: "", phone: "" });
+        setFormData({ type: "Home", firstName: "", lastName: "", street: "", landmark: "", city: "", state: "", country: "IN", zip: "", phone: "" });
+    };
+
+    // ZIP Code Validation with India Post API for Indian PIN codes
+    const fetchLocationFromZip = async (zip: string, countryCode?: string) => {
+        if (!zip || zip.length < 3) {
+            setZipError(false);
+            return;
+        }
+
+        setIsCheckingZip(true);
+        setZipError(false);
+
+        try {
+            const safeZip = zip.trim();
+
+            // For Indian PIN codes (6 digits), use India Post API
+            if ((!countryCode || countryCode === 'IN') && /^\d{6}$/.test(safeZip)) {
+                try {
+                    const response = await fetch(`https://api.postalpincode.in/pincode/${safeZip}`);
+                    const data = await response.json();
+
+                    if (data && data[0] && data[0].Status === 'Success' && data[0].PostOffice && data[0].PostOffice.length > 0) {
+                        const postOffice = data[0].PostOffice[0];
+
+                        // Find India in countries
+                        const india = countries.find(c => c.isoCode === 'IN');
+                        if (india) {
+                            // Load states for India
+                            const newStates = State.getStatesOfCountry('IN');
+                            setStates(newStates);
+
+                            // Find matching state
+                            const stateName = postOffice.State;
+                            const foundState = newStates.find(s =>
+                                s.name.toLowerCase() === stateName.toLowerCase()
+                            );
+
+                            if (foundState) {
+                                // Load cities for this state
+                                const newCities = City.getCitiesOfState('IN', foundState.isoCode);
+                                setCities(newCities);
+                            }
+
+                            // Update form data
+                            setFormData(prev => ({
+                                ...prev,
+                                country: 'IN',
+                                state: stateName,
+                                city: postOffice.District || postOffice.Name,
+                                zip: safeZip
+                            }));
+
+                            setZipError(false);
+                            setIsCheckingZip(false);
+                            return;
+                        }
+                    }
+                } catch (err) {
+                    console.error('India Post API error:', err);
+                }
+            }
+
+            // Fallback to Zippopotam for other countries
+            const countriesToTry = countryCode ? [countryCode.toLowerCase()] : ['us', 'gb', 'ca', 'au'];
+
+            for (const country of countriesToTry) {
+                try {
+                    const response = await fetch(`https://api.zippopotam.us/${country}/${safeZip}`);
+
+                    if (response.ok) {
+                        const data = await response.json();
+                        if (data && data.places && data.places.length > 0) {
+                            const place = data.places[0];
+                            const countryName = data['country abbreviation'];
+
+                            const foundCountry = countries.find(c => c.isoCode === countryName.toUpperCase());
+
+                            if (foundCountry) {
+                                const newStates = State.getStatesOfCountry(foundCountry.isoCode);
+                                setStates(newStates);
+
+                                const stateName = place['state'];
+                                const foundState = newStates.find(s =>
+                                    s.name.toLowerCase() === stateName.toLowerCase() ||
+                                    s.isoCode === place['state abbreviation']
+                                );
+
+                                if (foundState) {
+                                    const newCities = City.getCitiesOfState(foundCountry.isoCode, foundState.isoCode);
+                                    setCities(newCities);
+                                }
+
+                                setFormData(prev => ({
+                                    ...prev,
+                                    country: foundCountry.isoCode,
+                                    state: stateName,
+                                    city: place['place name'] || prev.city,
+                                    zip: safeZip
+                                }));
+
+                                setZipError(false);
+                                setIsCheckingZip(false);
+                                return;
+                            }
+                        }
+                    }
+                } catch (err) {
+                    continue;
+                }
+            }
+
+            // If we get here, no valid ZIP was found
+            setZipError(true);
+        } catch (error) {
+            console.error('ZIP lookup error:', error);
+            setZipError(true);
+        } finally {
+            setIsCheckingZip(false);
+        }
+    };
+
+    const handleZipChange = (value: string) => {
+        setFormData({ ...formData, zip: value });
+
+        if (lookupTimeoutRef.current) {
+            clearTimeout(lookupTimeoutRef.current);
+        }
+
+        // For Indian PIN codes, check after 6 digits
+        const minLength = /^\d{6}$/.test(value) ? 6 : 5;
+
+        if (value.length >= minLength) {
+            lookupTimeoutRef.current = setTimeout(() => {
+                fetchLocationFromZip(value, formData.country || undefined);
+            }, 800);
+        } else {
+            setZipError(false);
+        }
     };
 
     const handleEdit = (addr: Address) => {
-        setFormData({ ...addr });
+        const nameParts = addr.name.split(" ");
+        setFormData({
+            type: "Home",
+            firstName: nameParts[0] || "",
+            lastName: nameParts.slice(1).join(" ") || "",
+            street: addr.street,
+            landmark: addr.landmark || "",
+            city: addr.city,
+            state: addr.state,
+            country: addr.country,
+            zip: addr.zip,
+            phone: addr.phone
+        });
         setEditingAddressId(addr.id);
         setIsAddingNew(true);
+    };
+
+    const handlePlaceOrder = async () => {
+        setIsPlacing(true);
+        const result = await placeOrder();
+        setIsPlacing(false);
+
+        if (result.success) {
+            window.location.href = `/checkout/success?id=${result.orderId}`;
+        } else {
+            alert(result.error || "Failed to place order. Please try again.");
+        }
     };
 
     return (
@@ -70,7 +283,7 @@ export default function CheckoutPage() {
                                 <button
                                     onClick={() => {
                                         setEditingAddressId(null);
-                                        setFormData({ name: "", line1: "", line2: "", city: "", state: "", zip: "", phone: "" });
+                                        setFormData({ type: "Home", firstName: "", lastName: "", street: "", landmark: "", city: "", state: "", country: "IN", zip: "", phone: "" });
                                         setIsAddingNew(true);
                                     }}
                                     className="flex items-center gap-2 text-xs font-black uppercase tracking-widest text-black dark:text-white hover:opacity-50 transition-opacity"
@@ -86,17 +299,70 @@ export default function CheckoutPage() {
                                     {editingAddressId ? "Edit Address" : "New Shipping Address"}
                                 </h3>
                                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-                                    <FormInput label="Full Name" value={formData.name} onChange={(v) => setFormData({ ...formData, name: v })} placeholder="John Doe" />
+                                    <FormInput label="First Name" value={formData.firstName} onChange={(v) => setFormData({ ...formData, firstName: v })} placeholder="John" />
+                                    <FormInput label="Last Name" value={formData.lastName} onChange={(v) => setFormData({ ...formData, lastName: v })} placeholder="Doe" />
                                     <FormInput label="Phone Number" value={formData.phone} onChange={(v) => setFormData({ ...formData, phone: v })} placeholder="9876543210" />
                                     <div className="sm:col-span-2">
-                                        <FormInput label="Address Line 1" value={formData.line1} onChange={(v) => setFormData({ ...formData, line1: v })} placeholder="House No, Street Name" />
+                                        <FormInput label="Street Address" value={formData.street} onChange={(v) => setFormData({ ...formData, street: v })} placeholder="House No, Street Name" />
                                     </div>
                                     <div className="sm:col-span-2">
-                                        <FormInput label="Address Line 2 (Optional)" value={formData.line2 || ""} onChange={(v) => setFormData({ ...formData, line2: v })} placeholder="Apartment, Landmark" />
+                                        <FormInput label="Landmark / Area (Optional)" value={formData.landmark || ""} onChange={(v) => setFormData({ ...formData, landmark: v })} placeholder="Apartment, Landmark" />
                                     </div>
-                                    <FormInput label="City" value={formData.city} onChange={(v) => setFormData({ ...formData, city: v })} placeholder="Indore" />
-                                    <FormInput label="State" value={formData.state} onChange={(v) => setFormData({ ...formData, state: v })} placeholder="Madhya Pradesh" />
-                                    <FormInput label="ZIP / Postal Code" value={formData.zip} onChange={(v) => setFormData({ ...formData, zip: v })} placeholder="452001" />
+
+                                    {/* Country Dropdown */}
+                                    <div className="sm:col-span-2">
+                                        <SearchableSelect
+                                            options={countries.map(c => ({ value: c.isoCode, label: c.name }))}
+                                            value={formData.country}
+                                            onChange={(val) => {
+                                                setFormData({ ...formData, country: val, state: "", city: "" });
+                                                setStates(State.getStatesOfCountry(val));
+                                                setCities([]);
+                                            }}
+                                            placeholder="Select Country"
+                                            label="Country"
+                                        />
+                                    </div>
+
+                                    {/* State Dropdown */}
+                                    <SearchableSelect
+                                        options={states.map(s => ({ value: s.name, label: s.name }))}
+                                        value={formData.state}
+                                        onChange={(val) => {
+                                            setFormData({ ...formData, state: val, city: "" });
+                                            const selectedState = states.find(s => s.name === val);
+                                            if (selectedState) {
+                                                setCities(City.getCitiesOfState(formData.country, selectedState.isoCode));
+                                            }
+                                        }}
+                                        placeholder="Select State"
+                                        label="State"
+                                    />
+
+                                    {/* City Dropdown */}
+                                    <SearchableSelect
+                                        options={cities.map(c => ({ value: c.name, label: c.name }))}
+                                        value={formData.city}
+                                        onChange={(val) => setFormData({ ...formData, city: val })}
+                                        placeholder="Select City"
+                                        label="City"
+                                    />
+
+                                    {/* ZIP Code with Validation */}
+                                    <div className="relative">
+                                        <FormInput
+                                            label="ZIP / Postal Code"
+                                            value={formData.zip}
+                                            onChange={handleZipChange}
+                                            placeholder="452001"
+                                        />
+                                        {isCheckingZip && (
+                                            <div className="absolute right-3 top-9 text-xs text-zinc-400">Checking...</div>
+                                        )}
+                                        {zipError && (
+                                            <p className="mt-1 text-xs text-red-500">Invalid ZIP code</p>
+                                        )}
+                                    </div>
                                 </div>
                                 <div className="flex gap-4 pt-4">
                                     <button type="submit" className="flex-1 bg-black py-4 text-xs font-black uppercase tracking-widest text-white dark:bg-white dark:text-black hover:opacity-80 transition-opacity">
@@ -129,32 +395,42 @@ export default function CheckoutPage() {
                                         <div
                                             key={addr.id}
                                             onClick={() => selectAddress(addr.id)}
-                                            className={`group relative cursor-pointer border-2 p-5 transition-all ${selectedAddressId === addr.id ? 'border-black dark:border-white bg-zinc-50 dark:bg-zinc-900' : 'border-zinc-100 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-600'}`}
+                                            className={`group relative cursor-pointer border-2 p-6 transition-all rounded-lg ${selectedAddressId === addr.id
+                                                ? 'border-black dark:border-white bg-zinc-50 dark:bg-zinc-900'
+                                                : 'border-zinc-100 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-600'
+                                                }`}
                                         >
-                                            <div className="flex justify-between items-start mb-3">
-                                                <div className="flex h-5 w-5 items-center justify-center rounded-full border border-zinc-300">
+                                            <div className="flex justify-between items-start mb-4">
+                                                <div className="flex h-5 w-5 items-center justify-center rounded-full border-2 border-zinc-300 dark:border-zinc-700">
                                                     {selectedAddressId === addr.id && <div className="h-2.5 w-2.5 rounded-full bg-black dark:bg-white" />}
                                                 </div>
                                                 <div className="flex gap-1">
                                                     <button
                                                         onClick={(e) => { e.stopPropagation(); handleEdit(addr); }}
                                                         className="p-2 text-zinc-400 hover:text-black dark:hover:text-white transition-colors"
+                                                        aria-label="Edit address"
                                                     >
                                                         <Edit2 className="h-4 w-4" />
                                                     </button>
                                                     <button
                                                         onClick={(e) => { e.stopPropagation(); deleteAddress(addr.id); }}
                                                         className="p-2 text-zinc-400 hover:text-red-500 transition-colors"
+                                                        aria-label="Delete address"
                                                     >
                                                         <Trash2 className="h-4 w-4" />
                                                     </button>
                                                 </div>
                                             </div>
-                                            <p className="text-sm font-black uppercase tracking-tight text-black dark:text-white">{addr.name}</p>
-                                            <p className="mt-1 text-xs font-medium text-zinc-500 leading-relaxed">
-                                                {addr.line1}, {addr.line2 && `${addr.line2}, `}{addr.city}, {addr.state} - {addr.zip}
+                                            <p className="text-sm font-black uppercase tracking-tight text-black dark:text-white mb-2">{addr.name}</p>
+                                            <p className="text-xs font-medium text-zinc-600 dark:text-zinc-400 leading-relaxed">
+                                                {addr.street}
+                                                {addr.landmark && <>, {addr.landmark}</>}
+                                                <br />
+                                                {addr.city}, {addr.state} - {addr.zip}
+                                                <br />
+                                                {addr.country}
                                             </p>
-                                            <p className="mt-3 text-[10px] font-black uppercase tracking-widest text-zinc-400">{addr.phone}</p>
+                                            <p className="mt-3 text-[10px] font-black uppercase tracking-widest text-zinc-400">📞 {addr.phone}</p>
                                         </div>
                                     ))
                                 )}
@@ -162,15 +438,25 @@ export default function CheckoutPage() {
                         )}
                     </section>
 
-                    <section className="opacity-50 pointer-events-none">
+                    <section className={`${!selectedAddressId ? 'opacity-50 pointer-events-none' : 'opacity-100'} transition-opacity`}>
                         <div className="flex items-center justify-between border-b border-zinc-100 dark:border-zinc-800 pb-6 mb-8">
                             <h2 className="text-xl font-black uppercase tracking-widest text-black dark:text-white flex items-center gap-3">
-                                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-zinc-100 text-xs text-zinc-400 dark:bg-zinc-800 dark:text-zinc-500">2</span>
+                                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-black text-xs text-white dark:bg-white dark:text-black">2</span>
                                 Payment Method
                             </h2>
                         </div>
-                        <div className="bg-zinc-50 dark:bg-zinc-900 p-8 text-center text-xs font-bold uppercase tracking-widest text-zinc-400 border border-zinc-100 dark:border-zinc-800">
-                            Complete address selection to choose payment
+                        <div className="grid grid-cols-1 gap-4">
+                            <div className="bg-zinc-50 dark:bg-zinc-900 p-6 border-2 border-black dark:border-white">
+                                <div className="flex items-center gap-4">
+                                    <div className="h-4 w-4 rounded-full border border-zinc-300 flex items-center justify-center">
+                                        <div className="h-2 w-2 rounded-full bg-black dark:bg-white" />
+                                    </div>
+                                    <div>
+                                        <p className="text-sm font-black uppercase tracking-widest text-black dark:text-white">Cash on Delivery</p>
+                                        <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Pay when you receive your posters</p>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </section>
                 </div>
@@ -196,24 +482,37 @@ export default function CheckoutPage() {
                         </div>
 
                         <div className="space-y-4 border-t border-zinc-200 pt-8 dark:border-zinc-800">
-                            <SummaryRow label="Subtotal" value={`₹${subtotal}`} />
-                            <SummaryRow label="Shipping" value={shipping === 0 ? "FREE" : `₹${shipping}`} />
+                            <SummaryRow label="Subtotal" value={`₹${subtotal} `} />
+                            <SummaryRow label="Shipping" value={shipping === 0 ? "FREE" : `₹${shipping} `} />
                             <div className="flex justify-between text-xl font-black uppercase tracking-tighter pt-4 border-t border-zinc-200 dark:border-zinc-800">
                                 <span className="text-black dark:text-white">Total</span>
                                 <span className="text-black dark:text-white">₹{Math.round(total)}</span>
                             </div>
                         </div>
 
-                        <button
-                            disabled={!selectedAddressId}
-                            className={`flex w-full items-center justify-center gap-2 py-5 text-sm font-black uppercase tracking-[0.2em] transition-all ${selectedAddressId ? 'bg-black text-white hover:bg-zinc-800 dark:bg-white dark:text-black dark:hover:bg-zinc-200' : 'bg-zinc-200 text-zinc-400 cursor-not-allowed'}`}
-                        >
-                            Place Order
-                        </button>
+                        {user ? (
+                            <button
+                                disabled={!selectedAddressId || isPlacing}
+                                onClick={handlePlaceOrder}
+                                className={`flex w-full items-center justify-center gap-2 py-6 text-sm font-black uppercase tracking-[0.2em] transition-all ${selectedAddressId && !isPlacing
+                                        ? 'bg-black text-white hover:bg-zinc-800 dark:bg-white dark:text-black dark:hover:bg-zinc-200'
+                                        : 'bg-zinc-200 text-zinc-400 cursor-not-allowed dark:bg-zinc-800 dark:text-zinc-600'
+                                    }`}
+                            >
+                                {isPlacing ? "Processing..." : "Place Order"}
+                            </button>
+                        ) : (
+                            <Link
+                                href="/login?next=/checkout"
+                                className="flex w-full items-center justify-center gap-2 py-6 text-sm font-black uppercase tracking-[0.2em] bg-black text-white hover:bg-zinc-800 dark:bg-white dark:text-black dark:hover:bg-zinc-200 transition-all"
+                            >
+                                Login to Place Order
+                            </Link>
+                        )}
                     </div>
                 </div>
             </div>
-        </div>
+        </div >
     );
 }
 

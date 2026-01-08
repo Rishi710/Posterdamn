@@ -25,6 +25,9 @@ export default function AccountPage() {
     const [pwdLoading, setPwdLoading] = useState(false);
     const [pwdMessage, setPwdMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
 
+    // Recent Orders State
+    const [recentOrders, setRecentOrders] = useState<any[]>([]);
+
     useEffect(() => {
         if (!user && !session) {
             // Optional: redirect to login if not authenticated
@@ -47,8 +50,35 @@ export default function AccountPage() {
                 setPwdMessage({ type: 'success', text: "Password was reset successfully. Your identity is secure." });
                 window.history.replaceState({}, '', window.location.pathname);
             }
+
+            // Fetch recent orders
+            fetchRecentOrders();
         }
     }, [user, session, router]);
+
+    const fetchRecentOrders = async () => {
+        if (!user) return;
+        try {
+            const { data, error } = await supabase
+                .from('orders')
+                .select(`
+                    id,
+                    created_at,
+                    total_amount,
+                    status,
+                    order_items!inner(image)
+                `)
+                .eq('user_id', user.id)
+                .order('created_at', { ascending: false })
+                .limit(3);
+
+            if (!error && data) {
+                setRecentOrders(data);
+            }
+        } catch (err) {
+            console.error('Error fetching recent orders:', err);
+        }
+    };
 
     const handleUpdateProfile = async () => {
         setLoading(true);
@@ -307,26 +337,39 @@ export default function AccountPage() {
                         <h2 className="text-2xl font-black italic tracking-tighter uppercase text-black dark:text-white">Recent Orders</h2>
                         <p className="text-xs font-bold uppercase tracking-widest text-zinc-500 dark:text-zinc-400 mt-1">Your latest acquisitions</p>
                     </div>
-                    <button className="text-xs font-bold uppercase tracking-widest text-zinc-400 hover:text-black dark:hover:text-white transition-colors">
+                    <a href="/account/orders" className="text-xs font-bold uppercase tracking-widest text-zinc-400 hover:text-black dark:hover:text-white transition-colors">
                         View All
-                    </button>
+                    </a>
                 </div>
 
                 <div className="grid grid-cols-1 gap-6">
-                    <OrderCard
-                        id="#10234"
-                        date="Dec 20, 2024"
-                        status="Delivered"
-                        price="₹1,299"
-                        image="https://loremflickr.com/400/400/art,minimal"
-                    />
+                    {recentOrders.length === 0 ? (
+                        <div className="flex flex-col items-center justify-center py-12 border-2 border-dashed border-zinc-100 dark:border-zinc-800 rounded-lg">
+                            <p className="text-sm font-bold text-zinc-400 uppercase tracking-widest">No orders yet</p>
+                            <a href="/shop" className="mt-4 text-xs font-black uppercase tracking-widest text-black dark:text-white underline underline-offset-4">
+                                Start Shopping
+                            </a>
+                        </div>
+                    ) : (
+                        recentOrders.map((order) => (
+                            <OrderCard
+                                key={order.id}
+                                id={`#${order.id.slice(-8).toUpperCase()}`}
+                                date={new Date(order.created_at).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
+                                status={order.status.charAt(0).toUpperCase() + order.status.slice(1)}
+                                price={`₹${order.total_amount}`}
+                                image={order.order_items[0]?.image || 'https://loremflickr.com/400/400/art,minimal'}
+                                orderId={order.id}
+                            />
+                        ))
+                    )}
                 </div>
             </section>
         </div>
     );
 }
 
-function OrderCard({ id, date, status, price, image }: { id: string; date: string; status: string; price: string; image: string }) {
+function OrderCard({ id, date, status, price, image, orderId }: { id: string; date: string; status: string; price: string; image: string; orderId?: string }) {
     return (
         <div className="group flex flex-col gap-6 border border-zinc-100 bg-white p-6 transition-all hover:border-black dark:border-zinc-800 dark:bg-black dark:hover:border-white sm:flex-row sm:items-center">
             <div className="h-24 w-24 flex-shrink-0 overflow-hidden bg-zinc-100 dark:bg-zinc-800">
@@ -346,9 +389,9 @@ function OrderCard({ id, date, status, price, image }: { id: string; date: strin
 
             <div className="flex flex-col items-start gap-4 sm:items-end">
                 <span className="text-xl font-black tracking-tight">{price}</span>
-                <button className="text-xs font-black uppercase tracking-widest border border-zinc-200 px-6 py-2 hover:bg-black hover:text-white dark:border-zinc-800 dark:hover:bg-white dark:hover:text-black transition-all">
+                <a href="/account/orders" className="text-xs font-black uppercase tracking-widest border border-zinc-200 px-6 py-2 hover:bg-black hover:text-white dark:border-zinc-800 dark:hover:bg-white dark:hover:text-black transition-all inline-block text-center">
                     Details
-                </button>
+                </a>
             </div>
         </div>
     );
