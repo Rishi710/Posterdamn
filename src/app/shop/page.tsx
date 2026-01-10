@@ -1,16 +1,39 @@
 "use client";
 
 import ProductCard from "@/components/shop/ProductCard";
-import { products, collections } from "@/data/mockData";
 import { ChevronDown, Filter, Search as SearchIcon, X } from "lucide-react";
 import { useState, useEffect, useRef, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
+import { supabase } from "@/lib/supabase";
 
 const ITEMS_PER_PAGE = 40;
 
+// Types matching Supabase structure
+interface Product {
+    id: string;
+    title: string;
+    price: number; // Base price (max or min) - purely for display logic if needed
+    discountedPrice: number; // Calculated min price
+    image: string;
+    collectionId?: string; // UUID
+    categoryId?: string; // UUID
+    collectionName?: string;
+    categoryName?: string;
+    tags?: string[];
+    variants?: any[]; // Full variants data might be heavy, but useful for filtering
+    sizes: string[];
+    materials: string[];
+}
+
+interface Collection {
+    id: string;
+    name: string;
+    slug: string;
+}
+
 export default function ShopPage() {
     return (
-        <Suspense fallback={<div className="min-h-screen bg-white dark:bg-black p-8 text-center">Loading Shop...</div>}>
+        <Suspense fallback={<div className="min-h-screen bg-white dark:bg-black p-8 text-center text-zinc-500 font-bold uppercase tracking-widest">Loading Shop...</div>}>
             <ShopContent />
         </Suspense>
     );
@@ -23,8 +46,13 @@ function ShopContent() {
 
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
+    // Data State
+    const [products, setProducts] = useState<Product[]>([]);
+    const [collections, setCollections] = useState<Collection[]>([]);
+    const [loading, setLoading] = useState(true);
+
     // Filter State
-    const [selectedCollectionIds, setSelectedCollectionIds] = useState<number[]>([]);
+    const [selectedCollectionIds, setSelectedCollectionIds] = useState<string[]>([]);
     const [priceRange, setPriceRange] = useState<string>("all");
     const [sortBy, setSortBy] = useState<string>("recommended");
     const [isSortOpen, setIsSortOpen] = useState(false);
@@ -34,11 +62,78 @@ function ShopContent() {
 
     const topRef = useRef<HTMLDivElement>(null);
 
+    // 1. Fetch Data
+    useEffect(() => {
+        const fetchData = async () => {
+            setLoading(true);
+            try {
+                // Fetch Collections
+                const { data: cols } = await supabase.from('collections').select('*').order('name');
+                if (cols) setCollections(cols);
+
+                // Fetch Products with relations
+                const { data: prodData, error } = await supabase
+                    .from('products')
+                    .select(`
+                        id, title, is_active, images, collection_id, category_id,
+                        collections (name),
+                        categories (name),
+                        product_variants (
+                            size, material, price
+                        )
+                    `)
+                    .eq('is_active', true) // Only active products
+                    .order('created_at', { ascending: false });
+
+                if (error) throw error;
+
+                // Transform to Product Interface
+                const transformed: Product[] = prodData.map((p: any) => {
+                    const variants = p.product_variants || [];
+                    const prices = variants.map((v: any) => v.price);
+                    const minPrice = prices.length > 0 ? Math.min(...prices) : 0;
+                    // Mocking "original price" as slightly higher for display effect if desired, 
+                    // or just using minPrice as both if we don't have a separate MRP column yet.
+                    // For now, let's assume `price` is MRP and `discountedPrice` is selling price.
+                    // Since we only have `price` in variants which is usually the selling price, 
+                    // we'll treat it as the discountedPrice.
+                    // If you want a fake "original price" for now to show discount:
+                    const displayPrice = minPrice;
+                    const fakeOriginalPrice = Math.round(minPrice * 1.4); // 40% markup for "strike-through"
+
+                    const sizes = Array.from(new Set(variants.map((v: any) => v.size))) as string[];
+                    const materials = Array.from(new Set(variants.map((v: any) => v.material))) as string[];
+
+                    return {
+                        id: p.id,
+                        title: p.title,
+                        image: p.images?.[0] || "",
+                        price: fakeOriginalPrice,
+                        discountedPrice: displayPrice,
+                        collectionId: p.collection_id,
+                        categoryId: p.category_id,
+                        collectionName: p.collections?.name,
+                        categoryName: p.categories?.name,
+                        sizes,
+                        materials
+                    };
+                });
+
+                setProducts(transformed);
+
+            } catch (err) {
+                console.error("Error fetching shop data:", err);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchData();
+    }, []);
+
     // Scroll to top when filter changes
     useEffect(() => {
-        // Reset pagination when filters change
         setVisibleCount(ITEMS_PER_PAGE);
-
         if (selectedCollectionIds.length > 0 && topRef.current) {
             topRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
@@ -50,16 +145,16 @@ function ShopContent() {
         if (searchQuery) {
             const query = searchQuery.toLowerCase();
             const matchesTitle = product.title.toLowerCase().includes(query);
-            const matchesTags = product.tags?.some(tag => tag.toLowerCase().includes(query));
-            const matchesCollection = collections.find(c => c.id === product.collectionId)?.name.toLowerCase().includes(query);
+            const matchesCollection = product.collectionName?.toLowerCase().includes(query);
+            // const matchesCategory = product.categoryName?.toLowerCase().includes(query);
 
-            if (!matchesTitle && !matchesTags && !matchesCollection) {
+            if (!matchesTitle && !matchesCollection) {
                 return false;
             }
         }
 
         // 1. Collection Filter
-        if (selectedCollectionIds.length > 0 && !selectedCollectionIds.includes(product.collectionId)) {
+        if (selectedCollectionIds.length > 0 && product.collectionId && !selectedCollectionIds.includes(product.collectionId)) {
             return false;
         }
 
@@ -77,14 +172,14 @@ function ShopContent() {
     const sortedProducts = [...filteredProducts].sort((a, b) => {
         if (sortBy === "price-low") return a.discountedPrice - b.discountedPrice;
         if (sortBy === "price-high") return b.discountedPrice - a.discountedPrice;
-        if (sortBy === "newest") return b.id.localeCompare(a.id); // Mock "newest" by ID
+        if (sortBy === "newest") return 0; // Already sorted by created_at in fetch
         return 0; // "recommended"
     });
 
     const displayProducts = sortedProducts.slice(0, visibleCount);
     const hasMore = visibleCount < sortedProducts.length;
 
-    const toggleCollection = (id: number) => {
+    const toggleCollection = (id: string) => {
         setSelectedCollectionIds(prev =>
             prev.includes(id)
                 ? prev.filter(c => c !== id)
@@ -95,6 +190,10 @@ function ShopContent() {
     const handleLoadMore = () => {
         setVisibleCount(prev => prev + ITEMS_PER_PAGE);
     };
+
+    if (loading) {
+        return <div className="min-h-screen bg-white dark:bg-black p-20 text-center text-zinc-500 font-bold uppercase tracking-widest">Loading Inventory...</div>;
+    }
 
     return (
         <div className="min-h-screen bg-white dark:bg-black">
@@ -217,23 +316,6 @@ function ShopContent() {
                                     <PriceRadio label="₹500 - ₹999" value="500-999" current={priceRange} onChange={setPriceRange} />
                                     <PriceRadio label="₹1000 - ₹1999" value="1000-1999" current={priceRange} onChange={setPriceRange} />
                                     <PriceRadio label="Over ₹2000" value="over-2000" current={priceRange} onChange={setPriceRange} />
-                                </div>
-                            </div>
-
-                            <div className="h-px w-full bg-gray-100 dark:bg-zinc-800" />
-
-                            {/* Orientation */}
-                            <div className="space-y-4">
-                                <h3 className="text-sm font-bold uppercase tracking-widest text-gray-900 dark:text-white">
-                                    Orientation
-                                </h3>
-                                <div className="flex gap-2">
-                                    <button className="flex-1 rounded border border-gray-200 py-2 text-sm font-medium text-gray-600 hover:border-black hover:text-black dark:border-zinc-800 dark:text-gray-400 dark:hover:border-white dark:hover:text-white">
-                                        Portrait
-                                    </button>
-                                    <button className="flex-1 rounded border border-gray-200 py-2 text-sm font-medium text-gray-600 hover:border-black hover:text-black dark:border-zinc-800 dark:text-gray-400 dark:hover:border-white dark:hover:text-white">
-                                        Landscape
-                                    </button>
                                 </div>
                             </div>
                         </div>

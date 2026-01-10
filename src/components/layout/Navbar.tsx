@@ -6,8 +6,8 @@ import { Menu, ShoppingBag, Search, User, ChevronDown, X, Package, Heart, Tag, C
 import { useState, useEffect, useRef } from "react";
 import Logo from "@/components/common/Logo";
 import { useStore } from "@/context/StoreContext";
-import { products } from "@/data/mockData";
 import { useRouter, usePathname } from "next/navigation";
+import { supabase } from "@/lib/supabase";
 
 export default function Navbar() {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -20,46 +20,52 @@ export default function Navbar() {
     // Search State
     const [isSearchOpen, setIsSearchOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
-    const [searchResults, setSearchResults] = useState<typeof products>([]);
+    const [searchResults, setSearchResults] = useState<any[]>([]);
     const [keywordSuggestions, setKeywordSuggestions] = useState<string[]>([]);
+
+    // Cache for simple search to avoid too many requests? 
+    // For now, let's debounce fetching.
 
     useEffect(() => setMounted(true), []);
 
     // Handle Search Logic
     useEffect(() => {
-        if (searchQuery.trim().length > 1) {
-            const query = searchQuery.toLowerCase();
+        const fetchSearch = async () => {
+            if (searchQuery.trim().length > 1) {
+                const query = searchQuery.toLowerCase();
 
-            // Filter products
-            const filteredProds = products.filter(p =>
-                p.title.toLowerCase().includes(query) ||
-                p.tags.some(t => t.toLowerCase().includes(query))
-            ).slice(0, 5);
-            setSearchResults(filteredProds);
+                // Simple Search: Title or tag matches
+                const { data, error } = await supabase
+                    .from('products')
+                    .select('id, title, images, product_variants(price)')
+                    .ilike('title', `%${query}%`)
+                    .limit(5);
 
-            // Filter keyword suggestions
-            const words: string[] = [];
-            products.forEach(p => {
-                // Add title words
-                p.title?.split(' ').forEach(word => {
-                    const clean = word.replace(/[^a-zA-Z-]/g, '');
-                    if (clean) words.push(clean);
-                });
-                // Add tags
-                p.tags?.forEach(tag => {
-                    if (tag) words.push(tag);
-                });
-            });
+                if (data) {
+                    const mapped = data.map((p: any) => ({
+                        ...p,
+                        image: p.images?.[0] || "",
+                        // Mock discount price for display
+                        discountedPrice: p.product_variants?.[0]?.price || 0
+                    }));
+                    setSearchResults(mapped);
+                } else {
+                    setSearchResults([]);
+                }
 
-            const uniqueKeywords = Array.from(new Set(words))
-                .filter(word => word.toLowerCase().includes(query) && word.toLowerCase() !== query)
-                .slice(0, 8);
+                // Suggestions (Mocking for now based on query, or simple expansion)
+                // Real implementation would need a separate 'tags' table or similar.
+                // We'll skip complex keyword suggestions for now to save API calls/latency
+                setKeywordSuggestions([]);
+            } else {
+                setSearchResults([]);
+                setKeywordSuggestions([]);
+            }
+        };
 
-            setKeywordSuggestions(uniqueKeywords);
-        } else {
-            setSearchResults([]);
-            setKeywordSuggestions([]);
-        }
+        // Debounce
+        const timeoutId = setTimeout(fetchSearch, 300);
+        return () => clearTimeout(timeoutId);
     }, [searchQuery]);
 
     const handleSearchSubmit = (e: React.FormEvent) => {
@@ -82,10 +88,9 @@ export default function Navbar() {
                 {/* Center Navigation - Desktop */}
                 <div className="hidden flex-1 items-center justify-center space-x-8 px-8 md:flex">
                     <NavItem href="/shop" label="Shop" hasDropdown />
-                    <NavItem href="/collection" label="Collections" />
-                    <NavItem href="/retro" label="Retro" />
-                    <NavItem href="/stickers" label="Stickers" />
-                    <NavItem href="/custom" label="Custom" />
+                    <NavItem href="/shop?sort=collections" label="Collections" />
+                    <NavItem href="/shop?tag=retro" label="Retro" />
+                    <NavItem href="/shop?tag=stickers" label="Stickers" />
                     <NavItem href="/contact" label="Contact" />
                 </div>
 
@@ -187,10 +192,10 @@ export default function Navbar() {
 
                             <div className="flex flex-col space-y-8">
                                 <MobileLink href="/shop" onClick={() => setIsMenuOpen(false)}>Shop</MobileLink>
-                                <MobileLink href="/collection" onClick={() => setIsMenuOpen(false)}>Collections</MobileLink>
-                                <MobileLink href="/retro" onClick={() => setIsMenuOpen(false)}>Retro Arc</MobileLink>
-                                <MobileLink href="/stickers" onClick={() => setIsMenuOpen(false)}>Stickers</MobileLink>
-                                <MobileLink href="/custom" onClick={() => setIsMenuOpen(false)}>Customs</MobileLink>
+                                <MobileLink href="/shop?sort=collections" onClick={() => setIsMenuOpen(false)}>Collections</MobileLink>
+                                <MobileLink href="/shop?tag=retro" onClick={() => setIsMenuOpen(false)}>Retro Arc</MobileLink>
+                                <MobileLink href="/shop?tag=stickers" onClick={() => setIsMenuOpen(false)}>Stickers</MobileLink>
+                                <MobileLink href="/shop?tag=custom" onClick={() => setIsMenuOpen(false)}>Customs</MobileLink>
                                 <MobileLink href="/contact" onClick={() => setIsMenuOpen(false)}>Contact</MobileLink>
                             </div>
 
@@ -305,49 +310,9 @@ export default function Navbar() {
                                                     ))}
                                                 </ul>
                                             </div>
-                                            <div>
-                                                <h3 className="mb-4 text-[10px] font-black uppercase tracking-[0.3em] text-zinc-400">Popular Searches</h3>
-                                                <div className="flex flex-wrap gap-2">
-                                                    {['Retro', 'Cyberpunk', 'Anime', 'Minimal', 'Abstract'].map((tag) => (
-                                                        <button
-                                                            key={tag}
-                                                            onClick={() => {
-                                                                setSearchQuery(tag);
-                                                                router.push(`/shop?q=${encodeURIComponent(tag)}`);
-                                                                setIsSearchOpen(false);
-                                                            }}
-                                                            className="rounded-full bg-gray-100 px-4 py-1.5 text-xs font-bold text-zinc-600 transition-colors hover:bg-black hover:text-white dark:bg-zinc-800 dark:text-zinc-400 dark:hover:bg-white dark:hover:text-black"
-                                                        >
-                                                            {tag}
-                                                        </button>
-                                                    ))}
-                                                </div>
-                                            </div>
                                         </>
                                     ) : (
                                         <div className="space-y-8 animate-in fade-in slide-in-from-left-4 duration-500">
-                                            {keywordSuggestions.length > 0 && (
-                                                <div>
-                                                    <h3 className="mb-4 text-[10px] font-black uppercase tracking-[0.3em] text-zinc-400">Suggestions</h3>
-                                                    <ul className="space-y-3">
-                                                        {keywordSuggestions.map((suggestion) => (
-                                                            <li key={suggestion}>
-                                                                <button
-                                                                    onClick={() => {
-                                                                        setSearchQuery(suggestion);
-                                                                        router.push(`/shop?q=${encodeURIComponent(suggestion)}`);
-                                                                        setIsSearchOpen(false);
-                                                                    }}
-                                                                    className="flex items-center gap-2 text-sm font-bold text-zinc-600 transition-colors hover:text-black dark:text-zinc-400 dark:hover:text-white"
-                                                                >
-                                                                    <Search className="h-3 w-3" />
-                                                                    {suggestion}
-                                                                </button>
-                                                            </li>
-                                                        ))}
-                                                    </ul>
-                                                </div>
-                                            )}
                                             <p className="text-sm font-medium text-zinc-400 underline underline-offset-8">
                                                 Search results for &quot;{searchQuery}&quot;
                                             </p>
@@ -361,7 +326,7 @@ export default function Navbar() {
                                         {searchQuery ? 'Top Results' : 'Featured Products'}
                                     </h3>
                                     <div className="space-y-4">
-                                        {(searchQuery && searchResults.length > 0 ? searchResults : products.slice(0, 4)).map((product) => (
+                                        {searchResults.map((product) => (
                                             <Link
                                                 key={product.id}
                                                 href={`/shop/${product.id}`}

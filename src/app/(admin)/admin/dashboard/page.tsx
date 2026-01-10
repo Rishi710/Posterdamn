@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
     TrendingUp,
     ShoppingBag,
@@ -9,10 +9,97 @@ import {
     ArrowDownRight,
     Users,
     CreditCard,
-    Activity
+    Activity,
+    Clock
 } from "lucide-react";
+import { supabase } from "@/lib/supabase";
+import Link from "next/link";
 
 export default function AdminDashboard() {
+    const [stats, setStats] = useState({
+        revenue: 0,
+        orders: 0,
+        activeStock: 0,
+        customers: 0 // We'll just count unique users from orders for now or 0
+    });
+    const [recentOrders, setRecentOrders] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    const fetchData = async () => {
+        // 1. Stats
+        const { data: ordersData } = await supabase
+            .from('orders')
+            .select('total_amount, user_id');
+
+        const { count: productsCount } = await supabase
+            .from('products')
+            .select('id', { count: 'exact', head: true })
+            .eq('is_active', true);
+
+        const totalRevenue = ordersData?.reduce((sum, order) => sum + Number(order.total_amount), 0) || 0;
+        const totalOrders = ordersData?.length || 0;
+        // Simple unique customers count from orders
+        const uniqueCustomers = new Set(ordersData?.map(o => o.user_id)).size;
+
+        setStats({
+            revenue: totalRevenue,
+            orders: totalOrders,
+            activeStock: productsCount || 0,
+            customers: uniqueCustomers
+        });
+
+        // 2. Recent Orders (Fetch last 5)
+        const { data: recent } = await supabase
+            .from('orders')
+            .select(`
+                id, 
+                total_amount, 
+                status, 
+                created_at,
+                user_id
+            `)
+            .order('created_at', { ascending: false })
+            .limit(5);
+
+        // We need to fetch user details (names) separately or normally joined if profile exists.
+        // For now, let's just use the ID or a placeholder if we don't have a profiles table joined easily yet.
+        // Actually, let's try to fetch address names if possible, effectively joining addresses.
+        // Or we can just display the ID for now to be safe.
+        // Better: Let's join addresses to get the name!
+
+        if (recent) {
+            const enrichedOrders = await Promise.all(recent.map(async (order) => {
+                const { data: address } = await supabase
+                    .from('addresses')
+                    .select('name')
+                    .eq('user_id', order.user_id)
+                    .limit(1)
+                    .single();
+                return { ...order, customerName: address?.name || 'Customer' };
+            }));
+            setRecentOrders(enrichedOrders);
+        }
+
+        setLoading(false);
+    };
+
+    useEffect(() => {
+        fetchData();
+
+        // Realtime Subscription
+        const subscription = supabase
+            .channel('dashboard-realtime')
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'orders' }, (payload) => {
+                console.log('Realtime update:', payload);
+                fetchData(); // Refresh all stats on any order change
+            })
+            .subscribe();
+
+        return () => {
+            supabase.removeChannel(subscription);
+        };
+    }, []);
+
     return (
         <div className="space-y-12">
             {/* Greeting & Quick Summary */}
@@ -22,41 +109,42 @@ export default function AdminDashboard() {
                         <h1 className="text-4xl font-black italic tracking-tighter lg:text-5xl uppercase text-black dark:text-white">Dashboard</h1>
                         <p className="text-sm font-bold text-zinc-500 uppercase tracking-widest mt-2">Global Operations Control</p>
                     </div>
+                    {loading && <Activity className="h-6 w-6 animate-spin text-black dark:text-white" />}
                 </div>
 
                 {/* Stats Grid */}
                 <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
                     <StatCard
                         title="Total Revenue"
-                        value="₹1,24,500"
-                        change="+12.5%"
+                        value={`₹${stats.revenue.toLocaleString()}`}
+                        change="+0%" // Todo: calculate real growth
                         isPositive={true}
                         icon={TrendingUp}
-                        detail="vs last month"
+                        detail="Lifetime"
                     />
                     <StatCard
                         title="Total Orders"
-                        value="482"
-                        change="+18.2%"
+                        value={stats.orders}
+                        change="+0%"
                         isPositive={true}
                         icon={ShoppingBag}
                         detail="Processed"
                     />
                     <StatCard
                         title="Active Stock"
-                        value="124"
-                        change="-2.4%"
-                        isPositive={false}
+                        value={stats.activeStock}
+                        change="Live"
+                        isPositive={true}
                         icon={Package}
                         detail="SKUs online"
                     />
                     <StatCard
-                        title="New Customers"
-                        value="+54"
-                        change="+4.1%"
+                        title="Customers"
+                        value={stats.customers}
+                        change="Live"
                         isPositive={true}
                         icon={Users}
-                        detail="This week"
+                        detail="Unique"
                     />
                 </div>
             </section>
@@ -67,24 +155,39 @@ export default function AdminDashboard() {
                 <div className="lg:col-span-2 space-y-8">
                     <div className="flex items-center justify-between border-b border-zinc-100 dark:border-zinc-800 pb-4">
                         <h3 className="text-xs font-black uppercase tracking-[0.3em] text-zinc-400">Mission Registry / Recent Orders</h3>
-                        <button className="text-[10px] font-black uppercase tracking-widest text-black dark:text-white border-b border-black dark:border-white">View All</button>
+                        <Link href="/admin/orders" className="text-[10px] font-black uppercase tracking-widest text-black dark:text-white border-b border-black dark:border-white hover:opacity-70">View All</Link>
                     </div>
 
                     <div className="space-y-4">
-                        {[1, 2, 3, 4, 5].map((i) => (
-                            <div key={i} className="group flex items-center justify-between p-4 bg-white dark:bg-zinc-950 border border-zinc-100 dark:border-zinc-800 hover:border-black dark:hover:border-white transition-all cursor-crosshair">
+                        {recentOrders.length === 0 && !loading && (
+                            <p className="text-sm text-zinc-500 italic">No orders yet.</p>
+                        )}
+                        {recentOrders.map((order) => (
+                            <div key={order.id} className="group flex items-center justify-between p-4 bg-white dark:bg-zinc-950 border border-zinc-100 dark:border-zinc-800 hover:border-black dark:hover:border-white transition-all cursor-crosshair">
                                 <div className="flex items-center gap-4">
                                     <div className="h-10 w-10 bg-zinc-100 dark:bg-zinc-900 flex items-center justify-center">
                                         <CreditCard className="h-4 w-4 opacity-50" />
                                     </div>
                                     <div>
-                                        <p className="text-sm font-bold text-black dark:text-white">ORD-240{i}1</p>
-                                        <p className="text-[10px] font-bold uppercase text-zinc-400">Abhiroop S. • ₹1,299</p>
+                                        <p className="text-sm font-bold text-black dark:text-white uppercase tracking-tight">
+                                            {order.id.split('-')[0]}
+                                        </p>
+                                        <p className="text-[10px] font-bold uppercase text-zinc-400">
+                                            {order.customerName} • ₹{order.total_amount}
+                                        </p>
                                     </div>
                                 </div>
                                 <div className="flex flex-col items-end">
-                                    <span className="text-[10px] font-black uppercase tracking-widest px-2 py-1 bg-zinc-100 dark:bg-zinc-900 rounded">Pending</span>
-                                    <span className="text-[8px] font-bold text-zinc-400 uppercase mt-1">2 mins ago</span>
+                                    <span className={`text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded ${order.status === 'completed' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' :
+                                        order.status === 'pending' ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400' :
+                                            'bg-zinc-100 dark:bg-zinc-900 text-zinc-500'
+                                        }`}>
+                                        {order.status}
+                                    </span>
+                                    <span className="text-[8px] font-bold text-zinc-400 uppercase mt-1 flex items-center gap-1">
+                                        <Clock className="h-2 w-2" />
+                                        {new Date(order.created_at).toLocaleDateString('en-IN', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                                    </span>
                                 </div>
                             </div>
                         ))}
@@ -101,18 +204,15 @@ export default function AdminDashboard() {
                     <div className="bg-black text-white p-8 rounded-none border border-zinc-800 flex flex-col items-center justify-center space-y-4 shadow-2xl">
                         <TrendingUp className="h-12 w-12 opacity-20" />
                         <div className="text-center">
-                            <p className="text-3xl font-black italic tracking-tighter">84.2%</p>
-                            <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">Sell-through Rate</p>
+                            <p className="text-3xl font-black italic tracking-tighter">100%</p>
+                            <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">System Uptime</p>
                         </div>
                     </div>
 
                     <div className="space-y-6 pt-4">
-                        <h4 className="text-[10px] font-black uppercase tracking-widest text-zinc-500">Popular Categories</h4>
-                        <div className="space-y-4">
-                            <CategoryStat name="Abstract Minimal" count={45} percent={75} />
-                            <CategoryStat name="Brutalist Architecture" count={32} percent={60} />
-                            <CategoryStat name="Retro Archive" count={28} percent={45} />
-                        </div>
+                        <h4 className="text-[10px] font-black uppercase tracking-widest text-zinc-500">Inventory Health</h4>
+                        {/* Placeholder for now */}
+                        <p className="text-xs text-zinc-400">Detailed category analytics coming soon.</p>
                     </div>
                 </div>
             </div>
@@ -139,20 +239,6 @@ function StatCard({ title, value, change, isPositive, icon: Icon, detail }: any)
                     <span className="h-1 w-1 rounded-full bg-zinc-200" />
                     <p className="text-[8px] font-bold uppercase text-zinc-500">{detail}</p>
                 </div>
-            </div>
-        </div>
-    );
-}
-
-function CategoryStat({ name, count, percent }: any) {
-    return (
-        <div className="space-y-2">
-            <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest">
-                <span>{name}</span>
-                <span className="text-zinc-400">{count} items</span>
-            </div>
-            <div className="h-1 w-full bg-zinc-100 dark:bg-zinc-900">
-                <div className="h-full bg-black dark:bg-white" style={{ width: `${percent}%` }} />
             </div>
         </div>
     );

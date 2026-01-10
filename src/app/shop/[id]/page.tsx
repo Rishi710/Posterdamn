@@ -1,53 +1,112 @@
 "use client";
 
-import { useState, use } from "react";
-import { products, collections } from "@/data/mockData";
+import { useState, use, useEffect } from "react";
 import { ArrowLeft, Check, Heart, Minus, Plus, Share2, Star, Truck } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { useStore } from "@/context/StoreContext";
+import { supabase } from "@/lib/supabase";
 
 export default function ProductPage({ params }: { params: Promise<{ id: string }> }) {
-    // Unwrap params using React.use() for Next.js 15
+    // Unwrap params using React.use()
     const resolvedParams = use(params);
     const { toggleWishlist, isInWishlist, addToCart } = useStore();
 
-    const product = products.find((p) => p.id === resolvedParams.id);
+    const [product, setProduct] = useState<any>(null);
+    const [loading, setLoading] = useState(true);
+    const [variants, setVariants] = useState<any[]>([]);
+
+    // State for selections
+    const [selectedSize, setSelectedSize] = useState("");
+    const [selectedMaterial, setSelectedMaterial] = useState("");
+    const [quantity, setQuantity] = useState(1);
+
+    // Derived state for current variant
+    const [currentVariant, setCurrentVariant] = useState<any>(null);
+
+    // Fetch Product
+    useEffect(() => {
+        const fetchProduct = async () => {
+            setLoading(true);
+            const { data, error } = await supabase
+                .from('products')
+                .select(`
+                    id, title, description, images, collection_id, category_id,
+                    collections (name),
+                    categories (name),
+                    product_variants (
+                        id, size, material, price, stock, sku
+                    )
+                `)
+                .eq('id', resolvedParams.id)
+                .single();
+
+            if (error || !data) {
+                console.error("Product fetch error:", error);
+                setLoading(false);
+                return; // Will eventually trigger notFound or empty state handling
+            }
+
+            setProduct(data);
+            setVariants(data.product_variants || []);
+
+            // Set initial defaults
+            if (data.product_variants && data.product_variants.length > 0) {
+                // Try to sort variants logic if needed, or just pick first
+                // Ideally pick a "middle" size or first available
+                const firstVar = data.product_variants[0];
+                setSelectedSize(firstVar.size);
+                setSelectedMaterial(firstVar.material);
+            }
+
+            setLoading(false);
+        };
+
+        fetchProduct();
+    }, [resolvedParams.id]);
+
+    // Update current variant when selections change
+    useEffect(() => {
+        if (!variants.length) return;
+        const found = variants.find(v => v.size === selectedSize && v.material === selectedMaterial);
+        setCurrentVariant(found || null);
+    }, [selectedSize, selectedMaterial, variants]);
+
+    if (loading) {
+        return <div className="min-h-screen bg-white dark:bg-black p-20 text-center text-zinc-500 font-bold uppercase tracking-widest">Loading Details...</div>;
+    }
 
     if (!product) {
         notFound();
     }
 
-    // State for selections
-    const [selectedSize, setSelectedSize] = useState(product.sizes[0]);
-    const [selectedMaterial, setSelectedMaterial] = useState(product.materials[0]);
-    const [quantity, setQuantity] = useState(1);
-
     const isWishlisted = isInWishlist(product.id);
 
-    // Calculate pricing changes based on size (Mock Logic)
-    // In a real app, price would come from a variant object
-    const getPriceMultiplier = (size: string) => {
-        switch (size) {
-            case 'A4': return 1;
-            case 'A3': return 1.5;
-            case 'A2': return 2.5;
-            default: return 1;
-        }
-    };
+    // Available Options
+    const availableSizes = Array.from(new Set(variants.map(v => v.size)));
+    const availableMaterials = Array.from(new Set(variants.map(v => v.material)));
 
-    const currentPrice = Math.round(product.discountedPrice * getPriceMultiplier(selectedSize));
-    const originalPrice = Math.round(product.price * getPriceMultiplier(selectedSize));
-    const discount = Math.round(((originalPrice - currentPrice) / originalPrice) * 100);
+    // Pricing
+    const currentPrice = currentVariant ? currentVariant.price : 0;
+    const fakeOriginalPrice = Math.round(currentPrice * 1.4); // Mock MRP
+    const discount = Math.round(((fakeOriginalPrice - currentPrice) / fakeOriginalPrice) * 100);
 
     const handleAddToCart = () => {
+        if (!currentVariant) {
+            alert("This variation is currently unavailable.");
+            return;
+        }
+
         for (let i = 0; i < quantity; i++) {
             addToCart({
-                ...product,
+                id: product.id, // Or currentVariant.id if you want to track by variant in cart
+                title: product.title,
+                price: fakeOriginalPrice,
                 discountedPrice: currentPrice,
-                price: originalPrice,
+                image: product.images?.[0] || "",
                 sizes: [selectedSize],
-                materials: [selectedMaterial]
+                materials: [selectedMaterial],
+                collectionName: product.collections?.name
             });
         }
     };
@@ -72,13 +131,21 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                         <div className="aspect-[3/4] w-full overflow-hidden rounded-2xl bg-gray-100 dark:bg-zinc-800 border border-zinc-100 dark:border-zinc-800">
                             {/* eslint-disable-next-line @next/next/no-img-element */}
                             <img
-                                src={product.image}
+                                src={product.images?.[0] || ""}
                                 alt={product.title}
                                 className="h-full w-full object-cover"
                             />
                         </div>
                         <button
-                            onClick={() => toggleWishlist(product)}
+                            onClick={() => toggleWishlist({
+                                id: product.id,
+                                title: product.title,
+                                price: fakeOriginalPrice,
+                                discountedPrice: currentPrice,
+                                image: product.images?.[0] || "",
+                                sizes: [selectedSize],
+                                materials: [selectedMaterial]
+                            })}
                             className="absolute right-4 top-4 rounded-full bg-white p-3 shadow-lg transition-transform hover:scale-110 active:scale-95 dark:bg-zinc-800 dark:text-white border border-zinc-100 dark:border-zinc-700"
                             aria-label="Toggle wishlist"
                         >
@@ -91,7 +158,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                         {/* Title & Reviews */}
                         <div className="mb-2">
                             <p className="text-xs font-black uppercase tracking-[0.2em] text-zinc-400">
-                                {product.id.split('-')[0].replace(/-/g, ' ')}
+                                {product.collections?.name || "POSTERDAMN"}
                             </p>
                         </div>
                         <h1 className="text-4xl font-black italic tracking-tighter uppercase text-black dark:text-white lg:text-5xl leading-none">
@@ -115,7 +182,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                                 ₹{currentPrice}
                             </span>
                             <span className="text-2xl text-zinc-400 line-through font-bold">
-                                ₹{originalPrice}
+                                ₹{fakeOriginalPrice}
                             </span>
                             <span className="bg-black px-3 py-1 text-[10px] font-black uppercase tracking-widest text-white dark:bg-white dark:text-black">
                                 {discount}% OFF
@@ -132,7 +199,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                                     <button className="text-[10px] font-black uppercase tracking-widest text-zinc-400 hover:text-black dark:hover:text-white transition-colors border-b border-zinc-400">Size Guide</button>
                                 </div>
                                 <div className="grid grid-cols-4 gap-3 sm:grid-cols-4">
-                                    {product.sizes.map((size) => (
+                                    {availableSizes.map((size: any) => (
                                         <button
                                             key={size}
                                             onClick={() => setSelectedSize(size)}
@@ -148,7 +215,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                             <div>
                                 <h3 className="text-xs font-black uppercase tracking-widest text-zinc-400 mb-4">Material</h3>
                                 <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                                    {product.materials.map((material) => (
+                                    {availableMaterials.map((material: any) => (
                                         <button
                                             key={material}
                                             onClick={() => setSelectedMaterial(material)}
@@ -186,16 +253,17 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
 
                             <button
                                 onClick={handleAddToCart}
-                                className="flex-1 bg-black px-8 py-5 text-xs font-black uppercase tracking-[0.2em] text-white shadow-2xl transition-all hover:bg-zinc-800 active:scale-95 dark:bg-white dark:text-black dark:hover:bg-zinc-200"
+                                disabled={!currentVariant}
+                                className="flex-1 bg-black px-8 py-5 text-xs font-black uppercase tracking-[0.2em] text-white shadow-2xl transition-all hover:bg-zinc-800 active:scale-95 dark:bg-white dark:text-black dark:hover:bg-zinc-200 disabled:opacity-50 disabled:cursor-not-allowed"
                             >
-                                Add to Cart - ₹{currentPrice * quantity}
+                                {currentVariant ? `Add to Cart - ₹${currentPrice * quantity}` : "Unavailable Combination"}
                             </button>
                         </div>
 
                         {/* Delivery Info */}
                         <div className="mt-8 flex items-center gap-3 rounded-lg bg-blue-50 p-4 text-sm text-blue-700 dark:bg-blue-900/20 dark:text-blue-300">
                             <Truck className="h-5 w-5" />
-                            <span>Free delivery on orders over ₹999. Estimated delivery by <b>Dec 25</b>.</span>
+                            <span>Free delivery on orders over ₹999. Estimated delivery in <b>5-7 days</b>.</span>
                         </div>
 
                         {/* Description */}

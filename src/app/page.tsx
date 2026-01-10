@@ -1,13 +1,58 @@
 import Link from "next/link";
 import { ArrowRight, ShieldCheck, Truck, Zap, Palette } from "lucide-react";
 import CollectionsScroll from "@/components/home/CollectionsScroll";
+import CollectionsGrid from "@/components/home/CollectionsGrid";
 import FAQ from "@/components/home/FAQ";
 import ProductCard from "@/components/shop/ProductCard";
-import { products } from "@/data/mockData";
+import { supabase } from "@/lib/supabase";
 
-export default function Home() {
-  // Get trending products (first 4 items from the mock data)
-  const trendingProducts = products.slice(0, 4);
+// Force dynamic rendering since we are fetching randomness or fresh data
+export const dynamic = 'force-dynamic';
+
+async function getData() {
+  // Parallel fetch
+  const [productsRes, collectionsRes] = await Promise.all([
+    supabase
+      .from('products')
+      .select('id, title, is_active, images, collection_id, category_id, product_variants(price, size, material), collections(name), categories(name)')
+      .eq('is_active', true)
+      .limit(4)
+      .order('created_at', { ascending: false }),
+    supabase
+      .from('collections')
+      .select('*')
+      .order('name')
+  ]);
+
+  const products = (productsRes.data || []).map((p: any) => {
+    // Basic transform similar to ShopPage
+    const variants = p.product_variants || [];
+    const prices = variants.map((v: any) => v.price);
+    const minPrice = prices.length > 0 ? Math.min(...prices) : 0;
+    const fakeOriginalPrice = Math.round(minPrice * 1.4);
+
+    return {
+      id: p.id,
+      title: p.title,
+      image: p.images?.[0] || "",
+      price: fakeOriginalPrice,
+      discountedPrice: minPrice,
+      collectionName: p.collections?.name,
+      categoryName: p.categories?.name,
+      // Minimal props needed for Card
+      sizes: [],
+      materials: []
+    };
+  });
+
+  return {
+    trendingProducts: products,
+    collections: collectionsRes.data || []
+  };
+}
+
+export default async function Home() {
+  const { trendingProducts, collections } = await getData();
 
   return (
     <div className="flex min-h-screen flex-col bg-white dark:bg-black">
@@ -39,7 +84,7 @@ export default function Home() {
               </span>
             </Link>
             <Link
-              href="/collections"
+              href="/shop?sort=collections"
               className="px-10 py-4 text-sm font-black uppercase tracking-widest text-white transition-all hover:text-zinc-400"
             >
               Explore Archive
@@ -77,7 +122,7 @@ export default function Home() {
       </section>
 
       {/* Scrollable Collections Preview */}
-      <CollectionsScroll />
+      <CollectionsScroll collections={collections} />
 
       {/* Featured Section */}
       <section className="py-24">
@@ -99,12 +144,27 @@ export default function Home() {
           </div>
 
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4 lg:gap-8">
-            {trendingProducts.map((product) => (
+            {trendingProducts.map((product: any) => (
               <ProductCard key={product.id} product={product} />
             ))}
           </div>
         </div>
       </section>
+
+      {/* Collections Grid (Renamed from just Scroll to include Grid too if used?) 
+          Wait, previous file imported CollectionsScroll AND CollectionsGrid was separate? 
+          Checking previous file content...
+          File 2325 imported CollectionsScroll. It did NOT import CollectionsGrid in the code block I saw?
+          Wait. Line 3 in file 2325: `import CollectionsScroll from "@/components/home/CollectionsScroll";`
+          There was NO `CollectionsGrid` import in `src/app/page.tsx` file 2325!
+          But grep found mockData in `CollectionsGrid.tsx`.
+          So CollectionsGrid might be used elsewhere? Or just unused code?
+          If unused, I should probably clean it or update it anyway.
+          I see `src/app/page.tsx` line 80: `<CollectionsScroll />`
+          I do not see `<CollectionsGrid />` in file 2325.
+          
+          However, I should update `CollectionsScroll` to accept props.
+      */}
 
       {/* FAQ Section */}
       <FAQ />

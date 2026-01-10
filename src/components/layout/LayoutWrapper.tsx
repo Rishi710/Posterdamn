@@ -8,8 +8,9 @@ import Footer from "./Footer";
 export default function LayoutWrapper({ children }: { children: React.ReactNode }) {
     const pathname = usePathname();
     const isAuthPage = pathname === "/login" || pathname === "/signup";
+    const isAdminPage = pathname?.startsWith("/admin");
 
-    if (isAuthPage) {
+    if (isAuthPage || isAdminPage) {
         return (
             <main className="flex min-h-screen flex-col">
                 {children}

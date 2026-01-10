@@ -2,14 +2,21 @@
 
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
-import { collections } from "@/data/mockData";
+interface Collection {
+    id: string;
+    name: string;
+    slug: string;
+}
 
-export default function CollectionsScroll() {
+export default function CollectionsScroll({ collections }: { collections: Collection[] }) {
     // Split collections into 3 rows for visual variety
-    // We duplicate the array in the render to ensure the loop is seamless (CSS trick: translateX(-50%) on a double-length list)
-    const row1 = collections.slice(0, 14);
-    const row2 = collections.slice(14, 28);
-    const row3 = collections.slice(28, 40);
+    // Ensure we have enough items for rows. If not, just duplicate whatever we have.
+    const items = collections.length > 0 ? collections : [];
+
+    // Distribute randomly or sequentially
+    const row1 = items.filter((_, i) => i % 3 === 0);
+    const row2 = items.filter((_, i) => i % 3 === 1);
+    const row3 = items.filter((_, i) => i % 3 === 2);
 
     return (
         <section className="border-b border-gray-100 bg-white py-16 dark:border-gray-800 dark:bg-black overflow-hidden">
@@ -24,7 +31,7 @@ export default function CollectionsScroll() {
                         </p>
                     </div>
                     <Link
-                        href="/collections"
+                        href="/shop"
                         className="group flex items-center text-sm font-semibold text-blue-600 hover:text-blue-500"
                     >
                         View all categories
@@ -35,21 +42,16 @@ export default function CollectionsScroll() {
 
             {/* Marquee Rows Container */}
             <div className="space-y-8">
-                {/* Row 1: Right (Odd) */}
-                <MarqueeRow items={row1} direction="right" />
-
-                {/* Row 2: Left (Even) */}
-                <MarqueeRow items={row2} direction="left" />
-
-                {/* Row 3: Right (Odd) */}
-                <MarqueeRow items={row3} direction="right" />
+                {row1.length > 0 && <MarqueeRow items={row1} direction="right" />}
+                {row2.length > 0 && <MarqueeRow items={row2} direction="left" />}
+                {row3.length > 0 && <MarqueeRow items={row3} direction="right" />}
             </div>
         </section >
     );
 }
 
 // Helper component for a single marquee row
-function MarqueeRow({ items, direction }: { items: typeof collections, direction: 'left' | 'right' }) {
+function MarqueeRow({ items, direction }: { items: Collection[], direction: 'left' | 'right' }) {
     // We duplicate the items to create the seamless loop
     const displayItems = [...items, ...items, ...items, ...items]; // Quadruple to be safe on wide screens
 

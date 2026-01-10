@@ -13,6 +13,8 @@ interface ProductProps {
     image: string;
     sizes: string[];
     materials: string[];
+    collectionName?: string;
+    categoryName?: string;
 }
 
 export default function ProductCard({ product }: { product: ProductProps }) {
@@ -20,7 +22,7 @@ export default function ProductCard({ product }: { product: ProductProps }) {
     const isWishlisted = isInWishlist(product.id);
 
     // Get collection name if available, otherwise use a default
-    const category = typeof product.id === 'string' ? product.id.split('-')[0].toUpperCase().replace(/-/g, ' ') : "POSTERDAMN";
+    const category = product.categoryName || product.collectionName || (typeof product.id === 'string' ? product.id.split('-')[0].toUpperCase().replace(/-/g, ' ') : "POSTERDAMN");
 
     return (
         <div className="group relative flex flex-col border border-zinc-100 bg-white transition-all hover:border-black dark:border-zinc-800 dark:bg-black dark:hover:border-white">

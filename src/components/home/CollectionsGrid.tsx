@@ -2,9 +2,18 @@
 
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
-import { collections } from "@/data/mockData";
+import { useEffect, useState } from "react";
+import { supabase } from "@/lib/supabase";
 
 export default function CollectionsGrid() {
+    const [collections, setCollections] = useState<any[]>([]);
+
+    useEffect(() => {
+        supabase.from('collections').select('*').order('name').then(({ data }) => {
+            if (data) setCollections(data);
+        });
+    }, []);
+
     return (
         <section className="bg-gray-50 py-12 dark:bg-black">
             <div className="mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8">
@@ -14,7 +23,7 @@ export default function CollectionsGrid() {
                         The Infinite <span className="text-zinc-500 italic">Wall</span>
                     </h2>
                     <p className="mt-4 text-lg font-medium text-zinc-500 dark:text-zinc-400">
-                        Dive into 40+ unique worlds. Find your vibe.
+                        Dive into {collections.length}+ unique worlds. Find your vibe.
                     </p>
                 </div>
 
