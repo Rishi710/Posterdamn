@@ -85,6 +85,36 @@ export default function AdminInventory() {
         }
     };
 
+    const handleToggleActive = async (id: string, currentStatus: boolean) => {
+        try {
+            const { error } = await supabase
+                .from("products")
+                .update({ is_active: !currentStatus })
+                .eq("id", id);
+
+            if (error) throw error;
+            setRefreshTrigger(prev => prev + 1);
+        } catch (err: any) {
+            alert("Error updating status: " + err.message);
+        }
+    };
+
+    const handleDeleteProduct = async (id: string, title: string) => {
+        if (!confirm(`Are you sure you want to delete "${title}"? This action cannot be undone.`)) return;
+
+        try {
+            const { error } = await supabase
+                .from("products")
+                .delete()
+                .eq("id", id);
+
+            if (error) throw error;
+            setRefreshTrigger(prev => prev + 1);
+        } catch (err: any) {
+            alert("Error deleting product: " + err.message);
+        }
+    };
+
     const fetchMetadata = async () => {
         const table = activeMetadataTab;
         const { data, error } = await supabase.from(table).select("*").order("created_at", { ascending: false });
@@ -207,10 +237,13 @@ export default function AdminInventory() {
                                 filteredProducts.map((product) => (
                                     <tr key={product.id} className="group hover:bg-white dark:hover:bg-zinc-950 transition-colors cursor-default">
                                         <td className="py-6 px-4">
-                                            <div className="flex items-center gap-2">
+                                            <button
+                                                onClick={() => handleToggleActive(product.id, product.is_active)}
+                                                className="flex items-center gap-2 group/status hover:opacity-80 transition-opacity"
+                                            >
                                                 <div className={`h-2 w-2 rounded-full shadow-[0_0_8px_rgba(0,0,0,0.2)] ${product.is_active ? "bg-green-500 shadow-green-500/40" : "bg-red-500 shadow-red-500/40"}`} />
                                                 <span className="text-[10px] font-black uppercase tracking-widest">{product.is_active ? "Active" : "Draft"}</span>
-                                            </div>
+                                            </button>
                                         </td>
                                         <td className="py-6 px-4">
                                             <div className="flex items-center gap-4">
@@ -245,13 +278,25 @@ export default function AdminInventory() {
                                                     </button>
 
                                                     {/* Dropdown Menu */}
-                                                    <div className="hidden group-hover/menu:block absolute right-0 top-full w-32 bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 shadow-xl z-10">
+                                                    <div className="hidden group-hover/menu:block absolute right-0 top-full w-40 bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 shadow-xl z-10 py-1">
                                                         <Link
                                                             href={`/admin/inventory/edit/${product.id}`}
                                                             className="block w-full text-left px-4 py-3 text-[10px] font-black uppercase tracking-widest hover:bg-zinc-50 dark:hover:bg-zinc-900"
                                                         >
                                                             Edit Data
                                                         </Link>
+                                                        <button
+                                                            onClick={() => handleToggleActive(product.id, product.is_active)}
+                                                            className="block w-full text-left px-4 py-3 text-[10px] font-black uppercase tracking-widest hover:bg-zinc-50 dark:hover:bg-zinc-900 border-t border-zinc-100 dark:border-zinc-900"
+                                                        >
+                                                            {product.is_active ? "Set as Draft" : "Set as Active"}
+                                                        </button>
+                                                        <button
+                                                            onClick={() => handleDeleteProduct(product.id, product.title)}
+                                                            className="block w-full text-left px-4 py-3 text-[10px] font-black uppercase tracking-widest hover:bg-red-50 dark:hover:bg-red-900/20 text-red-500 border-t border-zinc-100 dark:border-zinc-900"
+                                                        >
+                                                            Delete Product
+                                                        </button>
                                                     </div>
                                                 </div>
                                             </div>

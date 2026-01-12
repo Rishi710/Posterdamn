@@ -28,10 +28,19 @@ export default function AddProduct() {
     // Initial Fetch
     React.useEffect(() => {
         const fetchMeta = async () => {
-            const { data: cols } = await supabase.from('collections').select('*').order('name');
-            const { data: cats } = await supabase.from('categories').select('*').order('name');
-            if (cols) setCollections(cols);
-            if (cats) setCategories(cats);
+            try {
+                console.log("Fetching metadata...");
+                const { data: cols, error: colsError } = await supabase.from('collections').select('*').order('name');
+                if (colsError) console.error("Collections error:", colsError);
+
+                const { data: cats, error: catsError } = await supabase.from('categories').select('*').order('name');
+                if (catsError) console.error("Categories error:", catsError);
+
+                if (cols) setCollections(cols);
+                if (cats) setCategories(cats);
+            } catch (err) {
+                console.error("METADATA FETCH ERROR:", err);
+            }
         };
         fetchMeta();
     }, [refreshMetadata]);
@@ -64,19 +73,27 @@ export default function AddProduct() {
 
     const generateVariants = () => {
         const variants: any[] = [];
+        const selectedCollection = collections.find(c => c.id === collectionId);
+        const prefix = selectedCollection ? (selectedCollection.name.substring(0, 3).toUpperCase()) : "PRD";
+        const titlePart = title ? title.substring(0, 3).toUpperCase() : "XXX";
+
         selectedSizes.forEach((size) => {
             selectedMaterials.forEach((material) => {
-                // Check if already exists to preserve pricing if re-generating
                 const existing = generatedVariants.find(v => v.size === size && v.material === material);
                 if (existing) {
                     variants.push(existing);
                 } else {
+                    // Generate a random 4-char suffix for uniqueness
+                    const randomSuffix = Math.random().toString(36).substring(2, 6).toUpperCase();
+                    const sizePart = size.replace(/ /g, "").substring(0, 3).toUpperCase();
+                    const matPart = material.substring(0, 3).toUpperCase();
+
                     variants.push({
                         size,
                         material,
                         price: "",
                         stock: 100,
-                        sku: ""
+                        sku: `${prefix}-${titlePart}-${sizePart}-${matPart}-${randomSuffix}`
                     });
                 }
             });
@@ -146,7 +163,7 @@ export default function AddProduct() {
                 material: v.material,
                 price: parseFloat(v.price),
                 stock: parseInt(v.stock),
-                sku: v.sku || `${prefix}-${title.substring(0, 3).toUpperCase()}-${v.size}-${v.material.substring(0, 3)}`
+                sku: v.sku
             }));
 
             const { error: variantsError } = await supabase
@@ -334,6 +351,7 @@ export default function AddProduct() {
                                                 <th className="p-3 text-[9px] font-black uppercase tracking-widest text-zinc-500">Variant</th>
                                                 <th className="p-3 text-[9px] font-black uppercase tracking-widest text-zinc-500">Price (₹)</th>
                                                 <th className="p-3 text-[9px] font-black uppercase tracking-widest text-zinc-500">Stock</th>
+                                                <th className="p-3 text-[9px] font-black uppercase tracking-widest text-zinc-500">SKU</th>
                                                 <th className="p-3 text-[9px] font-black uppercase tracking-widest text-zinc-500 text-right">Action</th>
                                             </tr>
                                         </thead>
@@ -363,7 +381,14 @@ export default function AddProduct() {
                                                             className="w-20 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-2 text-xs font-bold outline-none focus:border-black transition-all"
                                                         />
                                                     </td>
-                                                    <td className="p-3 text-right">
+                                                    <td className="p-3 text-right flex items-center justify-end gap-2">
+                                                        <input
+                                                            type="text"
+                                                            value={variant.sku}
+                                                            onChange={(e) => updateVariant(idx, 'sku', e.target.value.toUpperCase())}
+                                                            className="w-32 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-2 text-[10px] font-mono font-bold outline-none focus:border-black transition-all"
+                                                            placeholder="SKU"
+                                                        />
                                                         <button
                                                             onClick={() => removeVariant(idx)}
                                                             className="text-zinc-400 hover:text-red-500 transition-colors"

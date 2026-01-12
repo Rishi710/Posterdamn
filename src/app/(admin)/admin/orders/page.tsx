@@ -46,7 +46,13 @@ export default function OrdersPage() {
         const { data, count, error } = await query;
 
         if (error) {
-            console.error(error);
+            console.error("Error fetching orders:", {
+                message: error.message,
+                details: error.details,
+                hint: error.hint,
+                code: error.code
+            });
+            alert(`Failed to fetch orders: ${error.message}`);
         } else {
             // Fetch User Names for these orders (N+1 problem but manageable for 10 items)
             const enriched = await Promise.all((data || []).map(async (order) => {

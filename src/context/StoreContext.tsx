@@ -426,6 +426,23 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
                 return { success: false, message: `Minimum order of ₹${data.min_order_amount} required` };
             }
 
+            if (data.is_second_purchase_only) {
+                if (!user) {
+                    return { success: false, message: "Login required for this coupon" };
+                }
+                const { count, error: countError } = await supabase
+                    .from('orders')
+                    .select('id', { count: 'exact', head: true })
+                    .eq('user_id', user.id)
+                    .eq('status', 'completed'); // Only count successfully completed orders
+
+                if (countError) throw countError;
+
+                if (count !== 1) {
+                    return { success: false, message: count === 0 ? "Only for your second purchase" : "Coupon valid for second purchase only" };
+                }
+            }
+
             setCoupon({
                 code: data.code,
                 type: data.discount_type,

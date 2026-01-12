@@ -26,61 +26,77 @@ export default function AdminDashboard() {
     const [loading, setLoading] = useState(true);
 
     const fetchData = async () => {
-        // 1. Stats
-        const { data: ordersData } = await supabase
-            .from('orders')
-            .select('total_amount, user_id');
+        try {
+            setLoading(true);
+            console.log("AdminDashboard: Starting data fetch...");
 
-        const { count: productsCount } = await supabase
-            .from('products')
-            .select('id', { count: 'exact', head: true })
-            .eq('is_active', true);
+            // 1. Stats
+            const { data: ordersData, error: ordersError } = await supabase
+                .from('orders')
+                .select('total_amount, user_id');
 
-        const totalRevenue = ordersData?.reduce((sum, order) => sum + Number(order.total_amount), 0) || 0;
-        const totalOrders = ordersData?.length || 0;
-        // Simple unique customers count from orders
-        const uniqueCustomers = new Set(ordersData?.map(o => o.user_id)).size;
+            if (ordersError) {
+                console.error("Dashboard: Orders fetch error:", {
+                    message: ordersError.message,
+                    details: ordersError.details,
+                    hint: ordersError.hint,
+                    code: ordersError.code
+                });
+            }
 
-        setStats({
-            revenue: totalRevenue,
-            orders: totalOrders,
-            activeStock: productsCount || 0,
-            customers: uniqueCustomers
-        });
+            const { count: productsCount, error: productsError } = await supabase
+                .from('products')
+                .select('id', { count: 'exact', head: true })
+                .eq('is_active', true);
 
-        // 2. Recent Orders (Fetch last 5)
-        const { data: recent } = await supabase
-            .from('orders')
-            .select(`
-                id, 
-                total_amount, 
-                status, 
-                created_at,
-                user_id
-            `)
-            .order('created_at', { ascending: false })
-            .limit(5);
+            if (productsError) {
+                console.error("Dashboard: Products fetch error:", productsError);
+            }
 
-        // We need to fetch user details (names) separately or normally joined if profile exists.
-        // For now, let's just use the ID or a placeholder if we don't have a profiles table joined easily yet.
-        // Actually, let's try to fetch address names if possible, effectively joining addresses.
-        // Or we can just display the ID for now to be safe.
-        // Better: Let's join addresses to get the name!
+            const totalRevenue = ordersData?.reduce((sum, order) => sum + Number(order.total_amount), 0) || 0;
+            const totalOrders = ordersData?.length || 0;
+            const uniqueCustomers = new Set(ordersData?.map(o => o.user_id)).size;
 
-        if (recent) {
-            const enrichedOrders = await Promise.all(recent.map(async (order) => {
-                const { data: address } = await supabase
-                    .from('addresses')
-                    .select('name')
-                    .eq('user_id', order.user_id)
-                    .limit(1)
-                    .single();
-                return { ...order, customerName: address?.name || 'Customer' };
-            }));
-            setRecentOrders(enrichedOrders);
+            setStats({
+                revenue: totalRevenue,
+                orders: totalOrders,
+                activeStock: productsCount || 0,
+                customers: uniqueCustomers
+            });
+
+            // 2. Recent Orders
+            const { data: recent, error: recentError } = await supabase
+                .from('orders')
+                .select(`id, total_amount, status, created_at, user_id`)
+                .order('created_at', { ascending: false })
+                .limit(5);
+
+            if (recentError) {
+                console.error("Dashboard: Recent orders fetch error:", recentError);
+            }
+
+            if (recent) {
+                const enrichedOrders = await Promise.all(recent.map(async (order) => {
+                    try {
+                        const { data: address } = await supabase
+                            .from('addresses')
+                            .select('name')
+                            .eq('user_id', order.user_id)
+                            .limit(1)
+                            .single();
+                        return { ...order, customerName: address?.name || 'Customer' };
+                    } catch (err) {
+                        console.error("Dashboard: Single address enrichment error:", err);
+                        return { ...order, customerName: 'Customer' };
+                    }
+                }));
+                setRecentOrders(enrichedOrders);
+            }
+        } catch (err) {
+            console.error("CRITICAL DASHBOARD FETCH ERROR:", err);
+        } finally {
+            setLoading(false);
         }
-
-        setLoading(false);
     };
 
     useEffect(() => {

@@ -27,39 +27,57 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
     // Fetch Product
     useEffect(() => {
         const fetchProduct = async () => {
-            setLoading(true);
-            const { data, error } = await supabase
-                .from('products')
-                .select(`
-                    id, title, description, images, collection_id, category_id,
-                    collections (name),
-                    categories (name),
-                    product_variants (
-                        id, size, material, price, stock, sku
-                    )
-                `)
-                .eq('id', resolvedParams.id)
-                .single();
+            if (!resolvedParams.id) return;
 
-            if (error || !data) {
-                console.error("Product fetch error:", error);
+            // Basic UUID validation to prevent 400 errors
+            const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+            if (!uuidRegex.test(resolvedParams.id)) {
+                console.error("Invalid Product ID format:", resolvedParams.id);
                 setLoading(false);
-                return; // Will eventually trigger notFound or empty state handling
+                setProduct(null);
+                return;
             }
 
-            setProduct(data);
-            setVariants(data.product_variants || []);
+            setLoading(true);
+            try {
+                const { data, error } = await supabase
+                    .from('products')
+                    .select(`
+                        id, title, description, images, collection_id, category_id, is_active,
+                        collections (name),
+                        categories (name),
+                        product_variants (
+                            id, size, material, price, stock, sku
+                        )
+                    `)
+                    .eq('id', resolvedParams.id)
+                    .single();
 
-            // Set initial defaults
-            if (data.product_variants && data.product_variants.length > 0) {
-                // Try to sort variants logic if needed, or just pick first
-                // Ideally pick a "middle" size or first available
-                const firstVar = data.product_variants[0];
-                setSelectedSize(firstVar.size);
-                setSelectedMaterial(firstVar.material);
+                if (error) {
+                    console.error("Product fetch error detail:", {
+                        code: error.code,
+                        message: error.message,
+                        details: error.details,
+                        hint: error.hint
+                    });
+                    setProduct(null);
+                } else if (!data) {
+                    setProduct(null);
+                } else {
+                    setProduct(data);
+                    setVariants(data.product_variants || []);
+
+                    if (data.product_variants && data.product_variants.length > 0) {
+                        const firstVar = data.product_variants[0];
+                        setSelectedSize(firstVar.size);
+                        setSelectedMaterial(firstVar.material);
+                    }
+                }
+            } catch (err) {
+                console.error("Unexpected fetch crash:", err);
+            } finally {
+                setLoading(false);
             }
-
-            setLoading(false);
         };
 
         fetchProduct();

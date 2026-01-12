@@ -23,6 +23,7 @@ export default function EditProduct() {
     const [categoryId, setCategoryId] = useState("");
     const [description, setDescription] = useState("");
     const [imageUrl, setImageUrl] = useState("");
+    const [isActive, setIsActive] = useState(true);
 
     // Metadata Data
     const [collections, setCollections] = useState<any[]>([]);
@@ -47,7 +48,7 @@ export default function EditProduct() {
                 const { data: product, error: productError } = await supabase
                     .from("products")
                     .select(`
-                        id, title, description, collection_id, category_id, images,
+                        id, title, description, collection_id, category_id, images, is_active,
                         product_variants (
                             id, size, material, price, stock, sku
                         )
@@ -64,6 +65,7 @@ export default function EditProduct() {
                 setCategoryId(product.category_id || "");
                 setDescription(product.description || "");
                 setImageUrl(product.images?.[0] || "");
+                setIsActive(product.is_active);
 
                 // 4. Populate Variants
                 const variants = product.product_variants || [];
@@ -101,19 +103,26 @@ export default function EditProduct() {
 
     const generateVariants = () => {
         const variants: any[] = [];
+        const selectedCollection = collections.find(c => c.id === collectionId);
+        const prefix = selectedCollection ? (selectedCollection.name.substring(0, 3).toUpperCase()) : "PRD";
+        const titlePart = title ? title.substring(0, 3).toUpperCase() : "XXX";
+
         selectedSizes.forEach((size) => {
             selectedMaterials.forEach((material) => {
-                // Check if already exists in current state to preserve ID and data
                 const existing = generatedVariants.find(v => v.size === size && v.material === material);
                 if (existing) {
                     variants.push(existing);
                 } else {
+                    const randomSuffix = Math.random().toString(36).substring(2, 6).toUpperCase();
+                    const sizePart = size.replace(/ /g, "").substring(0, 3).toUpperCase();
+                    const matPart = material.substring(0, 3).toUpperCase();
+
                     variants.push({
                         size,
                         material,
                         price: "",
                         stock: 100,
-                        sku: ""
+                        sku: `${prefix}-${titlePart}-${sizePart}-${matPart}-${randomSuffix}`
                     });
                 }
             });
@@ -162,7 +171,8 @@ export default function EditProduct() {
                     collection_id: collectionId,
                     category_id: categoryId,
                     description,
-                    images: [imageUrl]
+                    images: [imageUrl],
+                    is_active: isActive
                 })
                 .eq("id", id);
 
@@ -184,7 +194,7 @@ export default function EditProduct() {
                 material: v.material,
                 price: parseFloat(v.price),
                 stock: parseInt(v.stock),
-                sku: v.sku || `${prefix}-${title.substring(0, 3).toUpperCase()}-${v.size}-${v.material.substring(0, 3)}`
+                sku: v.sku
             }));
 
             // First, delete variants that are NO LONGER in the list
@@ -210,7 +220,12 @@ export default function EditProduct() {
             router.push("/admin/inventory");
 
         } catch (error: any) {
-            console.error("FULL ERROR OBJECT:", error);
+            console.error("FULL ERROR OBJECT:", {
+                message: error.message,
+                details: error.details,
+                hint: error.hint,
+                code: error.code
+            });
             alert(`Failed to update product: ${error.message || "Unknown error"}`);
         } finally {
             setSaving(false);
@@ -294,6 +309,16 @@ export default function EditProduct() {
                                     className="w-full bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-3 text-sm font-medium outline-none focus:border-black dark:focus:border-white transition-all resize-none"
                                 />
                             </div>
+
+                            <div className="flex items-center gap-3 pt-4">
+                                <button
+                                    onClick={() => setIsActive(!isActive)}
+                                    className={`relative w-12 h-6 rounded-full transition-colors ${isActive ? "bg-green-500" : "bg-zinc-300 dark:bg-zinc-700"}`}
+                                >
+                                    <div className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full transition-transform ${isActive ? "translate-x-6" : ""}`} />
+                                </button>
+                                <span className="text-[10px] font-black uppercase tracking-widest">{isActive ? "Product is Active" : "Product is Hidden (Draft)"}</span>
+                            </div>
                         </div>
                     </div>
 
@@ -359,6 +384,7 @@ export default function EditProduct() {
                                                 <th className="p-3 text-[9px] font-black uppercase tracking-widest text-zinc-500">Variant</th>
                                                 <th className="p-3 text-[9px] font-black uppercase tracking-widest text-zinc-500">Price (₹)</th>
                                                 <th className="p-3 text-[9px] font-black uppercase tracking-widest text-zinc-500">Stock</th>
+                                                <th className="p-3 text-[9px] font-black uppercase tracking-widest text-zinc-500">SKU</th>
                                                 <th className="p-3 text-[9px] font-black uppercase tracking-widest text-zinc-500 text-right">Action</th>
                                             </tr>
                                         </thead>
@@ -387,7 +413,14 @@ export default function EditProduct() {
                                                             className="w-20 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-2 text-xs font-bold outline-none focus:border-black transition-all"
                                                         />
                                                     </td>
-                                                    <td className="p-3 text-right">
+                                                    <td className="p-3 text-right flex items-center justify-end gap-2">
+                                                        <input
+                                                            type="text"
+                                                            value={variant.sku}
+                                                            onChange={(e) => updateVariant(idx, 'sku', e.target.value.toUpperCase())}
+                                                            className="w-32 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-2 text-[10px] font-mono font-bold outline-none focus:border-black transition-all"
+                                                            placeholder="SKU"
+                                                        />
                                                         <button
                                                             onClick={() => removeVariant(idx)}
                                                             className="text-zinc-400 hover:text-red-500 transition-colors"
