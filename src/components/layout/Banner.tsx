@@ -11,7 +11,7 @@ export default function Banner() {
     return (
         <div className="relative isolate flex items-center justify-center gap-x-6 overflow-hidden bg-black px-6 py-2.5 dark:bg-zinc-900 sm:px-3.5">
             <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
-                <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white">
+                <p className="text-[10px] uppercase tracking-[0.3em] text-white">
                     <span className="text-zinc-500">Notice:</span> FREE SHIPPING ON ALL ORDERS ABOVE ₹1499
                 </p>
             </div>

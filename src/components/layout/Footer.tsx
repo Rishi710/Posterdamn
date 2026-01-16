@@ -12,7 +12,7 @@ export default function Footer() {
         <footer className="relative w-full overflow-hidden bg-black pt-0 pb-6 text-white">
             {/* 1. Top Contrast Marquee */}
             <div className="w-full bg-white py-3 border-b-[4px] border-black">
-                <div className="flex animate-marquee whitespace-nowrap text-[11px] font-black uppercase tracking-[0.2em] text-black">
+                <div className="flex animate-marquee whitespace-nowrap text-[11px] uppercase tracking-[0.2em] text-black">
                     <MarqueeContent />
                     <MarqueeContent />
                     <MarqueeContent />
@@ -21,7 +21,7 @@ export default function Footer() {
 
             <div className="relative mx-auto max-w-[1440px] px-6 pt-20 pb-12 lg:px-12">
                 {/* 2. Giant Background Typography - Auto Scrolling */}
-                <div className="pointer-events-none absolute -bottom-10 left-0 w-full select-none overflow-hidden whitespace-nowrap text-[22vw] font-black leading-none text-zinc-900/40 tracking-tighter">
+                <div className="pointer-events-none absolute -bottom-10 left-0 w-full select-none overflow-hidden whitespace-nowrap text-[22vw] leading-none text-zinc-900/40 tracking-tighter">
                     <div className="flex animate-marquee-slow">
                         <span className="mr-24">POSTERDAMN</span>
                         <span className="mr-24">POSTERDAMN</span>
@@ -32,7 +32,7 @@ export default function Footer() {
 
                     {/* Left Section: Branding & Newsletter */}
                     <div className="lg:col-span-6 flex flex-col items-start">
-                        <h2 className="text-4xl font-black italic tracking-tighter sm:text-5xl lg:text-5xl">
+                        <h2 className="text-4xl tracking-tighter uppercase sm:text-5xl lg:text-5xl">
                             DON&apos;T LET <br /> YOUR WALLS<br />
                             BE <span className="text-zinc-500">BORING.</span>
                         </h2>
@@ -109,10 +109,10 @@ export default function Footer() {
                 {/* 3. Bottom Utility Bar */}
                 <div className="relative z-10 mt-32 flex flex-col items-center justify-between gap-6 border-t border-zinc-900 pt-8 lg:flex-row">
                     <div className="flex items-center gap-4">
-                        <div className="flex h-8 w-8 items-center justify-center rounded-full border border-zinc-700 text-[10px] font-black">
+                        <div className="flex h-8 w-8 items-center justify-center rounded-full border border-zinc-700 text-[10px]">
                             N
                         </div>
-                        <p className="text-xs font-bold tracking-widest text-zinc-500 uppercase">
+                        <p className="text-xs tracking-widest text-zinc-500 uppercase">
                             © {new Date().getFullYear()} POSTERDAMN INC.
                         </p>
                     </div>
@@ -123,7 +123,7 @@ export default function Footer() {
 
                     <button
                         onClick={scrollToTop}
-                        className="group flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-zinc-500 transition-colors hover:text-white"
+                        className="group flex items-center gap-2 text-xs uppercase tracking-widest text-zinc-500 transition-colors hover:text-white"
                     >
                         Back to Top
                         <ArrowUp className="h-4 w-4 transition-transform group-hover:-translate-y-1" />
@@ -157,7 +157,7 @@ function SocialPill({ label, href }: { label: string; href: string }) {
     return (
         <Link
             href={href}
-            className="rounded-full border border-zinc-800 px-6 py-2 text-xs font-bold tracking-wider transition-all hover:bg-white hover:text-black"
+            className="rounded-full border border-zinc-800 px-6 py-2 text-xs tracking-wider transition-all hover:bg-white hover:text-black"
         >
             {label}
         </Link>
@@ -167,7 +167,7 @@ function SocialPill({ label, href }: { label: string; href: string }) {
 function LinkColumn({ title, links }: { title: string; links: { label: string; href: string }[] }) {
     return (
         <div className="flex flex-col gap-6">
-            <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-zinc-600">
+            <h4 className="text-[10px] uppercase tracking-[0.3em] text-zinc-600">
                 {title}
             </h4>
             <ul className="flex flex-col gap-4">

@@ -52,7 +52,7 @@ export default function ProductCard({ product }: { product: ProductProps }) {
 
                 {/* Discount Badge */}
                 {product.price > product.discountedPrice && (
-                    <div className="absolute left-0 top-6 bg-black px-3 py-1 text-[10px] font-black uppercase tracking-widest text-white dark:bg-white dark:text-black">
+                    <div className="absolute left-0 top-6 bg-black px-3 py-1 text-[10px] uppercase tracking-widest text-white dark:bg-white dark:text-black">
                         {Math.round(((product.price - product.discountedPrice) / product.price) * 100)}% OFF
                     </div>
                 )}
@@ -61,20 +61,20 @@ export default function ProductCard({ product }: { product: ProductProps }) {
             {/* Content / Footer */}
             <div className="flex flex-1 flex-col p-4 sm:p-6">
                 <div className="mb-4">
-                    <span className="text-[10px] font-black uppercase tracking-widest text-zinc-400">
+                    <span className="text-[10px] uppercase tracking-widest text-zinc-400">
                         {category}
                     </span>
-                    <h3 className="mt-1 text-lg font-black tracking-tighter uppercase leading-tight text-black dark:text-white">
+                    <h3 className="mt-1 text-lg tracking-tighter uppercase leading-tight text-black dark:text-white">
                         <Link href={`/shop/${product.id}`}>
                             {product.title}
                         </Link>
                     </h3>
                     <div className="mt-2 flex items-baseline gap-3">
-                        <span className="text-xl font-black tracking-tight text-black dark:text-white">
+                        <span className="text-xl tracking-tight text-black dark:text-white">
                             ₹{product.discountedPrice}
                         </span>
                         {product.price > product.discountedPrice && (
-                            <span className="text-sm font-bold text-zinc-500 line-through">
+                            <span className="text-sm text-zinc-500 line-through">
                                 ₹{product.price}
                             </span>
                         )}
@@ -83,7 +83,7 @@ export default function ProductCard({ product }: { product: ProductProps }) {
 
                 <button
                     onClick={() => addToCart(product)}
-                    className="mt-auto flex items-center justify-center gap-2 bg-black py-4 text-[10px] font-black uppercase tracking-widest text-white transition-all hover:bg-zinc-800 dark:bg-white dark:text-black dark:hover:bg-zinc-200"
+                    className="mt-auto flex items-center justify-center gap-2 bg-black py-4 text-[10px] uppercase tracking-widest text-white transition-all hover:bg-zinc-800 dark:bg-white dark:text-black dark:hover:bg-zinc-200"
                 >
                     <ShoppingBag className="h-4 w-4" />
                     Add to Cart

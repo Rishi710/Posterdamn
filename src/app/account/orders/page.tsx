@@ -102,15 +102,15 @@ export default function OrdersPage() {
     return (
         <div className="space-y-8">
             <div className="border-b border-zinc-100 dark:border-zinc-800 pb-8">
-                <h1 className="text-3xl font-black italic tracking-tighter uppercase text-black dark:text-white lg:text-4xl">Order History</h1>
-                <p className="mt-2 text-xs font-bold text-zinc-400 uppercase tracking-widest">Track and manage your archival collections</p>
+                <h1 className="text-3xl tracking-tighter uppercase text-black dark:text-white lg:text-4xl">Order History</h1>
+                <p className="mt-2 text-xs text-zinc-400 uppercase tracking-widest">Track and manage your archival collections</p>
             </div>
 
             {orders.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-20 border-2 border-dashed border-zinc-100 dark:border-zinc-800 rounded-3xl">
                     <Package className="h-12 w-12 text-zinc-200 mb-4" />
-                    <p className="text-sm font-black uppercase tracking-widest text-zinc-400">No orders found</p>
-                    <Link href="/shop" className="mt-6 text-xs font-black uppercase tracking-widest text-black dark:text-white underline underline-offset-8">
+                    <p className="text-sm uppercase tracking-widest text-zinc-400">No orders found</p>
+                    <Link href="/shop" className="mt-6 text-xs uppercase tracking-widest text-black dark:text-white underline underline-offset-8">
                         Start Shopping
                     </Link>
                 </div>
@@ -122,23 +122,23 @@ export default function OrdersPage() {
                             <div className="flex flex-wrap items-center justify-between gap-4 border-b border-zinc-100 dark:border-zinc-800 p-6 bg-zinc-50/50 dark:bg-zinc-900/80">
                                 <div className="flex items-center gap-6">
                                     <div>
-                                        <p className="text-[10px] font-black uppercase tracking-widest text-zinc-400">Order ID</p>
-                                        <p className="text-xs font-black text-black dark:text-white mt-1">#{order.id.slice(-8).toUpperCase()}</p>
+                                        <p className="text-[10px] uppercase tracking-widest text-zinc-400">Order ID</p>
+                                        <p className="text-xs text-black dark:text-white mt-1">#{order.id.slice(-8).toUpperCase()}</p>
                                     </div>
                                     <div>
-                                        <p className="text-[10px] font-black uppercase tracking-widest text-zinc-400">Placed On</p>
-                                        <p className="text-xs font-black text-black dark:text-white mt-1">
+                                        <p className="text-[10px] uppercase tracking-widest text-zinc-400">Placed On</p>
+                                        <p className="text-xs text-black dark:text-white mt-1">
                                             {new Date(order.created_at).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
                                         </p>
                                     </div>
                                     <div>
-                                        <p className="text-[10px] font-black uppercase tracking-widest text-zinc-400">Total</p>
-                                        <p className="text-xs font-black text-black dark:text-white mt-1">₹{order.total_amount}</p>
+                                        <p className="text-[10px] uppercase tracking-widest text-zinc-400">Total</p>
+                                        <p className="text-xs text-black dark:text-white mt-1">₹{order.total_amount}</p>
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-2 rounded-full border border-zinc-200 dark:border-zinc-800 px-4 py-1.5">
                                     {getStatusIcon(order.status)}
-                                    <span className="text-[10px] font-black uppercase tracking-widest text-black dark:text-white">{order.status}</span>
+                                    <span className="text-[10px] uppercase tracking-widest text-black dark:text-white">{order.status}</span>
                                 </div>
                             </div>
 
@@ -151,11 +151,11 @@ export default function OrdersPage() {
                                                 <img src={item.image} alt={item.title} className="h-full w-full object-cover" />
                                             </div>
                                             <div className="flex-1 min-w-0">
-                                                <p className="text-xs font-black uppercase tracking-tight text-black dark:text-white truncate">{item.title}</p>
-                                                <p className="text-[10px] font-bold text-zinc-400 mt-1 uppercase tracking-widest">Qty: {item.quantity}</p>
+                                                <p className="text-xs uppercase tracking-tight text-black dark:text-white truncate">{item.title}</p>
+                                                <p className="text-[10px] text-zinc-400 mt-1 uppercase tracking-widest">Qty: {item.quantity}</p>
                                             </div>
                                             <div className="text-right">
-                                                <p className="text-xs font-black text-black dark:text-white">₹{item.price}</p>
+                                                <p className="text-xs text-black dark:text-white">₹{item.price}</p>
                                             </div>
                                         </div>
                                     ))}
@@ -167,7 +167,7 @@ export default function OrdersPage() {
                                         <button
                                             onClick={() => cancelOrder(order.id)}
                                             disabled={cancellingOrderId === order.id}
-                                            className="w-full sm:w-auto px-6 py-3 text-xs font-black uppercase tracking-widest text-red-500 border border-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                            className="w-full sm:w-auto px-6 py-3 text-xs uppercase tracking-widest text-red-500 border border-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                                         >
                                             {cancellingOrderId === order.id ? "Cancelling..." : "Cancel Order"}
                                         </button>

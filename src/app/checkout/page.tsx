@@ -263,11 +263,11 @@ export default function CheckoutPage() {
         <div className="mx-auto max-w-[1440px] px-6 py-12 lg:px-12 bg-white dark:bg-black min-h-screen">
             {/* Header */}
             <div className="mb-12 flex items-center gap-4">
-                <Link href="/cart" className="group flex items-center gap-2 text-sm font-bold uppercase tracking-widest text-zinc-500 hover:text-black dark:hover:text-white transition-colors">
+                <Link href="/cart" className="group flex items-center gap-2 text-sm uppercase tracking-widest text-zinc-500 hover:text-black dark:hover:text-white transition-colors">
                     <ChevronLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
                     Back to Bag
                 </Link>
-                <h1 className="text-4xl font-black italic tracking-tighter uppercase text-black dark:text-white lg:text-5xl">Checkout</h1>
+                <h1 className="text-4xl tracking-tighter uppercase text-black dark:text-white lg:text-5xl">Checkout</h1>
             </div>
 
             <div className="lg:grid lg:grid-cols-12 lg:gap-x-16">
@@ -275,7 +275,7 @@ export default function CheckoutPage() {
                 <div className="lg:col-span-8 space-y-12">
                     <section>
                         <div className="flex items-center justify-between border-b border-zinc-100 dark:border-zinc-800 pb-6 mb-8">
-                            <h2 className="text-xl font-black uppercase tracking-widest text-black dark:text-white flex items-center gap-3">
+                            <h2 className="text-xl uppercase tracking-widest text-black dark:text-white flex items-center gap-3">
                                 <span className="flex h-8 w-8 items-center justify-center rounded-full bg-black text-xs text-white dark:bg-white dark:text-black">1</span>
                                 Shipping Address
                             </h2>
@@ -286,7 +286,7 @@ export default function CheckoutPage() {
                                         setFormData({ type: "Home", firstName: "", lastName: "", street: "", landmark: "", city: "", state: "", country: "IN", zip: "", phone: "" });
                                         setIsAddingNew(true);
                                     }}
-                                    className="flex items-center gap-2 text-xs font-black uppercase tracking-widest text-black dark:text-white hover:opacity-50 transition-opacity"
+                                    className="flex items-center gap-2 text-xs uppercase tracking-widest text-black dark:text-white hover:opacity-50 transition-opacity"
                                 >
                                     <Plus className="h-4 w-4" /> Add New
                                 </button>
@@ -295,7 +295,7 @@ export default function CheckoutPage() {
 
                         {isAddingNew ? (
                             <form onSubmit={handleSubmit} className="bg-zinc-50 dark:bg-zinc-900 p-8 border border-zinc-100 dark:border-zinc-800 space-y-6">
-                                <h3 className="text-sm font-black uppercase tracking-widest text-black dark:text-white">
+                                <h3 className="text-sm uppercase tracking-widest text-black dark:text-white">
                                     {editingAddressId ? "Edit Address" : "New Shipping Address"}
                                 </h3>
                                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
@@ -365,13 +365,13 @@ export default function CheckoutPage() {
                                     </div>
                                 </div>
                                 <div className="flex gap-4 pt-4">
-                                    <button type="submit" className="flex-1 bg-black py-4 text-xs font-black uppercase tracking-widest text-white dark:bg-white dark:text-black hover:opacity-80 transition-opacity">
+                                    <button type="submit" className="flex-1 bg-black py-4 text-xs uppercase tracking-widest text-white dark:bg-white dark:text-black hover:opacity-80 transition-opacity">
                                         {editingAddressId ? "Update Address" : "Save Address"}
                                     </button>
                                     <button
                                         type="button"
                                         onClick={() => setIsAddingNew(false)}
-                                        className="px-8 py-4 text-xs font-black uppercase tracking-widest text-zinc-500 hover:text-black dark:hover:text-white transition-colors"
+                                        className="px-8 py-4 text-xs uppercase tracking-widest text-zinc-500 hover:text-black dark:hover:text-white transition-colors"
                                     >
                                         Cancel
                                     </button>
@@ -382,10 +382,10 @@ export default function CheckoutPage() {
                                 {addresses.length === 0 ? (
                                     <div className="sm:col-span-2 flex flex-col items-center justify-center py-12 border-2 border-dashed border-zinc-100 dark:border-zinc-800 rounded-2xl">
                                         <MapPin className="h-10 w-10 text-zinc-300 mb-4" />
-                                        <p className="text-sm font-bold text-zinc-500 uppercase tracking-widest text-center px-4">No addresses saved yet</p>
+                                        <p className="text-sm text-zinc-500 uppercase tracking-widest text-center px-4">No addresses saved yet</p>
                                         <button
                                             onClick={() => setIsAddingNew(true)}
-                                            className="mt-4 text-xs font-black uppercase text-black dark:text-white underline underline-offset-4"
+                                            className="mt-4 text-xs uppercase text-black dark:text-white underline underline-offset-4"
                                         >
                                             Add your first address
                                         </button>
@@ -421,8 +421,8 @@ export default function CheckoutPage() {
                                                     </button>
                                                 </div>
                                             </div>
-                                            <p className="text-sm font-black uppercase tracking-tight text-black dark:text-white mb-2">{addr.name}</p>
-                                            <p className="text-xs font-medium text-zinc-600 dark:text-zinc-400 leading-relaxed">
+                                            <p className="text-sm uppercase tracking-tight text-black dark:text-white mb-2">{addr.name}</p>
+                                            <p className="text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed">
                                                 {addr.street}
                                                 {addr.landmark && <>, {addr.landmark}</>}
                                                 <br />
@@ -430,7 +430,7 @@ export default function CheckoutPage() {
                                                 <br />
                                                 {addr.country}
                                             </p>
-                                            <p className="mt-3 text-[10px] font-black uppercase tracking-widest text-zinc-400">📞 {addr.phone}</p>
+                                            <p className="mt-3 text-[10px] uppercase tracking-widest text-zinc-400">📞 {addr.phone}</p>
                                         </div>
                                     ))
                                 )}
@@ -440,7 +440,7 @@ export default function CheckoutPage() {
 
                     <section className={`${!selectedAddressId ? 'opacity-50 pointer-events-none' : 'opacity-100'} transition-opacity`}>
                         <div className="flex items-center justify-between border-b border-zinc-100 dark:border-zinc-800 pb-6 mb-8">
-                            <h2 className="text-xl font-black uppercase tracking-widest text-black dark:text-white flex items-center gap-3">
+                            <h2 className="text-xl uppercase tracking-widest text-black dark:text-white flex items-center gap-3">
                                 <span className="flex h-8 w-8 items-center justify-center rounded-full bg-black text-xs text-white dark:bg-white dark:text-black">2</span>
                                 Payment Method
                             </h2>
@@ -452,8 +452,8 @@ export default function CheckoutPage() {
                                         <div className="h-2 w-2 rounded-full bg-black dark:bg-white" />
                                     </div>
                                     <div>
-                                        <p className="text-sm font-black uppercase tracking-widest text-black dark:text-white">Cash on Delivery</p>
-                                        <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Pay when you receive your posters</p>
+                                        <p className="text-sm uppercase tracking-widest text-black dark:text-white">Cash on Delivery</p>
+                                        <p className="text-[10px] text-zinc-500 uppercase tracking-widest">Pay when you receive your posters</p>
                                     </div>
                                 </div>
                             </div>
@@ -464,7 +464,7 @@ export default function CheckoutPage() {
                 {/* Right Column: Order Summary */}
                 <div className="mt-16 lg:col-span-4 lg:mt-0">
                     <div className="sticky top-24 space-y-8 bg-zinc-50 p-8 dark:bg-zinc-900/50 border border-zinc-100 dark:border-zinc-800">
-                        <h2 className="text-2xl font-black italic tracking-tighter uppercase text-black dark:text-white border-b border-zinc-200 dark:border-zinc-800 pb-4">Order Summary</h2>
+                        <h2 className="text-2xl tracking-tighter uppercase text-black dark:text-white border-b border-zinc-200 dark:border-zinc-800 pb-4">Order Summary</h2>
 
                         <div className="space-y-4 max-h-60 overflow-y-auto pr-2 custom-scrollbar">
                             {cart.map((item, idx) => (
@@ -473,9 +473,9 @@ export default function CheckoutPage() {
                                         <img src={item.image} alt={item.title} className="h-full w-full object-cover" />
                                     </div>
                                     <div className="flex-1 min-w-0">
-                                        <p className="text-xs font-black uppercase tracking-tight text-black dark:text-white truncate">{item.title}</p>
-                                        <p className="text-[10px] font-bold text-zinc-400">Qty: 1</p>
-                                        <p className="mt-1 text-xs font-black text-black dark:text-white">₹{item.discountedPrice}</p>
+                                        <p className="text-xs uppercase tracking-tight text-black dark:text-white truncate">{item.title}</p>
+                                        <p className="text-[10px] text-zinc-400">Qty: 1</p>
+                                        <p className="mt-1 text-xs text-black dark:text-white">₹{item.discountedPrice}</p>
                                     </div>
                                 </div>
                             ))}
@@ -484,7 +484,7 @@ export default function CheckoutPage() {
                         <div className="space-y-4 border-t border-zinc-200 pt-8 dark:border-zinc-800">
                             <SummaryRow label="Subtotal" value={`₹${subtotal} `} />
                             <SummaryRow label="Shipping" value={shipping === 0 ? "FREE" : `₹${shipping} `} />
-                            <div className="flex justify-between text-xl font-black uppercase tracking-tighter pt-4 border-t border-zinc-200 dark:border-zinc-800">
+                            <div className="flex justify-between text-xl uppercase tracking-tighter pt-4 border-t border-zinc-200 dark:border-zinc-800">
                                 <span className="text-black dark:text-white">Total</span>
                                 <span className="text-black dark:text-white">₹{Math.round(total)}</span>
                             </div>
@@ -494,9 +494,9 @@ export default function CheckoutPage() {
                             <button
                                 disabled={!selectedAddressId || isPlacing}
                                 onClick={handlePlaceOrder}
-                                className={`flex w-full items-center justify-center gap-2 py-6 text-sm font-black uppercase tracking-[0.2em] transition-all ${selectedAddressId && !isPlacing
-                                        ? 'bg-black text-white hover:bg-zinc-800 dark:bg-white dark:text-black dark:hover:bg-zinc-200'
-                                        : 'bg-zinc-200 text-zinc-400 cursor-not-allowed dark:bg-zinc-800 dark:text-zinc-600'
+                                className={`flex w-full items-center justify-center gap-2 py-6 text-sm uppercase tracking-[0.2em] transition-all ${selectedAddressId && !isPlacing
+                                    ? 'bg-black text-white hover:bg-zinc-800 dark:bg-white dark:text-black dark:hover:bg-zinc-200'
+                                    : 'bg-zinc-200 text-zinc-400 cursor-not-allowed dark:bg-zinc-800 dark:text-zinc-600'
                                     }`}
                             >
                                 {isPlacing ? "Processing..." : "Place Order"}
@@ -504,7 +504,7 @@ export default function CheckoutPage() {
                         ) : (
                             <Link
                                 href="/login?next=/checkout"
-                                className="flex w-full items-center justify-center gap-2 py-6 text-sm font-black uppercase tracking-[0.2em] bg-black text-white hover:bg-zinc-800 dark:bg-white dark:text-black dark:hover:bg-zinc-200 transition-all"
+                                className="flex w-full items-center justify-center gap-2 py-6 text-sm uppercase tracking-[0.2em] bg-black text-white hover:bg-zinc-800 dark:bg-white dark:text-black dark:hover:bg-zinc-200 transition-all"
                             >
                                 Login to Place Order
                             </Link>
@@ -519,13 +519,13 @@ export default function CheckoutPage() {
 function FormInput({ label, value, onChange, placeholder }: { label: string, value: string, onChange: (v: string) => void, placeholder: string }) {
     return (
         <div className="flex flex-col gap-2">
-            <label className="text-[10px] font-black uppercase tracking-widest text-zinc-400">{label}</label>
+            <label className="text-[10px] uppercase tracking-widest text-zinc-400">{label}</label>
             <input
                 type="text"
                 value={value}
                 onChange={(e) => onChange(e.target.value)}
                 placeholder={placeholder}
-                className="w-full bg-white dark:bg-black border border-zinc-200 dark:border-zinc-800 px-4 py-3 text-xs font-bold text-black dark:text-white outline-none focus:border-black dark:focus:border-white transition-colors"
+                className="w-full bg-white dark:bg-black border border-zinc-200 dark:border-zinc-800 px-4 py-3 text-xs text-black dark:text-white outline-none focus:border-black dark:focus:border-white transition-colors"
             />
         </div>
     );
@@ -533,7 +533,7 @@ function FormInput({ label, value, onChange, placeholder }: { label: string, val
 
 function SummaryRow({ label, value }: { label: string, value: string }) {
     return (
-        <div className="flex justify-between text-sm font-bold uppercase tracking-widest">
+        <div className="flex justify-between text-sm uppercase tracking-widest">
             <span className="text-zinc-500">{label}</span>
             <span className="text-black dark:text-white">{value}</span>
         </div>

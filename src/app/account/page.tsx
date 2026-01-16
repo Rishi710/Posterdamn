@@ -16,6 +16,8 @@ export default function AccountPage() {
     const [isEditing, setIsEditing] = useState(false);
     const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
 
+    const [role, setRole] = useState<'user' | 'admin' | null>(null);
+
     // Password Change State
     const [isChangingPassword, setIsChangingPassword] = useState(false);
     const [newPassword, setNewPassword] = useState("");
@@ -53,6 +55,18 @@ export default function AccountPage() {
 
             // Fetch recent orders
             fetchRecentOrders();
+
+            // Check Admin Role
+            const checkRole = async () => {
+                const { data: profile } = await supabase
+                    .from('profiles')
+                    .select('role')
+                    .eq('id', user.id)
+                    .single();
+
+                if (profile) setRole(profile.role);
+            };
+            checkRole();
         }
     }, [user, session, router]);
 
@@ -139,65 +153,75 @@ export default function AccountPage() {
                 <div className="mb-8 border-b border-zinc-100 dark:border-zinc-800 pb-8">
                     <div className="flex items-end justify-between">
                         <div>
-                            <h1 className="text-3xl font-black italic tracking-tighter lg:text-4xl uppercase text-black dark:text-white">Profile</h1>
+                            <h1 className="text-3xl tracking-tighter lg:text-4xl uppercase text-black dark:text-white">Profile</h1>
                             <p className="text-sm font-medium text-zinc-500 dark:text-zinc-400 mt-2">Manage your identity and preferences.</p>
                         </div>
-                        {!isEditing && (
-                            <button
-                                onClick={() => setIsEditing(true)}
-                                className="text-[10px] font-black uppercase tracking-widest text-zinc-400 hover:text-black dark:hover:text-white transition-colors"
-                            >
-                                Edit Information
-                            </button>
-                        )}
+                        <div className="flex gap-4 items-center">
+                            {role === 'admin' && (
+                                <a
+                                    href="/admin/dashboard"
+                                    className="bg-black text-white px-6 py-2 text-[10px] uppercase tracking-widest hover:bg-zinc-800 dark:bg-white dark:text-black dark:hover:bg-zinc-200 transition-colors"
+                                >
+                                    Admin Dashboard
+                                </a>
+                            )}
+                            {!isEditing && (
+                                <button
+                                    onClick={() => setIsEditing(true)}
+                                    className="flex items-center gap-2 text-[10px] uppercase tracking-widest text-zinc-500 hover:text-black dark:hover:text-white transition-colors"
+                                >
+                                    Edit Information
+                                </button>
+                            )}
+                        </div>
                     </div>
                 </div>
 
                 <div className="grid grid-cols-1 gap-12 lg:grid-cols-2">
                     <div className="space-y-6">
                         {message && (
-                            <div className={`flex items-center gap-2 rounded-lg p-4 text-[10px] font-black uppercase tracking-widest ${message.type === 'success' ? 'bg-green-50 text-green-600 dark:bg-green-950/20' : 'bg-red-50 text-red-600 dark:bg-red-950/20'}`}>
+                            <div className={`flex items-center gap-2 rounded-lg p-4 text-[10px] uppercase tracking-widest ${message.type === 'success' ? 'bg-green-50 text-green-600 dark:bg-green-950/20' : 'bg-red-50 text-red-600 dark:bg-red-950/20'}`}>
                                 {message.type === 'success' ? <CheckCircle2 className="h-4 w-4" /> : <AlertCircle className="h-4 w-4" />}
                                 {message.text}
                             </div>
                         )}
 
                         <div className="flex flex-col gap-2">
-                            <label htmlFor="first-name" className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400">First Name</label>
+                            <label htmlFor="first-name" className="text-[10px] uppercase tracking-[0.2em] text-zinc-400">First Name</label>
                             <input
                                 id="first-name"
                                 type="text"
                                 value={firstName}
                                 onChange={(e) => setFirstName(e.target.value)}
                                 disabled={!isEditing}
-                                className={`w-full border-b bg-transparent py-2 text-base font-bold tracking-tight outline-none transition-colors ${isEditing ? "border-zinc-200 text-black focus:border-black dark:border-zinc-800 dark:text-white dark:focus:border-white" : "border-transparent text-zinc-600 dark:text-zinc-400 cursor-default"}`}
+                                className={`w-full border-b bg-transparent py-2 text-base tracking-tight outline-none transition-colors ${isEditing ? "border-zinc-200 text-black focus:border-black dark:border-zinc-800 dark:text-white dark:focus:border-white" : "border-transparent text-zinc-600 dark:text-zinc-400 cursor-default"}`}
                             />
                         </div>
                         <div className="flex flex-col gap-2">
-                            <label htmlFor="last-name" className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400">Last Name</label>
+                            <label htmlFor="last-name" className="text-[10px] uppercase tracking-[0.2em] text-zinc-400">Last Name</label>
                             <input
                                 id="last-name"
                                 type="text"
                                 value={lastName}
                                 onChange={(e) => setLastName(e.target.value)}
                                 disabled={!isEditing}
-                                className={`w-full border-b bg-transparent py-2 text-base font-bold tracking-tight outline-none transition-colors ${isEditing ? "border-zinc-200 text-black focus:border-black dark:border-zinc-800 dark:text-white dark:focus:border-white" : "border-transparent text-zinc-600 dark:text-zinc-400 cursor-default"}`}
+                                className={`w-full border-b bg-transparent py-2 text-base tracking-tight outline-none transition-colors ${isEditing ? "border-zinc-200 text-black focus:border-black dark:border-zinc-800 dark:text-white dark:focus:border-white" : "border-transparent text-zinc-600 dark:text-zinc-400 cursor-default"}`}
                             />
                         </div>
 
                         <div className="flex flex-col gap-2">
-                            <label htmlFor="email" className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400">Email Address</label>
+                            <label htmlFor="email" className="text-[10px] uppercase tracking-[0.2em] text-zinc-400">Email Address</label>
                             <input
                                 id="email"
                                 type="email"
                                 value={user?.email || ""}
                                 disabled
-                                className="w-full border-b border-zinc-200 bg-transparent py-2 text-base font-bold tracking-tight text-zinc-400 outline-none cursor-not-allowed dark:border-zinc-800"
+                                className="w-full border-b border-zinc-200 bg-transparent py-2 text-base tracking-tight text-zinc-400 outline-none cursor-not-allowed dark:border-zinc-800"
                             />
                         </div>
 
                         <div className="flex flex-col gap-2">
-                            <label htmlFor="phone" className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400">Phone Number</label>
+                            <label htmlFor="phone" className="text-[10px] uppercase tracking-[0.2em] text-zinc-400">Phone Number</label>
                             <input
                                 id="phone"
                                 type="tel"
@@ -205,7 +229,7 @@ export default function AccountPage() {
                                 onChange={(e) => setPhone(e.target.value)}
                                 disabled={!isEditing}
                                 placeholder={isEditing ? "+91" : ""}
-                                className={`w-full border-b bg-transparent py-2 text-base font-bold tracking-tight outline-none transition-colors ${isEditing ? "border-zinc-200 text-black focus:border-black dark:border-zinc-800 dark:text-white dark:focus:border-white" : "border-transparent text-zinc-600 dark:text-zinc-400 cursor-default"}`}
+                                className={`w-full border-b bg-transparent py-2 text-base tracking-tight outline-none transition-colors ${isEditing ? "border-zinc-200 text-black focus:border-black dark:border-zinc-800 dark:text-white dark:focus:border-white" : "border-transparent text-zinc-600 dark:text-zinc-400 cursor-default"}`}
                             />
                         </div>
 
@@ -223,14 +247,14 @@ export default function AccountPage() {
                                             setPhone(user.user_metadata?.phone_number || user.phone || "");
                                         }
                                     }}
-                                    className="flex-1 bg-zinc-100 py-4 px-8 text-xs font-black uppercase tracking-widest text-zinc-500 transition-all hover:bg-zinc-200 dark:bg-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800"
+                                    className="flex-1 bg-zinc-100 py-4 px-8 text-xs uppercase tracking-widest text-zinc-500 transition-all hover:bg-zinc-200 dark:bg-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800"
                                 >
                                     Cancel
                                 </button>
                                 <button
                                     onClick={handleUpdateProfile}
                                     disabled={loading}
-                                    className="flex-1 bg-black py-4 px-8 text-xs font-black uppercase tracking-widest text-white transition-all hover:bg-zinc-800 disabled:opacity-50 dark:bg-white dark:text-black dark:hover:bg-zinc-200"
+                                    className="flex-1 bg-black py-4 px-8 text-xs uppercase tracking-widest text-white transition-all hover:bg-zinc-800 disabled:opacity-50 dark:bg-white dark:text-black dark:hover:bg-zinc-200"
                                 >
                                     {loading ? "Saving..." : "Save Changes"}
                                 </button>
@@ -239,7 +263,7 @@ export default function AccountPage() {
                     </div>
 
                     <div className="bg-zinc-50/50 p-8 dark:bg-zinc-900/30 border border-zinc-100 dark:border-zinc-800">
-                        <h4 className="text-xs font-black uppercase tracking-[0.2em] text-zinc-400 mb-6">Security</h4>
+                        <h4 className="text-xs uppercase tracking-[0.2em] text-zinc-400 mb-6">Security</h4>
                         {!isChangingPassword ? (
                             <>
                                 <p className="text-sm font-medium text-zinc-600 dark:text-zinc-400 mb-6 leading-relaxed">
@@ -247,7 +271,7 @@ export default function AccountPage() {
                                 </p>
                                 <button
                                     onClick={() => setIsChangingPassword(true)}
-                                    className="text-xs font-black uppercase tracking-widest border-b-2 border-black pb-1 hover:text-zinc-600 dark:border-white dark:hover:text-zinc-400 transition-colors"
+                                    className="text-xs uppercase tracking-widest border-b-2 border-black pb-1 hover:text-zinc-600 dark:border-white dark:hover:text-zinc-400 transition-colors"
                                 >
                                     Change Password
                                 </button>
@@ -255,18 +279,18 @@ export default function AccountPage() {
                         ) : (
                             <div className="space-y-6 animate-in fade-in slide-in-from-right-2 duration-300">
                                 {pwdMessage && (
-                                    <div className={`text-[10px] font-black uppercase tracking-widest p-3 rounded ${pwdMessage.type === 'success' ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'}`}>
+                                    <div className={`text-[10px] uppercase tracking-widest p-3 rounded ${pwdMessage.type === 'success' ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'}`}>
                                         {pwdMessage.text}
                                     </div>
                                 )}
                                 <div className="flex flex-col gap-2">
-                                    <label className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400">New Password</label>
+                                    <label className="text-[10px] uppercase tracking-[0.2em] text-zinc-400">New Password</label>
                                     <div className="relative">
                                         <input
                                             type={showNewPassword ? "text" : "password"}
                                             value={newPassword}
                                             onChange={(e) => setNewPassword(e.target.value)}
-                                            className="w-full border-b border-zinc-200 bg-transparent py-2 text-base font-bold tracking-tight text-black outline-none focus:border-black dark:border-zinc-800 dark:text-white dark:focus:border-white transition-colors"
+                                            className="w-full border-b border-zinc-300 bg-transparent py-2 text-sm text-black outline-none focus:border-black dark:border-zinc-700 dark:text-white dark:focus:border-white transition-colors"
                                             placeholder=""
                                         />
                                         <button
@@ -279,13 +303,13 @@ export default function AccountPage() {
                                     </div>
                                 </div>
                                 <div className="flex flex-col gap-2">
-                                    <label className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400">Confirm Password</label>
+                                    <label className="text-[10px] uppercase tracking-[0.2em] text-zinc-400">Confirm Password</label>
                                     <div className="relative">
                                         <input
                                             type={showConfirmPassword ? "text" : "password"}
                                             value={confirmPassword}
                                             onChange={(e) => setConfirmPassword(e.target.value)}
-                                            className={`w-full border-b bg-transparent py-2 text-base font-bold tracking-tight text-black outline-none transition-colors placeholder:text-zinc-300 dark:text-white dark:placeholder:text-zinc-700
+                                            className={`w-full border-b bg-transparent py-2 text-sm tracking-tight text-black outline-none transition-colors placeholder:text-zinc-300 dark:text-white dark:placeholder:text-zinc-700
                                                 ${confirmPassword && newPassword !== confirmPassword ? "border-red-500 focus:border-red-500" : "border-zinc-200 focus:border-black dark:border-zinc-800 dark:focus:border-white"}`}
                                             placeholder=""
                                         />
@@ -298,7 +322,7 @@ export default function AccountPage() {
                                         </button>
                                     </div>
                                     {confirmPassword && newPassword !== confirmPassword && (
-                                        <span className="text-[10px] font-bold text-red-500 uppercase tracking-wider animate-in fade-in duration-300">
+                                        <span className="text-[10px] text-red-500 uppercase tracking-wider animate-in fade-in duration-300">
                                             Passwords do not match
                                         </span>
                                     )}
@@ -307,7 +331,7 @@ export default function AccountPage() {
                                     <button
                                         onClick={handleUpdatePassword}
                                         disabled={pwdLoading || !newPassword || newPassword !== confirmPassword || newPassword.length < 6}
-                                        className="flex-1 bg-black py-3 text-[10px] font-black uppercase tracking-widest text-white hover:bg-zinc-800 transition-all disabled:opacity-30 disabled:cursor-not-allowed dark:bg-white dark:text-black dark:hover:bg-zinc-200"
+                                        className="flex-1 bg-black py-3 text-[10px] uppercase tracking-widest text-white hover:bg-zinc-800 transition-all disabled:opacity-30 disabled:cursor-not-allowed dark:bg-white dark:text-black dark:hover:bg-zinc-200"
                                     >
                                         {pwdLoading ? "Updating..." : "Update"}
                                     </button>
@@ -319,7 +343,7 @@ export default function AccountPage() {
                                             setConfirmPassword("");
                                         }}
                                         disabled={pwdLoading}
-                                        className="flex-1 border border-zinc-200 py-3 text-[10px] font-black uppercase tracking-widest text-zinc-500 hover:bg-zinc-50 transition-all dark:border-zinc-800 dark:hover:bg-zinc-900"
+                                        className="flex-1 border border-zinc-200 py-3 text-[10px] uppercase tracking-widest text-zinc-500 hover:bg-zinc-50 transition-all dark:border-zinc-800 dark:hover:bg-zinc-900"
                                     >
                                         Abort
                                     </button>
@@ -334,10 +358,10 @@ export default function AccountPage() {
             <section>
                 <div className="mb-8 flex items-end justify-between border-b border-zinc-100 dark:border-zinc-800 pb-8">
                     <div>
-                        <h2 className="text-2xl font-black italic tracking-tighter uppercase text-black dark:text-white">Recent Orders</h2>
-                        <p className="text-xs font-bold uppercase tracking-widest text-zinc-500 dark:text-zinc-400 mt-1">Your latest acquisitions</p>
+                        <h3 className="text-xl tracking-tighter uppercase text-black dark:text-white">Recent Acquisitions</h3>
+                        <p className="text-xs uppercase tracking-widest text-zinc-500 dark:text-zinc-400 mt-1">Your latest acquisitions</p>
                     </div>
-                    <a href="/account/orders" className="text-xs font-bold uppercase tracking-widest text-zinc-400 hover:text-black dark:hover:text-white transition-colors">
+                    <a href="/account/orders" className="text-xs uppercase tracking-widest text-zinc-400 hover:text-black dark:hover:text-white transition-colors">
                         View All
                     </a>
                 </div>
@@ -345,8 +369,8 @@ export default function AccountPage() {
                 <div className="grid grid-cols-1 gap-6">
                     {recentOrders.length === 0 ? (
                         <div className="flex flex-col items-center justify-center py-12 border-2 border-dashed border-zinc-100 dark:border-zinc-800 rounded-lg">
-                            <p className="text-sm font-bold text-zinc-400 uppercase tracking-widest">No orders yet</p>
-                            <a href="/shop" className="mt-4 text-xs font-black uppercase tracking-widest text-black dark:text-white underline underline-offset-4">
+                            <p className="text-sm text-zinc-500">No orders yet</p>
+                            <a href="/shop" className="mt-4 text-xs uppercase tracking-widest text-black dark:text-white underline underline-offset-4">
                                 Start Shopping
                             </a>
                         </div>
@@ -379,8 +403,8 @@ function OrderCard({ id, date, status, price, image, orderId }: { id: string; da
 
             <div className="flex flex-1 flex-col gap-1">
                 <div className="flex items-center gap-3">
-                    <span className="text-lg font-black tracking-tighter">{id}</span>
-                    <span className="rounded-full bg-zinc-100 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-zinc-500 dark:bg-zinc-900">
+                    <span className="text-lg tracking-tighter">{id}</span>
+                    <span className="rounded-full bg-zinc-100 px-3 py-1 text-[10px] uppercase tracking-widest text-zinc-500 dark:bg-zinc-900">
                         {status}
                     </span>
                 </div>
@@ -388,8 +412,8 @@ function OrderCard({ id, date, status, price, image, orderId }: { id: string; da
             </div>
 
             <div className="flex flex-col items-start gap-4 sm:items-end">
-                <span className="text-xl font-black tracking-tight">{price}</span>
-                <a href="/account/orders" className="text-xs font-black uppercase tracking-widest border border-zinc-200 px-6 py-2 hover:bg-black hover:text-white dark:border-zinc-800 dark:hover:bg-white dark:hover:text-black transition-all inline-block text-center">
+                <span className="text-xl tracking-tight">{price}</span>
+                <a href="/account/orders" className="text-xs uppercase tracking-widest border border-zinc-200 px-6 py-2 hover:bg-black hover:text-white dark:border-zinc-800 dark:hover:bg-white dark:hover:text-black transition-all inline-block text-center">
                     Details
                 </a>
             </div>

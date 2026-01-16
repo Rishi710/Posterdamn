@@ -25,10 +25,10 @@ export default function ContactPage() {
         <div className="mx-auto max-w-[1440px] px-6 py-12 lg:px-12 bg-white dark:bg-black min-h-screen">
             {/* Header Section */}
             <div className="mb-20 space-y-4 text-center">
-                <h1 className="text-5xl font-black italic tracking-tighter uppercase text-black dark:text-white lg:text-8xl">
+                <h1 className="text-5xl tracking-tighter uppercase text-black dark:text-white lg:text-8xl">
                     Connect
                 </h1>
-                <p className="mx-auto max-w-2xl text-sm font-bold uppercase tracking-[0.3em] text-zinc-400">
+                <p className="mx-auto max-w-2xl text-sm uppercase tracking-[0.3em] text-zinc-400">
                     Inquiries, Custom Orders, or just a Greeting. Our archive doors are always open.
                 </p>
             </div>
@@ -59,7 +59,7 @@ export default function ContactPage() {
 
                     {/* Socials */}
                     <div className="border-t border-zinc-100 dark:border-zinc-800 pt-12">
-                        <h3 className="mb-6 text-[10px] font-black uppercase tracking-[0.3em] text-zinc-400">Follow the Archive</h3>
+                        <h3 className="mb-6 text-[10px] uppercase tracking-[0.3em] text-zinc-400">Follow the Archive</h3>
                         <div className="flex gap-6">
                             <a href="#" className="group flex h-12 w-12 items-center justify-center rounded-full border border-zinc-100 transition-all hover:bg-black hover:text-white dark:border-zinc-800 dark:hover:bg-white dark:hover:text-black">
                                 <Instagram className="h-5 w-5" />
@@ -77,13 +77,13 @@ export default function ContactPage() {
                         {isSubmitted ? (
                             <div className="flex flex-col items-center justify-center py-12 text-center animate-in fade-in zoom-in duration-500">
                                 <CheckCircle2 className="h-16 w-16 text-black dark:text-white mb-6" strokeWidth={1} />
-                                <h2 className="text-2xl font-black uppercase tracking-tighter text-black dark:text-white">Message Delivered</h2>
-                                <p className="mt-4 text-xs font-bold text-zinc-500 uppercase tracking-widest leading-relaxed">
+                                <h2 className="text-2xl uppercase tracking-tighter text-black dark:text-white">Message Delivered</h2>
+                                <p className="mt-4 text-xs text-zinc-500 uppercase tracking-widest leading-relaxed">
                                     Your inquiry has been archived. Our curators will get back to you shortly.
                                 </p>
                                 <button
                                     onClick={() => setIsSubmitted(false)}
-                                    className="mt-8 text-[10px] font-black uppercase tracking-widest underline underline-offset-4 hover:opacity-50"
+                                    className="mt-8 text-[10px] uppercase tracking-widest underline underline-offset-4 hover:opacity-50"
                                 >
                                     Send another message
                                 </button>
@@ -92,35 +92,35 @@ export default function ContactPage() {
                             <form onSubmit={handleSubmit} className="space-y-8">
                                 <div className="grid grid-cols-1 gap-8 sm:grid-cols-2">
                                     <div className="space-y-2">
-                                        <label className="text-[10px] font-black uppercase tracking-widest text-zinc-400">Full Name</label>
+                                        <label className="text-[10px] uppercase tracking-widest text-zinc-400">Full Name</label>
                                         <input
                                             required
                                             type="text"
                                             value={formData.name}
                                             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                            className="w-full bg-transparent border-b border-zinc-200 dark:border-zinc-800 pb-2 text-xs font-bold uppercase tracking-widest outline-none focus:border-black dark:focus:border-white transition-colors"
+                                            className="w-full bg-transparent border-b border-zinc-200 dark:border-zinc-800 pb-2 text-xs uppercase tracking-widest outline-none focus:border-black dark:focus:border-white transition-colors"
                                             placeholder="John Wick"
                                         />
                                     </div>
                                     <div className="space-y-2">
-                                        <label className="text-[10px] font-black uppercase tracking-widest text-zinc-400">Email Address</label>
+                                        <label className="text-[10px] uppercase tracking-widest text-zinc-400">Email Address</label>
                                         <input
                                             required
                                             type="email"
                                             value={formData.email}
                                             onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                                            className="w-full bg-transparent border-b border-zinc-200 dark:border-zinc-800 pb-2 text-xs font-bold uppercase tracking-widest outline-none focus:border-black dark:focus:border-white transition-colors"
+                                            className="w-full bg-transparent border-b border-zinc-200 dark:border-zinc-800 pb-2 text-xs uppercase tracking-widest outline-none focus:border-black dark:focus:border-white transition-colors"
                                             placeholder="wick@continental.com"
                                         />
                                     </div>
                                 </div>
 
                                 <div className="space-y-2">
-                                    <label className="text-[10px] font-black uppercase tracking-widest text-zinc-400">Subject</label>
+                                    <label className="text-[10px] uppercase tracking-widest text-zinc-400">Subject</label>
                                     <select
                                         value={formData.subject}
                                         onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
-                                        className="w-full bg-transparent border-b border-zinc-200 dark:border-zinc-800 pb-2 text-xs font-bold uppercase tracking-widest outline-none focus:border-black dark:focus:border-white transition-colors cursor-pointer"
+                                        className="w-full bg-transparent border-b border-zinc-200 dark:border-zinc-800 pb-2 text-xs uppercase tracking-widest outline-none focus:border-black dark:focus:border-white transition-colors cursor-pointer"
                                     >
                                         <option value="General Inquiry">General Inquiry</option>
                                         <option value="Order Support">Order Support</option>
@@ -130,20 +130,20 @@ export default function ContactPage() {
                                 </div>
 
                                 <div className="space-y-2">
-                                    <label className="text-[10px] font-black uppercase tracking-widest text-zinc-400">Message</label>
+                                    <label className="text-[10px] uppercase tracking-widest text-zinc-400">Message</label>
                                     <textarea
                                         required
                                         rows={4}
                                         value={formData.message}
                                         onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                                        className="w-full bg-transparent border-b border-zinc-200 dark:border-zinc-800 pb-2 text-xs font-bold uppercase tracking-widest outline-none focus:border-black dark:focus:border-white transition-colors resize-none"
+                                        className="w-full bg-transparent border-b border-zinc-200 dark:border-zinc-800 pb-2 text-xs uppercase tracking-widest outline-none focus:border-black dark:focus:border-white transition-colors resize-none"
                                         placeholder="How can we help?"
                                     />
                                 </div>
 
                                 <button
                                     type="submit"
-                                    className="group flex items-center gap-3 bg-black px-10 py-5 text-xs font-black uppercase tracking-[0.2em] text-white transition-all hover:bg-zinc-800 dark:bg-white dark:text-black dark:hover:bg-zinc-200"
+                                    className="group flex items-center gap-3 bg-black px-10 py-5 text-xs uppercase tracking-[0.2em] text-white transition-all hover:bg-zinc-800 dark:bg-white dark:text-black dark:hover:bg-zinc-200"
                                 >
                                     Transmit Message
                                     <Send className="h-4 w-4 transition-transform group-hover:translate-x-1 group-hover:-translate-y-1" />
@@ -164,9 +164,9 @@ function ContactInfoItem({ icon, label, value, subValue }: { icon: React.ReactNo
                 {icon}
             </div>
             <div className="space-y-1">
-                <span className="text-[10px] font-black uppercase tracking-[0.3em] text-zinc-400">{label}</span>
-                <p className="text-xl font-black uppercase tracking-tighter text-black dark:text-white leading-tight">{value}</p>
-                <p className="text-xs font-bold text-zinc-500 uppercase tracking-widest">{subValue}</p>
+                <span className="text-[10px] uppercase tracking-[0.3em] text-zinc-400">{label}</span>
+                <p className="text-xl uppercase tracking-tighter text-black dark:text-white leading-tight">{value}</p>
+                <p className="text-xs text-zinc-500 uppercase tracking-widest">{subValue}</p>
             </div>
         </div>
     );

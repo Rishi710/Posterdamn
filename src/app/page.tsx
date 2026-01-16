@@ -64,10 +64,10 @@ export default async function Home() {
         </div>
 
         <div className="relative z-10 mx-auto max-w-[1440px] px-6 text-center">
-          <span className="mb-4 inline-block text-[10px] font-black uppercase tracking-[0.4em] text-zinc-400 sm:tracking-[0.5em]">
+          <span className="mb-4 inline-block text-[10px] uppercase tracking-[0.4em] text-zinc-400 sm:tracking-[0.5em]">
             Premium Poster Boutique
           </span>
-          <h1 className="mb-6 text-5xl font-black uppercase tracking-tighter sm:text-8xl lg:text-9xl leading-[0.9]">
+          <h1 className="mb-6 text-5xl uppercase tracking-tighter sm:text-8xl lg:text-9xl leading-[0.9]">
             OWN THE <br /> <span className="text-zinc-500">AESTHETIC.</span>
           </h1>
           <p className="mx-auto mb-10 max-w-xl text-base font-medium text-zinc-300 sm:text-xl">
@@ -77,7 +77,7 @@ export default async function Home() {
           <div className="flex flex-col items-center justify-center gap-4 sm:flex-row sm:gap-6">
             <Link
               href="/shop"
-              className="group relative overflow-hidden bg-white px-10 py-4 text-sm font-black uppercase tracking-widest text-black transition-all hover:bg-zinc-200"
+              className="group relative overflow-hidden bg-white px-10 py-4 text-sm uppercase tracking-widest text-black transition-all hover:bg-zinc-200"
             >
               <span className="relative z-10 flex items-center gap-2">
                 Shop Collection <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
@@ -85,7 +85,7 @@ export default async function Home() {
             </Link>
             <Link
               href="/shop?sort=collections"
-              className="px-10 py-4 text-sm font-black uppercase tracking-widest text-white transition-all hover:text-zinc-400"
+              className="px-10 py-4 text-sm uppercase tracking-widest text-white transition-all hover:text-zinc-400"
             >
               Explore Archive
             </Link>
@@ -129,14 +129,14 @@ export default async function Home() {
         <div className="mx-auto max-w-[1440px] px-6 lg:px-12">
           <div className="mb-16 flex items-end justify-between">
             <div>
-              <span className="text-[10px] font-black uppercase tracking-[0.3em] text-zinc-500">Curated Choice</span>
-              <h2 className="mt-2 text-4xl font-black uppercase tracking-tighter text-black dark:text-white sm:text-5xl">
+              <span className="text-[10px] uppercase tracking-[0.3em] text-zinc-500">Curated Choice</span>
+              <h2 className="mt-2 text-4xl uppercase tracking-tighter text-black dark:text-white sm:text-5xl">
                 Trending Now
               </h2>
             </div>
             <Link
               href="/shop"
-              className="group flex items-center text-xs font-black uppercase tracking-widest text-black dark:text-white"
+              className="group flex items-center text-xs uppercase tracking-widest text-black dark:text-white"
             >
               View all products
               <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
@@ -178,7 +178,7 @@ function FeatureCard({ icon, title, desc }: { icon: React.ReactNode, title: stri
       <div className="mb-6 flex h-12 w-12 items-center justify-center rounded-full bg-zinc-50 text-black dark:bg-zinc-900 dark:text-white transition-transform hover:scale-110">
         {icon}
       </div>
-      <h3 className="mb-2 text-xs font-black uppercase tracking-widest text-black dark:text-white">
+      <h3 className="mb-2 text-xs uppercase tracking-widest text-black dark:text-white">
         {title}
       </h3>
       <p className="text-sm font-medium leading-relaxed text-zinc-500">

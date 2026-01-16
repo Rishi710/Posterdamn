@@ -18,9 +18,9 @@ export default function CollectionsGrid() {
         <section className="bg-gray-50 py-12 dark:bg-black">
             <div className="mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8">
                 <div className="mb-12 text-center">
-                    <span className="text-[10px] font-black uppercase tracking-[0.5em] text-zinc-400">Curated Archives</span>
-                    <h2 className="mt-4 text-4xl font-black uppercase tracking-tighter text-black dark:text-white sm:text-7xl">
-                        The Infinite <span className="text-zinc-500 italic">Wall</span>
+                    <span className="text-[10px] uppercase tracking-[0.5em] text-zinc-400">Curated Archives</span>
+                    <h2 className="mt-4 text-4xl uppercase tracking-tighter text-black dark:text-white sm:text-7xl">
+                        The Infinite <span className="text-zinc-500">Wall</span>
                     </h2>
                     <p className="mt-4 text-lg font-medium text-zinc-500 dark:text-zinc-400">
                         Dive into {collections.length}+ unique worlds. Find your vibe.
@@ -58,7 +58,7 @@ export default function CollectionsGrid() {
                                 {/* Collection Name Overlay */}
                                 <div className="absolute bottom-0 left-0 w-full bg-gradient-to-t from-black/90 via-black/50 to-transparent p-4 pt-12">
                                     <div className="flex items-center justify-between">
-                                        <span className="text-sm font-bold text-white shadow-black drop-shadow-md sm:text-base">
+                                        <span className="text-sm text-white shadow-black drop-shadow-md sm:text-base">
                                             {item.name}
                                         </span>
                                         <ArrowRight className="h-4 w-4 text-white opacity-0 transition-all group-hover:translate-x-1 group-hover:opacity-100" />

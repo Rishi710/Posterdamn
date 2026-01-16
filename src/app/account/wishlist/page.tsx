@@ -57,12 +57,12 @@ export default function WishlistPage() {
                     <Heart className="h-12 w-12 text-zinc-300 dark:text-zinc-700" strokeWidth={1} />
                 </div>
                 <div>
-                    <h2 className="text-2xl font-black italic tracking-tighter uppercase text-black dark:text-white">Your wishlist is empty</h2>
+                    <h2 className="text-2xl tracking-tighter uppercase text-black dark:text-white">Your wishlist is empty</h2>
                     <p className="text-sm font-medium text-zinc-500 mt-2">Start adding the art that speaks to you.</p>
                 </div>
                 <Link
                     href="/shop"
-                    className="bg-black px-8 py-4 text-xs font-black uppercase tracking-widest text-white transition-all hover:bg-zinc-800 dark:bg-white dark:text-black dark:hover:bg-zinc-200"
+                    className="bg-black px-8 py-4 text-xs uppercase tracking-widest text-white transition-all hover:bg-zinc-800 dark:bg-white dark:text-black dark:hover:bg-zinc-200"
                 >
                     Explore Collections
                 </Link>
@@ -74,7 +74,7 @@ export default function WishlistPage() {
         <div className="space-y-12">
             {/* Header */}
             <div className="mb-8 border-b border-zinc-100 dark:border-zinc-800 pb-8">
-                <h1 className="text-3xl font-black italic tracking-tighter lg:text-4xl uppercase text-black dark:text-white">Wishlist</h1>
+                <h1 className="text-3xl tracking-tighter lg:text-4xl uppercase text-black dark:text-white">Wishlist</h1>
                 <p className="text-sm font-medium text-zinc-500 dark:text-zinc-400 mt-2">Items you&apos;ve saved for later.</p>
             </div>
 
@@ -105,18 +105,18 @@ export default function WishlistPage() {
                         {/* Content */}
                         <div className="flex flex-1 flex-col p-6 bg-black">
                             <div className="mb-4">
-                                <span className="text-[10px] font-black uppercase tracking-widest text-zinc-400">
+                                <span className="text-[10px] uppercase tracking-widest text-zinc-400">
                                     {typeof item.id === 'string' ? item.id.split('-')[0].toUpperCase().replace(/-/g, ' ') : "POSTERDAMN"}
                                 </span>
-                                <h3 className="mt-1 text-lg font-black tracking-tighter uppercase leading-tight text-white">
+                                <h3 className="mt-1 text-lg tracking-tighter uppercase leading-tight text-white">
                                     {item.title}
                                 </h3>
-                                <p className="mt-2 text-xl font-black tracking-tight text-white">₹{item.discountedPrice}</p>
+                                <p className="mt-2 text-xl tracking-tight text-white">₹{item.discountedPrice}</p>
                             </div>
 
                             <button
                                 onClick={() => handleAddToCart(item)}
-                                className="mt-auto flex items-center justify-center gap-2 bg-white py-4 text-[10px] font-black uppercase tracking-widest text-black transition-all hover:bg-zinc-200"
+                                className="mt-auto flex items-center justify-center gap-2 bg-white py-4 text-[10px] uppercase tracking-widest text-black transition-all hover:bg-zinc-200"
                             >
                                 <ShoppingBag className="h-4 w-4" />
                                 Add to Cart

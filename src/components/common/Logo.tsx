@@ -27,7 +27,7 @@ export default function Logo({ className = "" }: LogoProps) {
             </div>
 
             <div className="relative overflow-hidden">
-                <span className="text-xl font-black uppercase tracking-tighter text-black dark:text-white sm:text-2xl">
+                <span className="text-xl uppercase tracking-tighter text-black dark:text-white sm:text-2xl">
                     {text}
                 </span>
 

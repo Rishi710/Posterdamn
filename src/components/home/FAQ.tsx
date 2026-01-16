@@ -54,7 +54,7 @@ export default function FAQ() {
                     {/* Right Column: Content (60-70%) */}
                     <div className="lg:col-span-8">
                         <div className="mb-12">
-                            <h2 className="text-3xl font-black tracking-tight text-black dark:text-white sm:text-5xl">
+                            <h2 className="text-3xl tracking-tight text-black dark:text-white sm:text-5xl">
                                 You Ask, <span className="text-gray-400">We Answer</span>
                             </h2>
                             <p className="mt-4 text-lg text-gray-500">
@@ -72,7 +72,7 @@ export default function FAQ() {
                                         onClick={() => setOpenIndex(openIndex === index ? null : index)}
                                         className="flex w-full items-center justify-between px-6 py-5 text-left"
                                     >
-                                        <span className="text-lg font-bold text-black dark:text-white">
+                                        <span className="text-lg text-black dark:text-white">
                                             {faq.question}
                                         </span>
                                         <span className={`transform transition-transform duration-300 ${openIndex === index ? 'rotate-180' : ''}`}>

@@ -31,30 +31,36 @@ export async function updateSession(request: NextRequest) {
     // supabase.auth.getUser(). A simple mistake can make it very hard to debug
     // auth issues.
 
-    await supabase.auth.getUser();
+    const { data: { user } } = await supabase.auth.getUser();
 
-    // if (
-    //     !user &&
-    //     !request.nextUrl.pathname.startsWith('/login') &&
-    //     !request.nextUrl.pathname.startsWith('/auth')
-    // ) {
-    //     // no user, potentially respond by redirecting the user to the login page
-    //     const url = request.nextUrl.clone();
-    //     url.pathname = '/login';
-    //     return NextResponse.redirect(url);
-    // }
+    // Admin Route Protection
+    if (request.nextUrl.pathname.startsWith('/admin')) {
+        // 1. Check if user is logged in
+        if (!user) {
+            const url = request.nextUrl.clone();
+            url.pathname = '/login';
+            url.searchParams.set('redirect', request.nextUrl.pathname);
+            return NextResponse.redirect(url);
+        }
 
-    // IMPORTANT: You *must* return the supabaseResponse object as it is. If you're
-    // creating a new response object with NextResponse.next() make sure to:
-    // 1. Pass the request in it, like so:
-    //    const myNewResponse = NextResponse.next({ request })
-    // 2. Copy over the cookies, like so:
-    //    myNewResponse.cookies.setAll(supabaseResponse.cookies.getAll())
-    // 3. Change the myNewResponse object to fit your needs, but avoid changing
-    //    the cookies!
-    // 4. Finally: return myNewResponse
-    // If this is not done, you may be causing the browser and server to go out
-    // of sync and terminate the user's session prematurely!
+        // 2. Check if user has admin role
+        const { data: profile } = await supabase
+            .from('profiles')
+            .select('role')
+            .eq('id', user.id)
+            .single();
+
+        if (profile?.role !== 'admin') {
+            const url = request.nextUrl.clone();
+            url.pathname = '/unauthorized';
+            return NextResponse.redirect(url);
+        }
+    }
+
+    // Login Redirect for Admin
+    // If an admin logs in, we might want to redirect them? 
+    // Actually, that logic is better placed in the login page component itself, not here, 
+    // to avoid infinite loops or complex state management in middleware.
 
     return supabaseResponse;
 }

@@ -117,13 +117,9 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     useEffect(() => {
         async function fetchUserData() {
             if (!user) {
-                // Clear user-specific data when user logs out
-                setAddresses([]);
-                setSelectedAddressId(null);
-                setCart([]);
-                setWishlist([]);
-                setCoupon(null);
-                setIsDataLoaded(false);
+                // Do not clear data here; let localStorage persist for guests.
+                // Resetting is handled by the logout() function explicitly.
+                setIsDataLoaded(true); // Allow interaction for guests
                 return;
             }
 
@@ -151,16 +147,22 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
                 .eq('user_id', user.id);
 
             if (!cartError && cartData) {
-                const cartItems = cartData.map(item => ({
-                    id: item.product_id,
-                    title: item.title,
-                    price: parseFloat(item.price),
-                    discountedPrice: parseFloat(item.discounted_price),
-                    image: item.image,
-                    sizes: item.size ? [item.size] : [],
-                    materials: item.material ? [item.material] : []
-                }));
-                setCart(cartItems);
+                // Determine if we should overwrite local state
+                // If DB has items, we trust DB.
+                // If DB is empty, but we have local items (likely guest cart), we KEEP local items
+                // so they can be synced to DB by the syncCartToSupabase effect.
+                if (cartData.length > 0 || cart.length === 0) {
+                    const cartItems = cartData.map(item => ({
+                        id: item.product_id,
+                        title: item.title,
+                        price: parseFloat(item.price),
+                        discountedPrice: parseFloat(item.discounted_price),
+                        image: item.image,
+                        sizes: item.size ? [item.size] : [],
+                        materials: item.material ? [item.material] : []
+                    }));
+                    setCart(cartItems);
+                }
             }
 
             // Fetch wishlist items
@@ -170,16 +172,19 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
                 .eq('user_id', user.id);
 
             if (!wishlistError && wishlistData) {
-                const wishlistItems = wishlistData.map(item => ({
-                    id: item.product_id,
-                    title: item.title,
-                    price: parseFloat(item.price),
-                    discountedPrice: parseFloat(item.discounted_price),
-                    image: item.image,
-                    sizes: item.size ? [item.size] : [],
-                    materials: item.material ? [item.material] : []
-                }));
-                setWishlist(wishlistItems);
+                // Same logic for wishlist
+                if (wishlistData.length > 0 || wishlist.length === 0) {
+                    const wishlistItems = wishlistData.map(item => ({
+                        id: item.product_id,
+                        title: item.title,
+                        price: parseFloat(item.price),
+                        discountedPrice: parseFloat(item.discounted_price),
+                        image: item.image,
+                        sizes: item.size ? [item.size] : [],
+                        materials: item.material ? [item.material] : []
+                    }));
+                    setWishlist(wishlistItems);
+                }
             }
 
             setIsDataLoaded(true);
@@ -197,27 +202,50 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         if (!user) return;
 
         try {
-            const { error: deleteError } = await supabase
+            // 1. Get current DB items
+            const { data: dbItems, error: fetchError } = await supabase
                 .from('wishlist_items')
-                .delete()
+                .select('product_id')
                 .eq('user_id', user.id);
 
-            if (deleteError) return;
+            if (fetchError) throw fetchError;
 
-            if (wishlist.length > 0) {
-                const wishlistItems = wishlist.map(item => ({
+            const dbProductIds = dbItems?.map((item: any) => item.product_id) || [];
+            const localProductIds = wishlist.map((item) => item.id.toString());
+
+            // 2. Determine items to delete (In DB but not in Local)
+            const idsToDelete = dbProductIds.filter((id) => !localProductIds.includes(id));
+
+            if (idsToDelete.length > 0) {
+                const { error: deleteError } = await supabase
+                    .from('wishlist_items')
+                    .delete()
+                    .eq('user_id', user.id)
+                    .in('product_id', idsToDelete);
+
+                if (deleteError) console.error("Error deleting wishlist items:", deleteError);
+            }
+
+            // 3. Determine items to insert (In Local but not in DB)
+            const itemsToInsert = wishlist.filter((item) => !dbProductIds.includes(item.id.toString()));
+
+            if (itemsToInsert.length > 0) {
+                const inserts = itemsToInsert.map(item => ({
                     user_id: user.id,
-                    product_id: item.id,
+                    product_id: item.id.toString(),
                     title: item.title,
                     price: item.price,
                     discounted_price: item.discountedPrice,
-                    image: item.image,
-                    size: item.sizes?.[0] || null,
-                    material: item.materials?.[0] || null
+                    image: item.image
                 }));
 
-                await supabase.from('wishlist_items').insert(wishlistItems);
+                const { error: insertError } = await supabase
+                    .from('wishlist_items')
+                    .insert(inserts);
+
+                if (insertError) console.error("Error inserting wishlist items:", insertError);
             }
+
         } catch (error) {
             console.error('Error syncing wishlist:', error);
         }
@@ -236,27 +264,54 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         if (!user) return;
 
         try {
-            const { error: deleteError } = await supabase
+            // 1. Get current DB items
+            const { data: dbItems, error: fetchError } = await supabase
                 .from('cart_items')
-                .delete()
+                .select('product_id')
                 .eq('user_id', user.id);
 
-            if (deleteError) return;
+            if (fetchError) throw fetchError;
 
-            if (cart.length > 0) {
-                const cartItems = cart.map(item => ({
+            const dbProductIds = dbItems?.map((item: any) => item.product_id) || [];
+            const localProductIds = cart.map((item) => item.id.toString());
+
+            // 2. Determine items to delete (In DB but not in Local)
+            const idsToDelete = dbProductIds.filter((id) => !localProductIds.includes(id));
+
+            if (idsToDelete.length > 0) {
+                const { error: deleteError } = await supabase
+                    .from('cart_items')
+                    .delete()
+                    .eq('user_id', user.id)
+                    .in('product_id', idsToDelete);
+
+                if (deleteError) console.error("Error deleting cart items:", deleteError);
+            }
+
+            // 3. Determine items to insert (In Local but not in DB)
+            const itemsToInsert = cart.filter((item) => !dbProductIds.includes(item.id.toString()));
+
+            if (itemsToInsert.length > 0) {
+                const inserts = itemsToInsert.map(item => ({
                     user_id: user.id,
-                    product_id: item.id,
+                    product_id: item.id.toString(),
                     title: item.title,
                     price: item.price,
-                    discounted_price: item.discountedPrice,
+                    discounted_price: item.discountedPrice !== undefined ? item.discountedPrice : item.price, // Safeguard for missing discountedPrice
                     image: item.image,
-                    quantity: 1,
-                    size: item.sizes?.[0] || null,
-                    material: item.materials?.[0] || null
+                    quantity: 1
                 }));
 
-                await supabase.from('cart_items').insert(cartItems);
+                // console.log("SyncCart: Inserts payload:", JSON.stringify(inserts, null, 2));
+
+                const { error: insertError } = await supabase
+                    .from('cart_items')
+                    .insert(inserts);
+
+                if (insertError) {
+                    console.error("Error inserting cart items:", insertError.message, insertError.details, insertError.hint);
+                    console.error("Full Error Object:", JSON.stringify(insertError, null, 2));
+                }
             }
         } catch (error) {
             console.error('Error syncing cart:', error);
@@ -311,6 +366,8 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
 
     const addToCart = (product: Product) => {
         setCart((prev) => [...prev, product]);
+        // Check and remove from wishlist if present
+        removeFromWishlist(product.id);
     };
 
     const removeFromCart = (id: string | number, index?: number) => {
@@ -542,6 +599,17 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
             }
 
             // 4. Clear Cart
+            // FORCE CLEANUP: Explicitly delete from Supabase to ensure it's gone regardless of local state sync lag
+            const { error: clearCartError } = await supabase
+                .from('cart_items')
+                .delete()
+                .eq('user_id', user.id);
+
+            if (clearCartError) {
+                console.error("Critical: Failed to clear remote cart", clearCartError);
+                // We don't block success here, but we log it
+            }
+
             setCart([]);
             setCoupon(null);
             localStorage.removeItem("cart");
@@ -592,3 +660,4 @@ export function useStore() {
     }
     return context;
 }
+

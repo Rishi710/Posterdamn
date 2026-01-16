@@ -168,18 +168,18 @@ export default function AdminInventory() {
             <section>
                 <div className="mb-10 flex items-end justify-between border-b border-zinc-200 dark:border-zinc-800 pb-10">
                     <div>
-                        <h1 className="text-4xl font-black italic tracking-tighter lg:text-5xl uppercase text-black dark:text-white">Inventory</h1>
-                        <p className="text-sm font-bold text-zinc-500 uppercase tracking-widest mt-2">{products.length} Products Online</p>
+                        <h1 className="text-4xl tracking-tighter lg:text-5xl uppercase text-black dark:text-white">Inventory</h1>
+                        <p className="text-sm text-zinc-500 uppercase tracking-widest mt-2">{products.length} Products Online</p>
                     </div>
                     <div className="flex gap-4">
                         <button
                             onClick={() => setIsMetadataModalOpen(true)}
-                            className="flex items-center gap-2 border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 text-black dark:text-white py-4 px-6 text-[10px] font-black uppercase tracking-widest transition-all hover:bg-zinc-50 dark:hover:bg-zinc-900"
+                            className="flex items-center gap-2 border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 text-black dark:text-white py-4 px-6 text-[10px] uppercase tracking-widest transition-all hover:bg-zinc-50 dark:hover:bg-zinc-900"
                         >
                             <Folder className="h-4 w-4" />
                             Manage Tags
                         </button>
-                        <Link href="/admin/inventory/add" className="flex items-center gap-2 bg-black dark:bg-white text-white dark:text-black py-4 px-8 text-[10px] font-black uppercase tracking-widest transition-all hover:opacity-80 active:scale-95">
+                        <Link href="/admin/inventory/add" className="flex items-center gap-2 bg-black dark:bg-white text-white dark:text-black py-4 px-8 text-[10px] uppercase tracking-widest transition-all hover:opacity-80 active:scale-95">
                             <Plus className="h-4 w-4" />
                             Release New Product
                         </Link>
@@ -195,11 +195,11 @@ export default function AdminInventory() {
                             placeholder="SEARCH ARCHIVE..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            className="w-full bg-white dark:bg-zinc-950 border border-zinc-100 dark:border-zinc-800 py-4 pl-12 pr-4 text-[10px] font-black uppercase tracking-widest outline-none focus:border-black dark:focus:border-white transition-all"
+                            className="w-full bg-white dark:bg-zinc-950 border border-zinc-100 dark:border-zinc-800 py-4 pl-12 pr-4 text-[10px] uppercase tracking-widest outline-none focus:border-black dark:focus:border-white transition-all"
                         />
                     </div>
                     <div className="flex gap-4 w-full md:w-auto">
-                        <button onClick={() => setRefreshTrigger(prev => prev + 1)} className="flex-1 md:flex-none flex items-center justify-center gap-2 border border-zinc-100 dark:border-zinc-800 py-4 px-6 text-[10px] font-black uppercase tracking-widest hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-colors">
+                        <button onClick={() => setRefreshTrigger(prev => prev + 1)} className="flex-1 md:flex-none flex items-center justify-center gap-2 border border-zinc-100 dark:border-zinc-800 py-4 px-6 text-[10px] uppercase tracking-widest hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-colors">
                             <RefreshCw className={`h-3 w-3 ${loading ? "animate-spin" : ""}`} />
                             Refresh
                         </button>
@@ -211,25 +211,25 @@ export default function AdminInventory() {
                     <table className="w-full border-collapse">
                         <thead>
                             <tr className="border-b-2 border-zinc-100 dark:border-zinc-900">
-                                <th className="text-left py-6 px-4 text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400">Status</th>
-                                <th className="text-left py-6 px-4 text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400">Product</th>
-                                <th className="text-left py-6 px-4 text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400">Inventory</th>
-                                <th className="text-left py-6 px-4 text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400">Collection</th>
-                                <th className="text-left py-6 px-4 text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400">Category</th>
-                                <th className="text-left py-6 px-4 text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400">Start Price</th>
-                                <th className="text-right py-6 px-4 text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400">Actions</th>
+                                <th className="text-left py-6 px-4 text-[10px] uppercase tracking-[0.2em] text-zinc-400">Status</th>
+                                <th className="text-left py-6 px-4 text-[10px] uppercase tracking-[0.2em] text-zinc-400">Product</th>
+                                <th className="text-left py-6 px-4 text-[10px] uppercase tracking-[0.2em] text-zinc-400">Inventory</th>
+                                <th className="text-left py-6 px-4 text-[10px] uppercase tracking-[0.2em] text-zinc-400">Collection</th>
+                                <th className="text-left py-6 px-4 text-[10px] uppercase tracking-[0.2em] text-zinc-400">Category</th>
+                                <th className="text-left py-6 px-4 text-[10px] uppercase tracking-[0.2em] text-zinc-400">Start Price</th>
+                                <th className="text-right py-6 px-4 text-[10px] uppercase tracking-[0.2em] text-zinc-400">Actions</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-zinc-100 dark:divide-zinc-900">
                             {loading ? (
                                 <tr>
-                                    <td colSpan={7} className="py-12 text-center text-xs font-bold text-zinc-400 uppercase tracking-widest">
+                                    <td colSpan={7} className="py-12 text-center text-xs text-zinc-400 uppercase tracking-widest">
                                         Loading Archive...
                                     </td>
                                 </tr>
                             ) : filteredProducts.length === 0 ? (
                                 <tr>
-                                    <td colSpan={7} className="py-12 text-center text-xs font-bold text-zinc-400 uppercase tracking-widest">
+                                    <td colSpan={7} className="py-12 text-center text-xs text-zinc-400 uppercase tracking-widest">
                                         No products found in archive.
                                     </td>
                                 </tr>
@@ -242,7 +242,7 @@ export default function AdminInventory() {
                                                 className="flex items-center gap-2 group/status hover:opacity-80 transition-opacity"
                                             >
                                                 <div className={`h-2 w-2 rounded-full shadow-[0_0_8px_rgba(0,0,0,0.2)] ${product.is_active ? "bg-green-500 shadow-green-500/40" : "bg-red-500 shadow-red-500/40"}`} />
-                                                <span className="text-[10px] font-black uppercase tracking-widest">{product.is_active ? "Active" : "Draft"}</span>
+                                                <span className="text-[10px] uppercase tracking-widest">{product.is_active ? "Active" : "Draft"}</span>
                                             </button>
                                         </td>
                                         <td className="py-6 px-4">
@@ -253,20 +253,20 @@ export default function AdminInventory() {
                                                     )}
                                                 </div>
                                                 <div>
-                                                    <p className="text-sm font-black italic tracking-tighter uppercase leading-none mb-1 group-hover:text-black dark:group-hover:text-white transition-colors line-clamp-1">{product.title}</p>
-                                                    <p className="text-[9px] font-bold text-zinc-400 uppercase tracking-widest">{product.variants_count} Variants</p>
+                                                    <p className="text-sm tracking-tighter uppercase leading-none mb-1 group-hover:text-black dark:group-hover:text-white transition-colors line-clamp-1">{product.title}</p>
+                                                    <p className="text-[9px] text-zinc-400 uppercase tracking-widest">{product.variants_count} Variants</p>
                                                 </div>
                                             </div>
                                         </td>
                                         <td className="py-6 px-4">
                                             <div className="flex items-center gap-2">
-                                                <span className="text-[10px] font-black uppercase tracking-widest">{product.stock_total}</span>
-                                                <span className="text-[9px] font-bold text-zinc-400">units</span>
+                                                <span className="text-[10px] uppercase tracking-widest">{product.stock_total}</span>
+                                                <span className="text-[9px] text-zinc-400">units</span>
                                             </div>
                                         </td>
-                                        <td className="py-6 px-4 text-[10px] font-black uppercase tracking-widest text-zinc-500">{product.collection?.name || "-"}</td>
-                                        <td className="py-6 px-4 text-[10px] font-black uppercase tracking-widest text-zinc-500">{product.category?.name || "-"}</td>
-                                        <td className="py-6 px-4 text-[10px] font-black uppercase tracking-widest">₹{product.price}</td>
+                                        <td className="py-6 px-4 text-[10px] uppercase tracking-widest text-zinc-500">{product.collection?.name || "-"}</td>
+                                        <td className="py-6 px-4 text-[10px] uppercase tracking-widest text-zinc-500">{product.category?.name || "-"}</td>
+                                        <td className="py-6 px-4 text-[10px] uppercase tracking-widest">₹{product.price}</td>
                                         <td className="py-6 px-4 text-right">
                                             <div className="flex items-center justify-end gap-2">
                                                 <button className="p-2 hover:text-black dark:hover:text-white text-zinc-400 transition-colors">
@@ -281,19 +281,19 @@ export default function AdminInventory() {
                                                     <div className="hidden group-hover/menu:block absolute right-0 top-full w-40 bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 shadow-xl z-10 py-1">
                                                         <Link
                                                             href={`/admin/inventory/edit/${product.id}`}
-                                                            className="block w-full text-left px-4 py-3 text-[10px] font-black uppercase tracking-widest hover:bg-zinc-50 dark:hover:bg-zinc-900"
+                                                            className="block w-full text-left px-4 py-3 text-[10px] uppercase tracking-widest hover:bg-zinc-50 dark:hover:bg-zinc-900"
                                                         >
                                                             Edit Data
                                                         </Link>
                                                         <button
                                                             onClick={() => handleToggleActive(product.id, product.is_active)}
-                                                            className="block w-full text-left px-4 py-3 text-[10px] font-black uppercase tracking-widest hover:bg-zinc-50 dark:hover:bg-zinc-900 border-t border-zinc-100 dark:border-zinc-900"
+                                                            className="block w-full text-left px-4 py-3 text-[10px] uppercase tracking-widest hover:bg-zinc-50 dark:hover:bg-zinc-900 border-t border-zinc-100 dark:border-zinc-900"
                                                         >
                                                             {product.is_active ? "Set as Draft" : "Set as Active"}
                                                         </button>
                                                         <button
                                                             onClick={() => handleDeleteProduct(product.id, product.title)}
-                                                            className="block w-full text-left px-4 py-3 text-[10px] font-black uppercase tracking-widest hover:bg-red-50 dark:hover:bg-red-900/20 text-red-500 border-t border-zinc-100 dark:border-zinc-900"
+                                                            className="block w-full text-left px-4 py-3 text-[10px] uppercase tracking-widest hover:bg-red-50 dark:hover:bg-red-900/20 text-red-500 border-t border-zinc-100 dark:border-zinc-900"
                                                         >
                                                             Delete Product
                                                         </button>
@@ -314,7 +314,7 @@ export default function AdminInventory() {
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
                     <div className="bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 w-full max-w-2xl shadow-2xl overflow-hidden">
                         <div className="flex items-center justify-between p-6 border-b border-zinc-100 dark:border-zinc-800">
-                            <h2 className="text-xl font-black uppercase tracking-tighter">Manage Tags</h2>
+                            <h2 className="text-xl uppercase tracking-tighter">Manage Tags</h2>
                             <button onClick={() => setIsMetadataModalOpen(false)} className="p-2 hover:bg-zinc-100 dark:hover:bg-zinc-900 rounded-full transition-colors">
                                 <X className="h-5 w-5" />
                             </button>
@@ -325,13 +325,13 @@ export default function AdminInventory() {
                             <div className="flex gap-4 border-b border-zinc-100 dark:border-zinc-800 mb-6">
                                 <button
                                     onClick={() => setActiveMetadataTab('collections')}
-                                    className={`pb-4 text-[10px] font-black uppercase tracking-widest transition-all ${activeMetadataTab === 'collections' ? 'border-b-2 border-black dark:border-white text-black dark:text-white' : 'text-zinc-400 hover:text-zinc-600'}`}
+                                    className={`pb-4 text-[10px] uppercase tracking-widest transition-all ${activeMetadataTab === 'collections' ? 'border-b-2 border-black dark:border-white text-black dark:text-white' : 'text-zinc-400 hover:text-zinc-600'}`}
                                 >
                                     Collections
                                 </button>
                                 <button
                                     onClick={() => setActiveMetadataTab('categories')}
-                                    className={`pb-4 text-[10px] font-black uppercase tracking-widest transition-all ${activeMetadataTab === 'categories' ? 'border-b-2 border-black dark:border-white text-black dark:text-white' : 'text-zinc-400 hover:text-zinc-600'}`}
+                                    className={`pb-4 text-[10px] uppercase tracking-widest transition-all ${activeMetadataTab === 'categories' ? 'border-b-2 border-black dark:border-white text-black dark:text-white' : 'text-zinc-400 hover:text-zinc-600'}`}
                                 >
                                     Categories
                                 </button>
@@ -344,12 +344,12 @@ export default function AdminInventory() {
                                     placeholder={`NEW ${activeMetadataTab.slice(0, -1).toUpperCase()} NAME...`}
                                     value={newItemName}
                                     onChange={(e) => setNewItemName(e.target.value)}
-                                    className="flex-1 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-3 text-xs font-bold outline-none focus:border-black dark:focus:border-white transition-all uppercase"
+                                    className="flex-1 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-3 text-xs outline-none focus:border-black dark:focus:border-white transition-all uppercase"
                                 />
                                 <button
                                     onClick={handleCreateMetadata}
                                     disabled={!newItemName}
-                                    className="bg-black dark:bg-white text-white dark:text-black px-6 text-[10px] font-black uppercase tracking-widest hover:opacity-80 disabled:opacity-50"
+                                    className="bg-black dark:bg-white text-white dark:text-black px-6 text-[10px] uppercase tracking-widest hover:opacity-80 disabled:opacity-50"
                                 >
                                     Create
                                 </button>
@@ -364,12 +364,12 @@ export default function AdminInventory() {
                                         <div key={item.id} className="flex items-center justify-between p-3 bg-zinc-50 dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800 group">
                                             <div className="flex items-center gap-3">
                                                 {activeMetadataTab === 'collections' ? <Folder className="h-4 w-4 text-zinc-400" /> : <Tag className="h-4 w-4 text-zinc-400" />}
-                                                <span className="text-xs font-bold">{item.name}</span>
+                                                <span className="text-xs">{item.name}</span>
                                                 <span className="text-[10px] font-mono text-zinc-400">{item.slug}</span>
                                             </div>
                                             <button
                                                 onClick={() => handleDeleteMetadata(item.id)}
-                                                className="opacity-0 group-hover:opacity-100 text-[10px] font-black text-red-500 uppercase tracking-widest hover:underline"
+                                                className="opacity-0 group-hover:opacity-100 text-[10px] text-red-500 uppercase tracking-widest hover:underline"
                                             >
                                                 Delete
                                             </button>

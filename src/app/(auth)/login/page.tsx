@@ -18,13 +18,14 @@ function LoginContent() {
     const { user } = useStore();
 
     // Get redirect path or default to home, preventing loops
-    let next = searchParams.get('next') || '/';
+    let next = searchParams.get('next') || searchParams.get('redirect') || '/';
     if (next.includes('/login') || next.includes('/auth')) {
         next = '/';
     }
 
     useEffect(() => {
         if (user) {
+            // Optional: You could fetch profile here too for auto-redirect of already logged in users
             router.replace(next);
         }
     }, [user, router, next]);
@@ -36,7 +37,7 @@ function LoginContent() {
         setError(null);
 
         try {
-            const { error } = await supabase.auth.signInWithPassword({
+            const { data, error } = await supabase.auth.signInWithPassword({
                 email,
                 password,
             });
@@ -44,8 +45,19 @@ function LoginContent() {
             if (error) {
                 setError(error.message);
                 setLoading(false);
-            } else {
-                router.push(next);
+            } else if (data.user) {
+                // Check for admin role
+                const { data: profile } = await supabase
+                    .from('profiles')
+                    .select('role')
+                    .eq('id', data.user.id)
+                    .single();
+
+                if (profile?.role === 'admin' && next === '/') {
+                    router.push('/admin/dashboard');
+                } else {
+                    router.push(next);
+                }
             }
         } catch (err: any) {
             console.error("LOGIN_FETCH_ERROR:", err);
@@ -95,10 +107,10 @@ function LoginContent() {
                         <ShieldCheck className="h-8 w-8" />
                     </div>
                     <div className="space-y-4">
-                        <h2 className="text-6xl font-black italic tracking-tighter text-white uppercase leading-none">
+                        <h2 className="text-6xl tracking-tighter text-white uppercase leading-none">
                             The<br />Archive<br />Awaits.
                         </h2>
-                        <p className="max-w-md text-sm font-bold uppercase tracking-[0.2em] text-zinc-400">
+                        <p className="max-w-md text-sm uppercase tracking-[0.2em] text-zinc-400">
                             Authentication Required for Curated Access
                         </p>
                     </div>
@@ -106,7 +118,7 @@ function LoginContent() {
 
                 {/* Floating Aesthetic Element */}
                 <div className="absolute top-10 left-10 z-20">
-                    <span className="text-[10px] font-black uppercase tracking-[1em] text-zinc-500 transform -rotate-90 origin-left inline-block">
+                    <span className="text-[10px] uppercase tracking-[1em] text-zinc-500 transform -rotate-90 origin-left inline-block">
                         POSTERDAMN AUTH v1.0
                     </span>
                 </div>
@@ -116,7 +128,7 @@ function LoginContent() {
             <div className="flex w-full flex-col h-full lg:w-[40%]">
                 {/* Fixed Top: Nav */}
                 <div className="flex justify-between items-center p-8 md:p-12 lg:px-20 lg:py-10">
-                    <Link href="/" className="group flex items-center text-[10px] font-black uppercase tracking-widest text-zinc-500 hover:text-black dark:hover:text-white transition-colors">
+                    <Link href="/" className="group flex items-center text-[10px] uppercase tracking-widest text-zinc-500 hover:text-black dark:hover:text-white transition-colors">
                         <ArrowLeft className="mr-2 h-3 w-3 transition-transform group-hover:-translate-x-1" /> Back to Store
                     </Link>
                     <div className="h-2 w-2 rounded-full bg-black dark:bg-white animate-pulse" />
@@ -126,15 +138,15 @@ function LoginContent() {
                 <div className="flex-1 overflow-y-auto no-scrollbar px-8 md:px-12 lg:px-20">
                     <div className="mx-auto w-full max-w-sm py-12">
                         <div className="mb-12">
-                            <h1 className="text-5xl font-black italic tracking-tighter text-black dark:text-white uppercase">Sign In</h1>
-                            <p className="mt-4 text-xs font-bold uppercase tracking-widest text-zinc-400">
+                            <h1 className="text-5xl tracking-tighter text-black dark:text-white uppercase">Sign In</h1>
+                            <p className="mt-4 text-xs uppercase tracking-widest text-zinc-400">
                                 New User? <Link href="/signup" className="text-black dark:text-white underline underline-offset-4 hover:opacity-50">Create Identity</Link>
                             </p>
                         </div>
 
                         {/* Error Message */}
                         {error && (
-                            <div className="mb-6 flex items-center gap-2 rounded-lg bg-red-50 p-4 text-[10px] font-black uppercase tracking-widest text-red-600 dark:bg-red-950/20">
+                            <div className="mb-6 flex items-center gap-2 rounded-lg bg-red-50 p-4 text-[10px] uppercase tracking-widest text-red-600 dark:bg-red-950/20">
                                 <AlertCircle className="h-4 w-4" />
                                 {error}
                             </div>
@@ -142,25 +154,25 @@ function LoginContent() {
 
                         <form onSubmit={handleSubmit} className="space-y-6">
                             <div className="space-y-1">
-                                <label className="text-[10px] font-black uppercase tracking-widest text-zinc-400">Terminal ID (Email)</label>
+                                <label className="text-[10px] uppercase tracking-widest text-zinc-400">Terminal ID (Email)</label>
                                 <input
                                     type="email"
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
                                     required
-                                    className="w-full border-b-2 border-zinc-100 bg-transparent py-4 text-sm font-bold outline-none focus:border-black dark:border-zinc-800 dark:text-white dark:focus:border-white transition-colors"
+                                    className="w-full border-b-2 border-zinc-100 bg-transparent py-4 text-sm outline-none focus:border-black dark:border-zinc-800 dark:text-white dark:focus:border-white transition-colors"
                                     placeholder=""
                                 />
                             </div>
                             <div className="space-y-1 relative">
-                                <label className="text-[10px] font-black uppercase tracking-widest text-zinc-400">Access Key (Password)</label>
+                                <label className="text-[10px] uppercase tracking-widest text-zinc-400">Access Key (Password)</label>
                                 <div className="relative">
                                     <input
                                         type={showPassword ? "text" : "password"}
                                         value={password}
                                         onChange={(e) => setPassword(e.target.value)}
                                         required
-                                        className="w-full border-b-2 border-zinc-100 bg-transparent py-4 text-sm font-bold outline-none focus:border-black dark:border-zinc-800 dark:text-white dark:focus:border-white transition-colors pr-10"
+                                        className="w-full border-b-2 border-zinc-100 bg-transparent py-4 text-sm outline-none focus:border-black dark:border-zinc-800 dark:text-white dark:focus:border-white transition-colors pr-10"
                                         placeholder=""
                                     />
                                     <button
@@ -173,13 +185,13 @@ function LoginContent() {
                                 </div>
                             </div>
                             <div className="flex justify-end">
-                                <Link href="/forgot-password" title="Recover Access Key" className="text-[10px] font-black uppercase tracking-widest text-zinc-400 hover:text-black dark:hover:text-white underline underline-offset-4 transition-colors">
+                                <Link href="/forgot-password" title="Recover Access Key" className="text-[10px] uppercase tracking-widest text-zinc-400 hover:text-black dark:hover:text-white underline underline-offset-4 transition-colors">
                                     Lost Password?
                                 </Link>
                             </div>
                             <button
                                 disabled={loading}
-                                className="w-full bg-black py-5 text-xs font-black uppercase tracking-[0.2em] text-white shadow-2xl transition-all hover:bg-zinc-800 active:scale-95 disabled:opacity-50 dark:bg-white dark:text-black dark:hover:bg-zinc-200"
+                                className="w-full bg-black py-5 text-xs uppercase tracking-[0.2em] text-white shadow-2xl transition-all hover:bg-zinc-800 active:scale-95 disabled:opacity-50 dark:bg-white dark:text-black dark:hover:bg-zinc-200"
                             >
                                 {loading ? "Transmitting..." : "Authenticate"}
                             </button>
@@ -189,13 +201,13 @@ function LoginContent() {
                         <div className="mt-12">
                             <div className="relative mb-8 flex items-center">
                                 <div className="flex-grow border-t border-zinc-100 dark:border-zinc-800"></div>
-                                <span className="mx-4 flex-shrink text-[9px] font-black uppercase tracking-widest text-zinc-400">Network Bypass</span>
+                                <span className="mx-4 flex-shrink text-[9px] uppercase tracking-widest text-zinc-400">Network Bypass</span>
                                 <div className="flex-grow border-t border-zinc-100 dark:border-zinc-800"></div>
                             </div>
                             <button
                                 onClick={handleGoogleSignIn}
                                 disabled={loading}
-                                className="flex w-full items-center justify-center gap-4 border border-zinc-100 py-4 text-[10px] font-black uppercase tracking-widest text-black transition-all hover:bg-zinc-50 disabled:opacity-50 dark:border-zinc-800 dark:text-white dark:hover:bg-zinc-900"
+                                className="flex w-full items-center justify-center gap-4 border border-zinc-100 py-4 text-[10px] uppercase tracking-widest text-black transition-all hover:bg-zinc-50 disabled:opacity-50 dark:border-zinc-800 dark:text-white dark:hover:bg-zinc-900"
                             >
                                 <svg className="h-4 w-4" viewBox="0 0 24 24">
                                     <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
@@ -214,8 +226,8 @@ function LoginContent() {
                     <div className="flex items-center justify-between">
                         <span className="text-[8px] font-medium text-zinc-400 uppercase tracking-widest">© 2026 POSTERDAMN ARCHIVE</span>
                         <div className="flex gap-4">
-                            <a href="#" className="text-[8px] font-bold text-zinc-400 hover:text-black dark:hover:text-white uppercase tracking-widest">Privacy</a>
-                            <a href="#" className="text-[8px] font-bold text-zinc-400 hover:text-black dark:hover:text-white uppercase tracking-widest">Protocol</a>
+                            <a href="#" className="text-[8px] text-zinc-400 hover:text-black dark:hover:text-white uppercase tracking-widest">Privacy</a>
+                            <a href="#" className="text-[8px] text-zinc-400 hover:text-black dark:hover:text-white uppercase tracking-widest">Protocol</a>
                         </div>
                     </div>
                 </div>

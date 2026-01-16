@@ -23,7 +23,7 @@ export default function CollectionsScroll({ collections }: { collections: Collec
             <div className="mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8">
                 <div className="mb-12 flex items-end justify-between">
                     <div>
-                        <h2 className="text-3xl font-black tracking-tight text-gray-900 dark:text-white sm:text-4xl">
+                        <h2 className="text-3xl tracking-tight text-gray-900 dark:text-white sm:text-4xl">
                             Explore Collections
                         </h2>
                         <p className="mt-2 text-gray-500 dark:text-gray-400">
@@ -32,7 +32,7 @@ export default function CollectionsScroll({ collections }: { collections: Collec
                     </div>
                     <Link
                         href="/shop"
-                        className="group flex items-center text-sm font-semibold text-blue-600 hover:text-blue-500"
+                        className="group flex items-center text-sm text-blue-600 hover:text-blue-500"
                     >
                         View all categories
                         <ArrowRight className="ml-1 h-4 w-4 transition-transform group-hover:translate-x-1" />
@@ -82,7 +82,7 @@ function MarqueeRow({ items, direction }: { items: Collection[], direction: 'lef
                             />
                             <div className="absolute inset-0 bg-black/10 transition-colors hover:bg-black/0" />
                             <div className="absolute bottom-0 left-0 w-full bg-gradient-to-t from-black/80 to-transparent p-3">
-                                <span className="text-sm font-bold text-white shadow-sm">
+                                <span className="text-sm text-white shadow-sm">
                                     {item.name}
                                 </span>
                             </div>

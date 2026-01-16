@@ -70,11 +70,11 @@ export default function CartPage() {
                     <div className="w-24 h-24 bg-zinc-100 dark:bg-zinc-900 rounded-full flex items-center justify-center mx-auto mb-6">
                         <ShoppingBag className="w-10 h-10 text-zinc-400" />
                     </div>
-                    <h1 className="text-3xl font-black italic tracking-tighter uppercase">Your Cart is Empty</h1>
+                    <h1 className="text-3xl tracking-tighter uppercase">Your Cart is Empty</h1>
                     <p className="text-zinc-500 font-medium">Looks like you haven't added any posters yet. Time to decorate your walls?</p>
                     <Link
                         href="/shop"
-                        className="inline-flex items-center gap-2 bg-black text-white dark:bg-white dark:text-black px-8 py-4 font-black uppercase tracking-widest hover:scale-105 transition-transform"
+                        className="inline-flex items-center gap-2 bg-black text-white dark:bg-white dark:text-black px-8 py-4 uppercase tracking-widest hover:scale-105 transition-transform"
                     >
                         <ArrowLeft className="w-4 h-4" />
                         Start Shopping
@@ -88,10 +88,10 @@ export default function CartPage() {
         <div className="min-h-screen bg-white text-black dark:bg-black dark:text-white pt-32 pb-20">
             <div className="max-w-7xl mx-auto px-6">
                 <div className="mb-12 border-b border-zinc-100 dark:border-zinc-800 pb-12">
-                    <h1 className="text-4xl md:text-6xl font-black italic tracking-tighter uppercase mb-2">
+                    <h1 className="text-4xl md:text-6xl tracking-tighter uppercase mb-2">
                         Your Cart <span className="text-zinc-300 dark:text-zinc-800">({cart.length})</span>
                     </h1>
-                    <p className="text-sm font-bold uppercase tracking-widest text-zinc-500 mt-4">
+                    <p className="text-sm uppercase tracking-widest text-zinc-500 mt-4">
                         Review your selection before checkout.
                     </p>
                 </div>
@@ -122,7 +122,7 @@ export default function CartPage() {
                                     <div className="flex-1 flex flex-col justify-between">
                                         <div className="space-y-1">
                                             <div className="flex justify-between items-start">
-                                                <h3 className="font-black text-lg sm:text-xl uppercase tracking-tight leading-none">
+                                                <h3 className="text-lg sm:text-xl uppercase tracking-tight leading-none">
                                                     {item.title}
                                                 </h3>
                                                 <button
@@ -133,10 +133,10 @@ export default function CartPage() {
                                                 </button>
                                             </div>
                                             <div className="flex flex-wrap gap-3 mt-2">
-                                                <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider bg-zinc-100 dark:bg-zinc-900 px-2 py-1 rounded-sm">
+                                                <p className="text-[10px] text-zinc-500 uppercase tracking-wider bg-zinc-100 dark:bg-zinc-900 px-2 py-1 rounded-sm">
                                                     {item.sizes?.[0] || 'A3 (Standard)'}
                                                 </p>
-                                                <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider bg-zinc-100 dark:bg-zinc-900 px-2 py-1 rounded-sm">
+                                                <p className="text-[10px] text-zinc-500 uppercase tracking-wider bg-zinc-100 dark:bg-zinc-900 px-2 py-1 rounded-sm">
                                                     {item.materials?.[0] || '300 GSM Matte'}
                                                 </p>
                                             </div>
@@ -147,7 +147,7 @@ export default function CartPage() {
                                             <div className="flex items-center gap-4">
                                                 <button
                                                     onClick={() => moveToWishlist(item, index)}
-                                                    className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-zinc-400 transition-colors hover:text-black dark:hover:text-white"
+                                                    className="flex items-center gap-1.5 text-[10px] uppercase tracking-widest text-zinc-400 transition-colors hover:text-black dark:hover:text-white"
                                                 >
                                                     <Heart className="h-3 w-3" />
                                                     Save for Later
@@ -159,7 +159,7 @@ export default function CartPage() {
                                                         ₹{item.price}
                                                     </span>
                                                 )}
-                                                <span className="font-black text-lg">
+                                                <span className="text-lg">
                                                     ₹{item.discountedPrice || item.price}
                                                 </span>
                                             </div>
@@ -174,12 +174,12 @@ export default function CartPage() {
                     <div className="lg:col-span-4 mt-12 lg:mt-0">
                         <div className="sticky top-32 space-y-6">
                             <div className="border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/50 p-6">
-                                <h2 className="text-xl font-black italic tracking-tighter uppercase mb-6">Order Summary</h2>
+                                <h2 className="text-xl tracking-tighter uppercase mb-6">Order Summary</h2>
 
                                 <div className="space-y-4 text-sm mb-8">
                                     <div className="flex justify-between">
                                         <span className="text-zinc-500 font-medium">Subtotal</span>
-                                        <span className="font-bold">₹{subtotal.toFixed(0)}</span>
+                                        <span>₹{subtotal.toFixed(0)}</span>
                                     </div>
 
                                     {coupon && (
@@ -188,30 +188,30 @@ export default function CartPage() {
                                                 <Ticket className="w-3 h-3" />
                                                 Discount ({coupon.code})
                                             </span>
-                                            <span className="font-bold">-₹{discountAmount.toFixed(0)}</span>
+                                            <span>-₹{discountAmount.toFixed(0)}</span>
                                         </div>
                                     )}
 
                                     <div className="flex justify-between">
                                         <span className="text-zinc-500 font-medium">Shipping</span>
-                                        <span className="font-bold">{shipping === 0 ? 'FREE' : `₹${shipping}`}</span>
+                                        <span>{shipping === 0 ? 'FREE' : `₹${shipping}`}</span>
                                     </div>
 
                                     {shipping > 0 && (
-                                        <div className="text-xs text-zinc-400 italic">
+                                        <div className="text-xs text-zinc-400">
                                             Add items worth ₹{(1500 - (subtotal - discountAmount)).toFixed(0)} more for free shipping
                                         </div>
                                     )}
 
                                     <div className="pt-4 border-t border-zinc-200 dark:border-zinc-800 flex justify-between items-end">
-                                        <span className="font-black uppercase tracking-wider text-base">Total</span>
-                                        <span className="font-black text-2xl">₹{total.toFixed(0)}</span>
+                                        <span className="uppercase tracking-wider text-base">Total</span>
+                                        <span className="text-2xl">₹{total.toFixed(0)}</span>
                                     </div>
                                 </div>
 
                                 {/* Coupon Input */}
                                 <div className="mb-8">
-                                    <h3 className="text-[10px] font-black uppercase tracking-widest text-zinc-400 mb-2 flex items-center gap-2">
+                                    <h3 className="text-[10px] uppercase tracking-widest text-zinc-400 mb-2 flex items-center gap-2">
                                         <Ticket className="h-3 w-3" /> Promo Code
                                     </h3>
                                     <form onSubmit={handleApplyCoupon} className="relative">
@@ -220,7 +220,7 @@ export default function CartPage() {
                                             value={couponInput}
                                             onChange={(e) => setCouponInput(e.target.value)}
                                             placeholder="ENTER CODE"
-                                            className="w-full bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 p-3 pr-12 text-sm font-bold uppercase tracking-wider placeholder:text-zinc-400 focus:outline-none focus:border-black dark:focus:border-white transition-colors"
+                                            className="w-full bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 p-3 pr-12 text-sm uppercase tracking-wider placeholder:text-zinc-400 focus:outline-none focus:border-black dark:focus:border-white transition-colors"
                                             disabled={!!coupon}
                                         />
                                         {coupon ? (
@@ -246,12 +246,12 @@ export default function CartPage() {
                                         )}
                                     </form>
                                     {couponError && (
-                                        <p className="text-xs text-red-500 font-bold mt-2 uppercase tracking-wide animate-in slide-in-from-top-1">
+                                        <p className="text-xs text-red-500 mt-2 uppercase tracking-wide animate-in slide-in-from-top-1">
                                             {couponError}
                                         </p>
                                     )}
                                     {coupon && (
-                                        <p className="text-xs text-green-600 dark:text-green-500 font-bold mt-2 uppercase tracking-wide animate-in slide-in-from-top-1">
+                                        <p className="text-xs text-green-600 dark:text-green-500 mt-2 uppercase tracking-wide animate-in slide-in-from-top-1">
                                             Coupon Applied!
                                         </p>
                                     )}
@@ -259,7 +259,7 @@ export default function CartPage() {
 
                                 <Link
                                     href="/checkout"
-                                    className="block w-full bg-black text-white dark:bg-white dark:text-black py-4 text-center font-black uppercase tracking-widest hover:opacity-80 transition-opacity flex items-center justify-center gap-2"
+                                    className="block w-full bg-black text-white dark:bg-white dark:text-black py-4 text-center uppercase tracking-widest hover:opacity-80 transition-opacity flex items-center justify-center gap-2"
                                 >
                                     Proceed to Checkout
                                     <ChevronRight className="h-4 w-4" strokeWidth={3} />

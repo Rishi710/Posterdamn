@@ -143,12 +143,12 @@ export default function AdminCoupons() {
         <div className="space-y-8">
             <div className="flex items-end justify-between border-b border-zinc-200 dark:border-zinc-800 pb-8">
                 <div>
-                    <h1 className="text-4xl font-black italic tracking-tighter lg:text-5xl uppercase text-black dark:text-white">Coupons</h1>
-                    <p className="text-sm font-bold text-zinc-500 uppercase tracking-widest mt-2">Manage Promo Codes</p>
+                    <h1 className="text-4xl tracking-tighter lg:text-5xl uppercase text-black dark:text-white">Coupons</h1>
+                    <p className="text-sm text-zinc-500 uppercase tracking-widest mt-2">Manage Promo Codes</p>
                 </div>
                 <button
                     onClick={() => setIsCreateOpen(true)}
-                    className="flex items-center gap-2 bg-black dark:bg-white text-white dark:text-black py-4 px-8 text-[10px] font-black uppercase tracking-widest transition-all hover:opacity-80 active:scale-95"
+                    className="flex items-center gap-2 bg-black dark:bg-white text-white dark:text-black py-4 px-8 text-[10px] uppercase tracking-widest transition-all hover:opacity-80 active:scale-95"
                 >
                     <Plus className="h-4 w-4" />
                     Create New
@@ -158,7 +158,7 @@ export default function AdminCoupons() {
             {/* List */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {coupons.length === 0 && !loading && (
-                    <div className="col-span-full text-center py-20 text-zinc-400 text-xs font-bold uppercase tracking-widest">
+                    <div className="col-span-full text-center py-20 text-zinc-400 text-xs uppercase tracking-widest">
                         No active campaigns found. Create one to boost sales.
                     </div>
                 )}
@@ -171,8 +171,8 @@ export default function AdminCoupons() {
                                     <Ticket className="h-5 w-5 text-zinc-500" />
                                 </div>
                                 <div>
-                                    <h3 className="text-xl font-black uppercase tracking-tight text-black dark:text-white">{coupon.code}</h3>
-                                    <span className={`inline-block px-1.5 py-0.5 text-[8px] font-black uppercase tracking-widest rounded ${coupon.is_active ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                                    <h3 className="text-xl uppercase tracking-tight text-black dark:text-white">{coupon.code}</h3>
+                                    <span className={`inline-block px-1.5 py-0.5 text-[8px] uppercase tracking-widest rounded ${coupon.is_active ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
                                         {coupon.is_active ? 'Active' : 'Inactive'}
                                     </span>
                                 </div>
@@ -194,24 +194,24 @@ export default function AdminCoupons() {
                         </div>
 
                         <div className="space-y-2 mb-6">
-                            <div className="flex justify-between text-xs font-bold uppercase">
+                            <div className="flex justify-between text-xs uppercase">
                                 <span className="text-zinc-400">Discount</span>
                                 <span className="text-black dark:text-white">
                                     {coupon.discount_type === 'percentage' ? `${coupon.discount_value}% OFF` : `₹${coupon.discount_value} OFF`}
                                 </span>
                             </div>
                             {coupon.is_second_purchase_only && (
-                                <div className="flex justify-between text-xs font-bold uppercase">
+                                <div className="flex justify-between text-xs uppercase">
                                     <span className="text-zinc-400">Rule</span>
                                     <span className="text-blue-500">2nd Purchase Only</span>
                                 </div>
                             )}
-                            <div className="flex justify-between text-xs font-bold uppercase">
+                            <div className="flex justify-between text-xs uppercase">
                                 <span className="text-zinc-400">Usage</span>
                                 <span className="text-black dark:text-white">{coupon.used_count} / {coupon.usage_limit || '∞'}</span>
                             </div>
                             {coupon.expires_at && (
-                                <div className="flex justify-between text-xs font-bold uppercase">
+                                <div className="flex justify-between text-xs uppercase">
                                     <span className="text-zinc-400">Expires</span>
                                     <span className="text-red-500">{new Date(coupon.expires_at).toLocaleDateString()}</span>
                                 </div>
@@ -220,7 +220,7 @@ export default function AdminCoupons() {
 
                         <button
                             onClick={() => toggleActive(coupon.id, coupon.is_active)}
-                            className={`w-full py-3 text-[10px] font-black uppercase tracking-widest border transition-colors ${coupon.is_active
+                            className={`w-full py-3 text-[10px] uppercase tracking-widest border transition-colors ${coupon.is_active
                                 ? 'border-zinc-200 text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-900'
                                 : 'bg-black text-white dark:bg-white dark:text-black border-transparent'
                                 }`}
@@ -239,62 +239,62 @@ export default function AdminCoupons() {
                             <X className="h-5 w-5" />
                         </button>
 
-                        <h2 className="text-2xl font-black italic tracking-tighter uppercase mb-8">Create Coupon</h2>
+                        <h2 className="text-2xl tracking-tighter uppercase mb-8">Create Coupon</h2>
 
                         <div className="space-y-6">
                             <div>
-                                <label className="block text-[10px] font-black uppercase tracking-widest text-zinc-500 mb-2">Code</label>
+                                <label className="block text-[10px] uppercase tracking-widest text-zinc-500 mb-2">Code</label>
                                 <input
                                     type="text"
                                     value={newCode}
                                     onChange={(e) => setNewCode(e.target.value.toUpperCase())}
                                     placeholder="E.g. WELCOME20"
-                                    className="w-full bg-zinc-50 dark:bg-zinc-900 p-4 font-black uppercase tracking-widest outline-none border border-transparent focus:border-black dark:focus:border-white transition-all"
+                                    className="w-full bg-zinc-50 dark:bg-zinc-900 p-4 uppercase tracking-widest outline-none border border-transparent focus:border-black dark:focus:border-white transition-all"
                                 />
                             </div>
 
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label className="block text-[10px] font-black uppercase tracking-widest text-zinc-500 mb-2">Type</label>
+                                    <label className="block text-[10px] uppercase tracking-widest text-zinc-500 mb-2">Type</label>
                                     <select
                                         value={newDiscountType}
                                         onChange={(e) => setNewDiscountType(e.target.value as 'percentage' | 'fixed')}
-                                        className="w-full bg-zinc-50 dark:bg-zinc-900 p-4 font-bold text-xs outline-none appearance-none"
+                                        className="w-full bg-zinc-50 dark:bg-zinc-900 p-4 text-xs outline-none appearance-none"
                                     >
                                         <option value="percentage">Percentage (%)</option>
                                         <option value="fixed">Fixed Amount (₹)</option>
                                     </select>
                                 </div>
                                 <div>
-                                    <label className="block text-[10px] font-black uppercase tracking-widest text-zinc-500 mb-2">Value</label>
+                                    <label className="block text-[10px] uppercase tracking-widest text-zinc-500 mb-2">Value</label>
                                     <input
                                         type="number"
                                         value={newDiscountValue}
                                         onChange={(e) => setNewDiscountValue(e.target.value)}
                                         placeholder="20"
-                                        className="w-full bg-zinc-50 dark:bg-zinc-900 p-4 font-bold outline-none border border-transparent focus:border-black dark:focus:border-white transition-all"
+                                        className="w-full bg-zinc-50 dark:bg-zinc-900 p-4 outline-none border border-transparent focus:border-black dark:focus:border-white transition-all"
                                     />
                                 </div>
                             </div>
 
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label className="block text-[10px] font-black uppercase tracking-widest text-zinc-500 mb-2">Expiry Date</label>
+                                    <label className="block text-[10px] uppercase tracking-widest text-zinc-500 mb-2">Expiry Date</label>
                                     <input
                                         type="date"
                                         value={newExpiry}
                                         onChange={(e) => setNewExpiry(e.target.value)}
-                                        className="w-full bg-zinc-50 dark:bg-zinc-900 p-4 font-bold text-xs outline-none"
+                                        className="w-full bg-zinc-50 dark:bg-zinc-900 p-4 text-xs outline-none"
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-[10px] font-black uppercase tracking-widest text-zinc-500 mb-2">Usage Limit</label>
+                                    <label className="block text-[10px] uppercase tracking-widest text-zinc-500 mb-2">Usage Limit</label>
                                     <input
                                         type="number"
                                         value={newUsageLimit}
                                         onChange={(e) => setNewUsageLimit(e.target.value)}
                                         placeholder="Unlimited"
-                                        className="w-full bg-zinc-50 dark:bg-zinc-900 p-4 font-bold outline-none border border-transparent focus:border-black dark:focus:border-white transition-all"
+                                        className="w-full bg-zinc-50 dark:bg-zinc-900 p-4 outline-none border border-transparent focus:border-black dark:focus:border-white transition-all"
                                     />
                                 </div>
                             </div>
@@ -306,12 +306,12 @@ export default function AdminCoupons() {
                                 >
                                     <div className={`absolute top-1 left-1 w-3 h-3 rounded-full transition-transform ${newIsSecondPurchaseOnly ? "translate-x-5 bg-white dark:bg-black" : "bg-zinc-400"}`} />
                                 </button>
-                                <span className="text-[10px] font-black uppercase tracking-widest text-zinc-500">Only for 2nd Purchase</span>
+                                <span className="text-[10px] uppercase tracking-widest text-zinc-500">Only for 2nd Purchase</span>
                             </div>
 
                             <button
                                 onClick={handleCreateCoupon}
-                                className="w-full bg-black dark:bg-white text-white dark:text-black py-4 text-xs font-black uppercase tracking-widest hover:opacity-80 transition-opacity"
+                                className="w-full bg-black dark:bg-white text-white dark:text-black py-4 text-xs uppercase tracking-widest hover:opacity-80 transition-opacity"
                             >
                                 Generate Code
                             </button>
@@ -328,60 +328,60 @@ export default function AdminCoupons() {
                             <X className="h-5 w-5" />
                         </button>
 
-                        <h2 className="text-2xl font-black italic tracking-tighter uppercase mb-8">Edit Coupon</h2>
+                        <h2 className="text-2xl tracking-tighter uppercase mb-8">Edit Coupon</h2>
 
                         <div className="space-y-6">
                             <div>
-                                <label className="block text-[10px] font-black uppercase tracking-widest text-zinc-500 mb-2">Code</label>
+                                <label className="block text-[10px] uppercase tracking-widest text-zinc-500 mb-2">Code</label>
                                 <input
                                     type="text"
                                     value={editCode}
                                     onChange={(e) => setEditCode(e.target.value.toUpperCase())}
-                                    className="w-full bg-zinc-50 dark:bg-zinc-900 p-4 font-black uppercase tracking-widest outline-none border border-transparent focus:border-black dark:focus:border-white transition-all"
+                                    className="w-full bg-zinc-50 dark:bg-zinc-900 p-4 uppercase tracking-widest outline-none border border-transparent focus:border-black dark:focus:border-white transition-all"
                                 />
                             </div>
 
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label className="block text-[10px] font-black uppercase tracking-widest text-zinc-500 mb-2">Type</label>
+                                    <label className="block text-[10px] uppercase tracking-widest text-zinc-500 mb-2">Type</label>
                                     <select
                                         value={editDiscountType}
                                         onChange={(e) => setEditDiscountType(e.target.value as 'percentage' | 'fixed')}
-                                        className="w-full bg-zinc-50 dark:bg-zinc-900 p-4 font-bold text-xs outline-none appearance-none"
+                                        className="w-full bg-zinc-50 dark:bg-zinc-900 p-4 text-xs outline-none appearance-none"
                                     >
                                         <option value="percentage">Percentage (%)</option>
                                         <option value="fixed">Fixed Amount (₹)</option>
                                     </select>
                                 </div>
                                 <div>
-                                    <label className="block text-[10px] font-black uppercase tracking-widest text-zinc-500 mb-2">Value</label>
+                                    <label className="block text-[10px] uppercase tracking-widest text-zinc-500 mb-2">Value</label>
                                     <input
                                         type="number"
                                         value={editDiscountValue}
                                         onChange={(e) => setEditDiscountValue(e.target.value)}
-                                        className="w-full bg-zinc-50 dark:bg-zinc-900 p-4 font-bold outline-none border border-transparent focus:border-black dark:focus:border-white transition-all"
+                                        className="w-full bg-zinc-50 dark:bg-zinc-900 p-4 outline-none border border-transparent focus:border-black dark:focus:border-white transition-all"
                                     />
                                 </div>
                             </div>
 
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label className="block text-[10px] font-black uppercase tracking-widest text-zinc-500 mb-2">Expiry Date</label>
+                                    <label className="block text-[10px] uppercase tracking-widest text-zinc-500 mb-2">Expiry Date</label>
                                     <input
                                         type="date"
                                         value={editExpiry}
                                         onChange={(e) => setEditExpiry(e.target.value)}
-                                        className="w-full bg-zinc-50 dark:bg-zinc-900 p-4 font-bold text-xs outline-none"
+                                        className="w-full bg-zinc-50 dark:bg-zinc-900 p-4 text-xs outline-none"
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-[10px] font-black uppercase tracking-widest text-zinc-500 mb-2">Usage Limit</label>
+                                    <label className="block text-[10px] uppercase tracking-widest text-zinc-500 mb-2">Usage Limit</label>
                                     <input
                                         type="number"
                                         value={editUsageLimit}
                                         onChange={(e) => setEditUsageLimit(e.target.value)}
                                         placeholder="Unlimited"
-                                        className="w-full bg-zinc-50 dark:bg-zinc-900 p-4 font-bold outline-none border border-transparent focus:border-black dark:focus:border-white transition-all"
+                                        className="w-full bg-zinc-50 dark:bg-zinc-900 p-4 outline-none border border-transparent focus:border-black dark:focus:border-white transition-all"
                                     />
                                 </div>
                             </div>
@@ -393,12 +393,12 @@ export default function AdminCoupons() {
                                 >
                                     <div className={`absolute top-1 left-1 w-3 h-3 rounded-full transition-transform ${editIsSecondPurchaseOnly ? "translate-x-5 bg-white dark:bg-black" : "bg-zinc-400"}`} />
                                 </button>
-                                <span className="text-[10px] font-black uppercase tracking-widest text-zinc-500">Only for 2nd Purchase</span>
+                                <span className="text-[10px] uppercase tracking-widest text-zinc-500">Only for 2nd Purchase</span>
                             </div>
 
                             <button
                                 onClick={handleUpdateCoupon}
-                                className="w-full bg-black dark:bg-white text-white dark:text-black py-4 text-xs font-black uppercase tracking-widest hover:opacity-80 transition-opacity"
+                                className="w-full bg-black dark:bg-white text-white dark:text-black py-4 text-xs uppercase tracking-widest hover:opacity-80 transition-opacity"
                             >
                                 Save Changes
                             </button>

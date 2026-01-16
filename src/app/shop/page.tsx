@@ -33,7 +33,7 @@ interface Collection {
 
 export default function ShopPage() {
     return (
-        <Suspense fallback={<div className="min-h-screen bg-white dark:bg-black p-8 text-center text-zinc-500 font-bold uppercase tracking-widest">Loading Shop...</div>}>
+        <Suspense fallback={<div className="min-h-screen bg-white dark:bg-black p-8 text-center text-zinc-500 uppercase tracking-widest">Loading Shop...</div>}>
             <ShopContent />
         </Suspense>
     );
@@ -192,7 +192,7 @@ function ShopContent() {
     };
 
     if (loading) {
-        return <div className="min-h-screen bg-white dark:bg-black p-20 text-center text-zinc-500 font-bold uppercase tracking-widest">Loading Inventory...</div>;
+        return <div className="min-h-screen bg-white dark:bg-black p-20 text-center text-zinc-500 uppercase tracking-widest">Loading Inventory...</div>;
     }
 
     return (
@@ -201,7 +201,7 @@ function ShopContent() {
             <div className="border-b border-gray-200 bg-white sticky top-16 z-30 dark:border-zinc-800 dark:bg-black/80 dark:backdrop-blur-md">
                 <div className="mx-auto flex h-16 max-w-[1440px] items-center justify-between px-4 sm:px-6 lg:px-8">
                     <div className="flex items-center gap-4">
-                        <h1 className="text-xl font-bold uppercase tracking-wide text-black dark:text-white">
+                        <h1 className="text-xl uppercase tracking-wide text-black dark:text-white">
                             {searchQuery ? `Results for "${searchQuery}"` : "All Posters"}
                         </h1>
                         <span className="rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-600 dark:bg-zinc-800 dark:text-gray-400">
@@ -210,7 +210,7 @@ function ShopContent() {
                         {searchQuery && (
                             <button
                                 onClick={() => router.push("/shop")}
-                                className="flex items-center gap-1 text-[10px] font-black uppercase tracking-widest text-zinc-400 hover:text-black dark:hover:text-white"
+                                className="flex items-center gap-1 text-[10px] uppercase tracking-widest text-zinc-400 hover:text-black dark:hover:text-white"
                             >
                                 <X className="h-3 w-3" /> Clear Search
                             </button>
@@ -222,7 +222,7 @@ function ShopContent() {
                         <div className="relative">
                             <button
                                 onClick={() => setIsSortOpen(!isSortOpen)}
-                                className="flex items-center gap-1 text-sm font-black uppercase tracking-widest text-black dark:text-white"
+                                className="flex items-center gap-1 text-sm uppercase tracking-widest text-black dark:text-white"
                             >
                                 <span className="hidden sm:inline text-gray-500 font-medium normal-case tracking-normal mr-2">Sort by:</span>
                                 {sortBy === 'recommended' && 'Recommended'}
@@ -258,7 +258,7 @@ function ShopContent() {
                         ${isSidebarOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full lg:translate-x-0'}`}>
 
                         <div className="flex items-center justify-between lg:hidden mb-12">
-                            <h2 className="text-2xl font-black italic uppercase tracking-tighter dark:text-white">Filters</h2>
+                            <h2 className="text-2xl uppercase tracking-tighter dark:text-white">Filters</h2>
                             <button onClick={() => setIsSidebarOpen(false)} className="rounded-full p-2 hover:bg-zinc-100 dark:hover:bg-zinc-800">
                                 <X className="h-6 w-6" />
                             </button>
@@ -268,13 +268,13 @@ function ShopContent() {
                             {/* Categories (Collections) */}
                             <div className="space-y-4">
                                 <div className="flex items-center justify-between">
-                                    <h3 className="text-sm font-bold uppercase tracking-widest text-gray-900 dark:text-white">
+                                    <h3 className="text-sm uppercase tracking-widest text-gray-900 dark:text-white">
                                         Collections
                                     </h3>
                                     {(selectedCollectionIds.length > 0 || priceRange !== 'all') && (
                                         <button
                                             onClick={() => { setSelectedCollectionIds([]); setPriceRange('all'); }}
-                                            className="text-[10px] font-black uppercase tracking-widest text-zinc-400 hover:text-black dark:hover:text-white underline underline-offset-4"
+                                            className="text-[10px] uppercase tracking-widest text-zinc-400 hover:text-black dark:hover:text-white underline underline-offset-4"
                                         >
                                             Clear All
                                         </button>
@@ -295,7 +295,7 @@ function ShopContent() {
                                                     <path d="M3 8L6 11L11 3.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                                                 </svg>
                                             </div>
-                                            <span className={`text-sm transition-colors group-hover:text-black dark:group-hover:text-white ${selectedCollectionIds.includes(collection.id) ? 'font-bold text-black dark:text-white' : 'text-gray-500 dark:text-gray-400'}`}>
+                                            <span className={`text-sm transition-colors group-hover:text-black dark:group-hover:text-white ${selectedCollectionIds.includes(collection.id) ? 'text-black dark:text-white' : 'text-gray-500 dark:text-gray-400'}`}>
                                                 {collection.name}
                                             </span>
                                         </label>
@@ -307,7 +307,7 @@ function ShopContent() {
 
                             {/* Price */}
                             <div className="space-y-4">
-                                <h3 className="text-sm font-bold uppercase tracking-widest text-gray-900 dark:text-white">
+                                <h3 className="text-sm uppercase tracking-widest text-gray-900 dark:text-white">
                                     Price Range
                                 </h3>
                                 <div className="space-y-3">
@@ -334,7 +334,7 @@ function ShopContent() {
                                 <p className="text-xl text-gray-500">No posters found matching your filters.</p>
                                 <button
                                     onClick={() => { setSelectedCollectionIds([]); setPriceRange("all"); }}
-                                    className="mt-4 text-sm font-bold underline"
+                                    className="mt-4 text-sm underline"
                                 >
                                     Clear Filters
                                 </button>
@@ -348,7 +348,7 @@ function ShopContent() {
                                     onClick={handleLoadMore}
                                     className="group relative overflow-hidden rounded-full bg-black px-8 py-3 dark:bg-white"
                                 >
-                                    <span className="relative z-10 text-sm font-bold text-white transition-colors group-hover:text-white dark:text-black dark:group-hover:text-black">
+                                    <span className="relative z-10 text-sm text-white transition-colors group-hover:text-white dark:text-black dark:group-hover:text-black">
                                         Load More Posters
                                     </span>
                                     <div className="absolute inset-0 -translate-x-full bg-gray-800 transition-transform duration-300 group-hover:translate-x-0 dark:bg-gray-200" />
@@ -372,7 +372,7 @@ function ShopContent() {
                 className="fixed bottom-8 right-6 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-black text-white shadow-2xl transition-transform active:scale-90 lg:hidden dark:bg-white dark:text-black"
             >
                 <Filter className="h-6 w-6" />
-                <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white">
+                <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-[10px] text-white">
                     {selectedCollectionIds.length + (priceRange !== 'all' ? 1 : 0)}
                 </span>
             </button>

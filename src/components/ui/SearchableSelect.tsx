@@ -58,7 +58,7 @@ export default function SearchableSelect({
 
     return (
         <div className="flex flex-col gap-2 relative" ref={dropdownRef}>
-            <label className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400">
+            <label className="text-[10px] uppercase tracking-[0.2em] text-zinc-400">
                 {label}
             </label>
 
@@ -66,7 +66,7 @@ export default function SearchableSelect({
                 type="button"
                 disabled={disabled}
                 onClick={() => !disabled && setIsOpen(!isOpen)}
-                className={`flex w-full items-center justify-between border-b border-zinc-200 bg-transparent py-2 text-base font-bold tracking-tight transition-colors outline-none
+                className={`flex w-full items-center justify-between border-b border-zinc-200 bg-transparent py-2 text-base tracking-tight transition-colors outline-none
                     ${disabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer focus:border-black dark:focus:border-white"}
                     ${isOpen ? "border-black dark:border-white" : "dark:border-zinc-800"}
                     ${value ? "text-black dark:text-white" : "text-zinc-300 dark:text-zinc-700"}`}
@@ -106,14 +106,14 @@ export default function SearchableSelect({
                                         setSearchQuery("");
                                     }}
                                     className={`flex w-full items-center justify-between px-4 py-3 text-sm transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-800
-                                        ${opt.value === value ? "bg-zinc-50 font-black dark:bg-zinc-800" : "font-medium text-zinc-600 dark:text-zinc-400"}`}
+                                        ${opt.value === value ? "bg-zinc-50 dark:bg-zinc-800" : "font-medium text-zinc-600 dark:text-zinc-400"}`}
                                 >
                                     <span className="truncate">{opt.label}</span>
                                     {opt.value === value && <Check className="h-4 w-4" />}
                                 </button>
                             ))
                         ) : (
-                            <div className="px-4 py-8 text-center text-xs font-bold uppercase tracking-widest text-zinc-400">
+                            <div className="px-4 py-8 text-center text-xs uppercase tracking-widest text-zinc-400">
                                 No results found
                             </div>
                         )}

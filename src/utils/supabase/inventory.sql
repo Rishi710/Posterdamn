@@ -14,6 +14,7 @@ CREATE TABLE IF NOT EXISTS public.collections (
     slug TEXT NOT NULL UNIQUE,
     description TEXT,
     image_url TEXT,
+    parent_id UUID REFERENCES public.collections(id) ON DELETE SET NULL,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 

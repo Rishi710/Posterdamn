@@ -54,10 +54,10 @@ export default function ForgotPasswordPage() {
                         <ShieldCheck className="h-8 w-8" />
                     </div>
                     <div className="space-y-4">
-                        <h2 className="text-6xl font-black italic tracking-tighter text-white uppercase leading-none">
+                        <h2 className="text-6xl tracking-tighter text-white uppercase leading-none">
                             Recovery<br />Protocol.
                         </h2>
-                        <p className="max-w-md text-sm font-bold uppercase tracking-[0.2em] text-zinc-400">
+                        <p className="max-w-md text-sm uppercase tracking-[0.2em] text-zinc-400">
                             Initiate Access Key Restoration Sequence
                         </p>
                     </div>
@@ -68,7 +68,7 @@ export default function ForgotPasswordPage() {
             <div className="flex w-full flex-col h-full lg:w-[40%]">
                 {/* Fixed Top: Nav */}
                 <div className="flex justify-between items-center p-8 md:p-12 lg:px-20 lg:py-10">
-                    <Link href="/login" className="group flex items-center text-[10px] font-black uppercase tracking-widest text-zinc-500 hover:text-black dark:hover:text-white transition-colors">
+                    <Link href="/login" className="group flex items-center text-[10px] uppercase tracking-widest text-zinc-500 hover:text-black dark:hover:text-white transition-colors">
                         <ArrowLeft className="mr-2 h-3 w-3 transition-transform group-hover:-translate-x-1" /> Back to Login
                     </Link>
                     <div className="h-2 w-2 rounded-full bg-black dark:bg-white animate-pulse" />
@@ -78,15 +78,15 @@ export default function ForgotPasswordPage() {
                 <div className="flex-1 flex items-center px-8 md:px-12 lg:px-20">
                     <div className="mx-auto w-full max-w-sm">
                         <div className="mb-12">
-                            <h1 className="text-5xl font-black italic tracking-tighter text-black dark:text-white uppercase leading-tight">Reset Key</h1>
-                            <p className="mt-4 text-xs font-bold uppercase tracking-widest text-zinc-400">
+                            <h1 className="text-5xl tracking-tighter text-black dark:text-white uppercase leading-tight">Reset Key</h1>
+                            <p className="mt-4 text-xs uppercase tracking-widest text-zinc-400">
                                 Enter your Terminal ID to receive a recovery link.
                             </p>
                         </div>
 
                         {/* Message Display */}
                         {message && (
-                            <div className={`mb-6 flex items-center gap-2 rounded-lg p-4 text-[10px] font-black uppercase tracking-widest ${message.type === 'success' ? 'bg-green-50 text-green-600 dark:bg-green-950/20' : 'bg-red-50 text-red-600 dark:bg-red-950/20'}`}>
+                            <div className={`mb-6 flex items-center gap-2 rounded-lg p-4 text-[10px] uppercase tracking-widest ${message.type === 'success' ? 'bg-green-50 text-green-600 dark:bg-green-950/20' : 'bg-red-50 text-red-600 dark:bg-red-950/20'}`}>
                                 {message.type === 'success' ? <CheckCircle2 className="h-4 w-4" /> : <AlertCircle className="h-4 w-4" />}
                                 {message.text}
                             </div>
@@ -94,27 +94,27 @@ export default function ForgotPasswordPage() {
 
                         <form onSubmit={handleSubmit} className="space-y-8">
                             <div className="space-y-1">
-                                <label className="text-[10px] font-black uppercase tracking-widest text-zinc-400">Terminal ID (Email)</label>
+                                <label className="text-[10px] uppercase tracking-widest text-zinc-400">Terminal ID (Email)</label>
                                 <input
                                     type="email"
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
                                     required
-                                    className="w-full border-b-2 border-zinc-100 bg-transparent py-4 text-sm font-bold outline-none focus:border-black dark:border-zinc-800 dark:text-white dark:focus:border-white transition-colors"
+                                    className="w-full border-b-2 border-zinc-100 bg-transparent py-4 text-sm outline-none focus:border-black dark:border-zinc-800 dark:text-white dark:focus:border-white transition-colors"
                                     placeholder=""
                                 />
                             </div>
 
                             <button
                                 disabled={loading || (message?.type === 'success')}
-                                className="w-full bg-black py-5 text-xs font-black uppercase tracking-[0.2em] text-white shadow-2xl transition-all hover:bg-zinc-800 active:scale-95 disabled:opacity-50 dark:bg-white dark:text-black dark:hover:bg-zinc-200"
+                                className="w-full bg-black py-5 text-xs uppercase tracking-[0.2em] text-white shadow-2xl transition-all hover:bg-zinc-800 active:scale-95 disabled:opacity-50 dark:bg-white dark:text-black dark:hover:bg-zinc-200"
                             >
                                 {loading ? "Transmitting..." : "Send Recovery Link"}
                             </button>
                         </form>
 
                         <div className="mt-12 text-center">
-                            <p className="text-[8px] font-black uppercase tracking-widest text-zinc-400">
+                            <p className="text-[8px] uppercase tracking-widest text-zinc-400">
                                 Stuck? Contact <a href="mailto:support@posterdamn.xyz" className="text-black dark:text-white underline underline-offset-2">System Admin</a>
                             </p>
                         </div>

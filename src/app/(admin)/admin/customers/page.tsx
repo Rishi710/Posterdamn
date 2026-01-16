@@ -92,8 +92,8 @@ export default function AdminCustomers() {
         <div className="space-y-8">
             <div className="flex flex-col md:flex-row md:items-end justify-between border-b border-zinc-200 dark:border-zinc-800 pb-8 gap-4">
                 <div>
-                    <h1 className="text-4xl font-black italic tracking-tighter lg:text-5xl uppercase text-black dark:text-white">Customers</h1>
-                    <p className="text-sm font-bold text-zinc-500 uppercase tracking-widest mt-2">Insights & Order History</p>
+                    <h1 className="text-4xl tracking-tighter lg:text-5xl uppercase text-black dark:text-white">Customers</h1>
+                    <p className="text-sm text-zinc-500 uppercase tracking-widest mt-2">Insights & Order History</p>
                 </div>
 
                 <div className="flex items-center gap-4">
@@ -104,7 +104,7 @@ export default function AdminCustomers() {
                             placeholder="SEARCH NAME/ID..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 pl-11 pr-6 py-4 text-[10px] font-black uppercase tracking-widest outline-none focus:border-black dark:focus:border-white transition-all w-64"
+                            className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 pl-11 pr-6 py-4 text-[10px] uppercase tracking-widest outline-none focus:border-black dark:focus:border-white transition-all w-64"
                         />
                     </div>
                 </div>
@@ -119,7 +119,7 @@ export default function AdminCustomers() {
                     <button
                         key={tab.value}
                         onClick={() => setSortBy(tab.value as any)}
-                        className={`px-6 py-3 text-[10px] font-black uppercase tracking-widest transition-all border ${sortBy === tab.value
+                        className={`px-6 py-3 text-[10px] uppercase tracking-widest transition-all border ${sortBy === tab.value
                             ? 'bg-black text-white dark:bg-white dark:text-black border-transparent'
                             : 'bg-white dark:bg-zinc-950 border-zinc-200 dark:border-zinc-800 text-zinc-400 hover:border-zinc-400 dark:hover:border-zinc-600'}`}
                     >
@@ -132,10 +132,10 @@ export default function AdminCustomers() {
                 <table className="w-full text-left">
                     <thead>
                         <tr className="border-b border-zinc-200 dark:border-zinc-800">
-                            <th className="py-6 px-6 text-[10px] font-black uppercase tracking-widest text-zinc-400">Customer Info</th>
-                            <th className="py-6 px-4 text-[10px] font-black uppercase tracking-widest text-zinc-400">Order Stats</th>
-                            <th className="py-6 px-4 text-[10px] font-black uppercase tracking-widest text-zinc-400">Total Spent</th>
-                            <th className="py-6 px-4 text-[10px] font-black uppercase tracking-widest text-zinc-400">Last Seen</th>
+                            <th className="py-6 px-6 text-[10px] uppercase tracking-widest text-zinc-400">Customer Info</th>
+                            <th className="py-6 px-4 text-[10px] uppercase tracking-widest text-zinc-400">Order Stats</th>
+                            <th className="py-6 px-4 text-[10px] uppercase tracking-widest text-zinc-400">Total Spent</th>
+                            <th className="py-6 px-4 text-[10px] uppercase tracking-widest text-zinc-400">Last Seen</th>
                             <th className="py-6 px-6"></th>
                         </tr>
                     </thead>
@@ -148,7 +148,7 @@ export default function AdminCustomers() {
                             ))
                         ) : filteredCustomers.length === 0 ? (
                             <tr>
-                                <td colSpan={5} className="py-20 px-6 text-center text-xs font-bold uppercase tracking-widest text-zinc-400">
+                                <td colSpan={5} className="py-20 px-6 text-center text-xs uppercase tracking-widest text-zinc-400">
                                     No customers found matching your criteria.
                                 </td>
                             </tr>
@@ -161,30 +161,30 @@ export default function AdminCustomers() {
                                                 <Users className="h-5 w-5 text-zinc-400" />
                                             </div>
                                             <div>
-                                                <h3 className="text-sm font-black uppercase tracking-tight text-black dark:text-white leading-none mb-1">
+                                                <h3 className="text-sm uppercase tracking-tight text-black dark:text-white leading-none mb-1">
                                                     {customer.name}
                                                 </h3>
-                                                <p className="text-[10px] font-bold text-zinc-400 break-all">{customer.email}</p>
+                                                <p className="text-[10px] text-zinc-400 break-all">{customer.email}</p>
                                             </div>
                                         </div>
                                     </td>
                                     <td className="py-6 px-4">
                                         <div className="flex items-center gap-2">
                                             <ShoppingBag className="h-4 w-4 text-zinc-400" />
-                                            <span className="text-sm font-black text-black dark:text-white">{customer.orderCount} Orders</span>
+                                            <span className="text-sm text-black dark:text-white">{customer.orderCount} Orders</span>
                                         </div>
                                     </td>
                                     <td className="py-6 px-4">
                                         <div className="flex flex-col">
-                                            <span className="text-lg font-black tracking-tighter text-black dark:text-white">
+                                            <span className="text-lg tracking-tighter text-black dark:text-white">
                                                 ₹{customer.totalSpent.toLocaleString()}
                                             </span>
-                                            <span className="text-[9px] font-bold text-zinc-400 uppercase tracking-widest underline decoration-zinc-200 dark:decoration-zinc-800 underline-offset-4">Premium Value</span>
+                                            <span className="text-[9px] text-zinc-400 uppercase tracking-widest underline decoration-zinc-200 dark:decoration-zinc-800 underline-offset-4">Premium Value</span>
                                         </div>
                                     </td>
                                     <td className="py-6 px-4">
-                                        <div className="flex items-center gap-2 text-zinc-400 italic">
-                                            <span className="text-[10px] font-bold uppercase tracking-widest">
+                                        <div className="flex items-center gap-2 text-zinc-400">
+                                            <span className="text-[10px] uppercase tracking-widest">
                                                 {new Date(customer.lastOrder).toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' })}
                                             </span>
                                         </div>

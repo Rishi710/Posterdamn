@@ -118,7 +118,7 @@ export default function Navbar() {
                         <div className="relative group z-50">
                             <button className="flex items-center gap-1.5 rounded-full border border-gray-200 bg-white px-3 py-1.5 text-gray-900 transition-colors hover:bg-black hover:text-white dark:border-gray-800 dark:bg-black dark:text-white dark:hover:bg-white dark:hover:text-black">
                                 <User className="h-4 w-4" />
-                                <span className="text-xs font-bold uppercase tracking-tight hidden sm:inline">
+                                <span className="text-xs uppercase tracking-tight hidden sm:inline">
                                     {user.user_metadata?.full_name?.split(' ')[0] || user.email?.split('@')[0] || "Agent"}
                                 </span>
                                 <ChevronDown className="h-3 w-3 transition-transform group-hover:rotate-180" />
@@ -146,7 +146,7 @@ export default function Navbar() {
                     ) : (
                         <Link href={`/login?next=${pathname}`} className="flex items-center gap-1.5 rounded-full border border-gray-200 bg-white px-3 py-1.5 text-gray-900 transition-colors hover:bg-black hover:text-white dark:border-gray-800 dark:bg-black dark:text-white dark:hover:bg-white dark:hover:text-black">
                             <User className="h-4 w-4" />
-                            <span className="text-xs font-black uppercase tracking-widest hidden sm:inline">Login</span>
+                            <span className="text-xs uppercase tracking-widest hidden sm:inline">Login</span>
                         </Link>
                     )}
 
@@ -157,7 +157,7 @@ export default function Navbar() {
                     >
                         <ShoppingBag className="h-5 w-5" strokeWidth={1.5} />
                         {mounted && cart.length > 0 && (
-                            <span className="absolute right-1 top-1 flex h-4 w-4 items-center justify-center rounded-full bg-black text-[10px] font-bold text-white dark:bg-white dark:text-black">
+                            <span className="absolute right-1 top-1 flex h-4 w-4 items-center justify-center rounded-full bg-black text-[10px] text-white dark:bg-white dark:text-black">
                                 {cart.length}
                             </span>
                         )}
@@ -184,7 +184,7 @@ export default function Navbar() {
                     <div className="absolute right-0 top-0 h-screen w-[80%] max-w-sm bg-white p-8 shadow-2xl animate-in slide-in-from-right duration-500 ease-out dark:bg-black">
                         <div className="flex flex-col h-full">
                             <div className="flex items-center justify-between mb-12">
-                                <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-zinc-400">Navigation</h3>
+                                <h3 className="text-[10px] uppercase tracking-[0.3em] text-zinc-400">Navigation</h3>
                                 <button onClick={() => setIsMenuOpen(false)} className="rounded-full p-2 hover:bg-zinc-100 dark:hover:bg-zinc-800">
                                     <X className="h-5 w-5" />
                                 </button>
@@ -207,20 +207,20 @@ export default function Navbar() {
                                                 <User className="h-5 w-5 text-zinc-400" />
                                             </div>
                                             <div>
-                                                <p className="text-sm font-black uppercase tracking-tight text-black dark:text-white">
+                                                <p className="text-sm uppercase tracking-tight text-black dark:text-white">
                                                     {user.user_metadata?.full_name || user.email?.split('@')[0] || "Agent"}
                                                 </p>
-                                                <p className="text-[10px] font-bold text-zinc-400">Premium Member</p>
+                                                <p className="text-[10px] text-zinc-400">Premium Member</p>
                                             </div>
                                         </div>
                                         <div className="grid grid-cols-2 gap-4">
                                             <Link href="/account/orders" onClick={() => setIsMenuOpen(false)} className="flex flex-col items-center justify-center rounded-xl bg-zinc-50 p-4 dark:bg-zinc-900 border border-transparent hover:border-black dark:hover:border-white transition-all">
                                                 <Package className="h-5 w-5 mb-2" />
-                                                <span className="text-[10px] font-black uppercase tracking-widest">Orders</span>
+                                                <span className="text-[10px] uppercase tracking-widest">Orders</span>
                                             </Link>
                                             <Link href="/account/wishlist" onClick={() => setIsMenuOpen(false)} className="flex flex-col items-center justify-center rounded-xl bg-zinc-50 p-4 dark:bg-zinc-900 border border-transparent hover:border-black dark:hover:border-white transition-all">
                                                 <Heart className="h-5 w-5 mb-2" />
-                                                <span className="text-[10px] font-black uppercase tracking-widest">Saved</span>
+                                                <span className="text-[10px] uppercase tracking-widest">Saved</span>
                                             </Link>
                                         </div>
                                         <button
@@ -228,7 +228,7 @@ export default function Navbar() {
                                                 logout();
                                                 setIsMenuOpen(false);
                                             }}
-                                            className="w-full flex items-center justify-center gap-2 py-4 text-[10px] font-black uppercase tracking-widest text-red-500 bg-red-50 dark:bg-red-950/20 rounded-xl"
+                                            className="w-full flex items-center justify-center gap-2 py-4 text-[10px] uppercase tracking-widest text-red-500 bg-red-50 dark:bg-red-950/20 rounded-xl"
                                         >
                                             <LogOut className="h-4 w-4" />
                                             Terminate Session
@@ -238,7 +238,7 @@ export default function Navbar() {
                                     <Link
                                         href="/login"
                                         onClick={() => setIsMenuOpen(false)}
-                                        className="flex items-center justify-center gap-3 w-full bg-black text-white dark:bg-white dark:text-black py-5 rounded-xl text-xs font-black uppercase tracking-[0.2em]"
+                                        className="flex items-center justify-center gap-3 w-full bg-black text-white dark:bg-white dark:text-black py-5 rounded-xl text-xs uppercase tracking-[0.2em]"
                                     >
                                         <User className="h-5 w-5" />
                                         Authenticate
@@ -292,7 +292,7 @@ export default function Navbar() {
                                     {!searchQuery ? (
                                         <>
                                             <div>
-                                                <h3 className="mb-4 text-[10px] font-black uppercase tracking-[0.3em] text-zinc-400">Quick Links</h3>
+                                                <h3 className="mb-4 text-[10px] uppercase tracking-[0.3em] text-zinc-400">Quick Links</h3>
                                                 <ul className="space-y-3">
                                                     {['All Posters', 'New Arrivals', 'Supercars', 'Vintage Bikes', 'Custom Orders'].map((link) => (
                                                         <li key={link}>
@@ -302,7 +302,7 @@ export default function Navbar() {
                                                                     router.push(`/shop?q=${encodeURIComponent(link)}`);
                                                                     setIsSearchOpen(false);
                                                                 }}
-                                                                className="text-sm font-bold text-zinc-600 transition-colors hover:text-black dark:text-zinc-400 dark:hover:text-white"
+                                                                className="text-sm text-zinc-600 transition-colors hover:text-black dark:text-zinc-400 dark:hover:text-white"
                                                             >
                                                                 {link}
                                                             </button>
@@ -322,7 +322,7 @@ export default function Navbar() {
 
                                 {/* Right Column: Live Results */}
                                 <div>
-                                    <h3 className="mb-4 text-[10px] font-black uppercase tracking-[0.3em] text-zinc-400">
+                                    <h3 className="mb-4 text-[10px] uppercase tracking-[0.3em] text-zinc-400">
                                         {searchQuery ? 'Top Results' : 'Featured Products'}
                                     </h3>
                                     <div className="space-y-4">
@@ -345,10 +345,10 @@ export default function Navbar() {
                                                     />
                                                 </div>
                                                 <div className="flex-1">
-                                                    <h4 className="text-sm font-bold tracking-tight text-zinc-900 transition-colors group-hover:text-black dark:text-zinc-100 dark:group-hover:text-white">
+                                                    <h4 className="text-sm tracking-tight text-zinc-900 transition-colors group-hover:text-black dark:text-zinc-100 dark:group-hover:text-white">
                                                         {product.title}
                                                     </h4>
-                                                    <p className="text-[10px] font-black uppercase tracking-widest text-zinc-400">
+                                                    <p className="text-[10px] uppercase tracking-widest text-zinc-400">
                                                         ₹{product.discountedPrice}
                                                     </p>
                                                 </div>
@@ -363,7 +363,7 @@ export default function Navbar() {
                                         {searchQuery && searchResults.length > 0 && (
                                             <button
                                                 onClick={handleSearchSubmit}
-                                                className="mt-4 flex w-full items-center justify-center gap-2 rounded-lg bg-zinc-100 py-3 text-xs font-black uppercase tracking-[0.2em] text-zinc-900 transition-colors hover:bg-black hover:text-white dark:bg-zinc-800 dark:text-zinc-100 dark:hover:bg-white dark:hover:text-black"
+                                                className="mt-4 flex w-full items-center justify-center gap-2 rounded-lg bg-zinc-100 py-3 text-xs uppercase tracking-[0.2em] text-zinc-900 transition-colors hover:bg-black hover:text-white dark:bg-zinc-800 dark:text-zinc-100 dark:hover:bg-white dark:hover:text-black"
                                             >
                                                 View all results <ArrowRight className="h-3 w-3" />
                                             </button>
@@ -383,7 +383,7 @@ function NavItem({ href, label, hasDropdown = false }: { href: string; label: st
     return (
         <Link
             href={href}
-            className="group flex items-center text-sm font-bold uppercase tracking-widest text-gray-500 transition-colors hover:text-black dark:text-gray-400 dark:hover:text-white"
+            className="group flex items-center text-sm uppercase tracking-widest text-gray-500 transition-colors hover:text-black dark:text-gray-400 dark:hover:text-white"
         >
             {label}
             {hasDropdown && <ChevronDown className="ml-1 h-3 w-3 text-gray-400 transition-transform group-hover:rotate-180" />}
@@ -402,7 +402,7 @@ function DropdownItem({ href, icon: Icon, label, badge }: { href: string; icon: 
                 {label}
             </div>
             {badge && (
-                <span className="flex h-5 min-w-[20px] items-center justify-center rounded-full bg-red-100 px-1 text-[10px] font-bold text-red-600 dark:bg-red-900/30 dark:text-red-400">
+                <span className="flex h-5 min-w-[20px] items-center justify-center rounded-full bg-red-100 px-1 text-[10px] text-red-600 dark:bg-red-900/30 dark:text-red-400">
                     {badge}
                 </span>
             )}
@@ -415,7 +415,7 @@ function MobileLink({ href, onClick, children }: { href: string; onClick: () => 
         <Link
             href={href}
             onClick={onClick}
-            className="text-2xl font-black tracking-tight text-gray-900 hover:text-blue-600 dark:text-white dark:hover:text-blue-400"
+            className="text-2xl tracking-tight text-gray-900 hover:text-blue-600 dark:text-white dark:hover:text-blue-400"
         >
             {children}
         </Link>
