@@ -1,5 +1,7 @@
 "use client";
 
+export const dynamic = 'force-dynamic';
+
 import Link from "next/link";
 import { useState, useEffect, Suspense } from "react";
 import { ArrowLeft, Mail, Smartphone, ArrowRight, ShieldCheck, AlertCircle, Eye, EyeOff } from "lucide-react";

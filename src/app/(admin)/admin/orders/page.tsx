@@ -204,7 +204,7 @@ export default function OrdersPage() {
 
                 {/* Pagination */}
                 <div className="flex items-center justify-between border-t border-zinc-200 dark:border-zinc-800 px-6 py-4">
-                    <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">
+                    <p className="text-[10px] uppercase tracking-widest text-zinc-500">
                         Page {page} of {Math.ceil(totalParsed / PER_PAGE)} ({totalParsed} items)
                     </p>
                     <div className="flex gap-2">

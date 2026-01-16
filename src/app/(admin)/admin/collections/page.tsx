@@ -294,7 +294,7 @@ export default function AdminCollections() {
                                         <select
                                             value={formData.parent_id || ""}
                                             onChange={(e) => setFormData({ ...formData, parent_id: e.target.value || null })}
-                                            className="w-full bg-zinc-50 dark:bg-zinc-900 p-4 font-bold text-xs uppercase tracking-widest outline-none appearance-none"
+                                            className="w-full bg-zinc-50 dark:bg-zinc-900 p-4 text-xs uppercase tracking-widest outline-none appearance-none"
                                         >
                                             <option value="">TOP-LEVEL (NO PARENT)</option>
                                             {collections
@@ -323,7 +323,7 @@ export default function AdminCollections() {
                                                 type="text"
                                                 value={formData.image_url}
                                                 onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
-                                                className="w-full bg-zinc-50 dark:bg-zinc-900 p-4 font-bold text-[10px] outline-none border border-transparent focus:border-black dark:focus:border-white transition-all"
+                                                className="w-full bg-zinc-50 dark:bg-zinc-900 p-4 text-[10px] outline-none border border-transparent focus:border-black dark:focus:border-white transition-all"
                                                 placeholder="PASTE IMAGE URL..."
                                             />
                                         </div>

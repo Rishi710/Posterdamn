@@ -59,18 +59,7 @@ export default function Footer() {
                                 <SocialPill label="Pinterest" href="#" />
                             </div>
 
-                            {/* <div className="mt-12 flex flex-col gap-4 text-xs font-bold uppercase tracking-[0.2em] text-zinc-500">
-                                <div className="flex flex-col gap-1">
-                                    <span className="text-zinc-700">Support</span>
-                                    <a href="mailto:hello@posterdamn.com" className="text-white hover:text-zinc-300 transition-colors lowercase tracking-normal text-sm font-medium">hello@posterdamn.com</a>
-                                </div>
-                                <div className="flex flex-col gap-1">
-                                    <span className="text-zinc-700">Studio</span>
-                                    <address className="not-italic text-white text-sm font-medium lowercase tracking-normal">
-                                        LIG Street, Indore - 452001
-                                    </address>
-                                </div>
-                            </div> */}
+
                         </div>
                     </div>
 

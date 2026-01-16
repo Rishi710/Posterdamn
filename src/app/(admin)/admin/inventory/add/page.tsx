@@ -196,14 +196,14 @@ export default function AddProduct() {
                         <ArrowLeft className="h-5 w-5" />
                     </Link>
                     <div>
-                        <h1 className="text-2xl font-black uppercase tracking-tighter text-black dark:text-white">New Product</h1>
-                        <p className="text-xs font-bold text-zinc-500 uppercase tracking-widest">Add to Global Inventory</p>
+                        <h1 className="text-2xl uppercase tracking-tighter text-black dark:text-white">New Product</h1>
+                        <p className="text-xs text-zinc-500 uppercase tracking-widest">Add to Global Inventory</p>
                     </div>
                 </div>
                 <button
                     onClick={handleSubmit}
                     disabled={loading}
-                    className="flex items-center gap-2 bg-black dark:bg-white text-white dark:text-black py-3 px-6 text-[10px] font-black uppercase tracking-widest transition-all hover:opacity-80 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="flex items-center gap-2 bg-black dark:bg-white text-white dark:text-black py-3 px-6 text-[10px] uppercase tracking-widest transition-all hover:opacity-80 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                     <Save className="h-4 w-4" />
                     {loading ? "Releasing..." : "Release Product"}
@@ -215,16 +215,16 @@ export default function AddProduct() {
                 <div className="lg:col-span-2 space-y-8">
                     {/* Basic Details Card */}
                     <div className="bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 p-6 space-y-6">
-                        <h2 className="text-xs font-black uppercase tracking-[0.2em] text-zinc-400">Core Information</h2>
+                        <h2 className="text-xs uppercase tracking-[0.2em] text-zinc-400">Core Information</h2>
 
                         <div className="space-y-4">
                             <div>
-                                <label className="block text-[10px] font-black uppercase tracking-widest mb-2">Product Title</label>
+                                <label className="block text-[10px] uppercase tracking-widest mb-2">Product Title</label>
                                 <input
                                     type="text"
                                     value={title}
                                     onChange={(e) => setTitle(e.target.value)}
-                                    className="w-full bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-3 text-sm font-bold outline-none focus:border-black dark:focus:border-white transition-all"
+                                    className="w-full bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-3 text-sm outline-none focus:border-black dark:focus:border-white transition-all"
                                     placeholder=""
                                 />
                             </div>
@@ -232,13 +232,13 @@ export default function AddProduct() {
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
                                     <div className="flex justify-between mb-2">
-                                        <label className="block text-[10px] font-black uppercase tracking-widest">Collection</label>
+                                        <label className="block text-[10px] uppercase tracking-widest">Collection</label>
                                         <button
                                             onClick={() => {
                                                 const name = prompt("Enter new Collection name:");
                                                 if (name) quickCreate('collections', name);
                                             }}
-                                            className="text-[9px] font-bold text-blue-500 hover:underline uppercase"
+                                            className="text-[9px] text-blue-500 hover:underline uppercase"
                                         >
                                             + Valid New
                                         </button>
@@ -246,7 +246,7 @@ export default function AddProduct() {
                                     <select
                                         value={collectionId}
                                         onChange={(e) => setCollectionId(e.target.value)}
-                                        className="w-full bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-3 text-sm font-bold outline-none focus:border-black dark:focus:border-white transition-all appearance-none"
+                                        className="w-full bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-3 text-sm outline-none focus:border-black dark:focus:border-white transition-all appearance-none"
                                     >
                                         <option value="">SELECT COLLECTION</option>
                                         {collections.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
@@ -254,13 +254,13 @@ export default function AddProduct() {
                                 </div>
                                 <div>
                                     <div className="flex justify-between mb-2">
-                                        <label className="block text-[10px] font-black uppercase tracking-widest">Category</label>
+                                        <label className="block text-[10px] uppercase tracking-widest">Category</label>
                                         <button
                                             onClick={() => {
                                                 const name = prompt("Enter new Category name:");
                                                 if (name) quickCreate('categories', name);
                                             }}
-                                            className="text-[9px] font-bold text-blue-500 hover:underline uppercase"
+                                            className="text-[9px] text-blue-500 hover:underline uppercase"
                                         >
                                             + Valid New
                                         </button>
@@ -268,7 +268,7 @@ export default function AddProduct() {
                                     <select
                                         value={categoryId}
                                         onChange={(e) => setCategoryId(e.target.value)}
-                                        className="w-full bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-3 text-sm font-bold outline-none focus:border-black dark:focus:border-white transition-all appearance-none"
+                                        className="w-full bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-3 text-sm outline-none focus:border-black dark:focus:border-white transition-all appearance-none"
                                     >
                                         <option value="">SELECT CATEGORY</option>
                                         {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
@@ -277,7 +277,7 @@ export default function AddProduct() {
                             </div>
 
                             <div>
-                                <label className="block text-[10px] font-black uppercase tracking-widest mb-2">Description</label>
+                                <label className="block text-[10px] uppercase tracking-widest mb-2">Description</label>
                                 <textarea
                                     value={description}
                                     onChange={(e) => setDescription(e.target.value)}
@@ -291,19 +291,19 @@ export default function AddProduct() {
 
                     {/* Variant Generator Card */}
                     <div className="bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 p-6 space-y-6">
-                        <h2 className="text-xs font-black uppercase tracking-[0.2em] text-zinc-400">Variant Matrix</h2>
+                        <h2 className="text-xs uppercase tracking-[0.2em] text-zinc-400">Variant Matrix</h2>
 
                         <div className="space-y-6">
                             {/* Selection Controls */}
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
-                                    <label className="block text-[10px] font-black uppercase tracking-widest mb-3">Available Sizes</label>
+                                    <label className="block text-[10px] uppercase tracking-widest mb-3">Available Sizes</label>
                                     <div className="flex flex-wrap gap-2">
                                         {SIZES.map(size => (
                                             <button
                                                 key={size}
                                                 onClick={() => toggleSelection(size, selectedSizes, setSelectedSizes)}
-                                                className={`px-3 py-2 text-[10px] font-bold border transition-all ${selectedSizes.includes(size)
+                                                className={`px-3 py-2 text-[10px] border transition-all ${selectedSizes.includes(size)
                                                     ? "bg-black text-white border-black dark:bg-white dark:text-black dark:border-white"
                                                     : "bg-white text-zinc-500 border-zinc-200 dark:bg-zinc-900 dark:border-zinc-800 hover:border-black dark:hover:border-white"
                                                     }`}
@@ -315,13 +315,13 @@ export default function AddProduct() {
                                 </div>
 
                                 <div>
-                                    <label className="block text-[10px] font-black uppercase tracking-widest mb-3">Available Materials</label>
+                                    <label className="block text-[10px] uppercase tracking-widest mb-3">Available Materials</label>
                                     <div className="flex flex-wrap gap-2">
                                         {MATERIALS.map(material => (
                                             <button
                                                 key={material}
                                                 onClick={() => toggleSelection(material, selectedMaterials, setSelectedMaterials)}
-                                                className={`px-3 py-2 text-[10px] font-bold border transition-all ${selectedMaterials.includes(material)
+                                                className={`px-3 py-2 text-[10px] border transition-all ${selectedMaterials.includes(material)
                                                     ? "bg-black text-white border-black dark:bg-white dark:text-black dark:border-white"
                                                     : "bg-white text-zinc-500 border-zinc-200 dark:bg-zinc-900 dark:border-zinc-800 hover:border-black dark:hover:border-white"
                                                     }`}
@@ -336,7 +336,7 @@ export default function AddProduct() {
                             <button
                                 onClick={generateVariants}
                                 disabled={selectedSizes.length === 0 || selectedMaterials.length === 0}
-                                className="w-full flex items-center justify-center gap-2 border border-black dark:border-white border-dashed py-3 text-[10px] font-black uppercase tracking-widest hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="w-full flex items-center justify-center gap-2 border border-black dark:border-white border-dashed py-3 text-[10px] uppercase tracking-widest hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                                 <Plus className="h-4 w-4" />
                                 Generate Pricing Matrix
@@ -348,11 +348,11 @@ export default function AddProduct() {
                                     <table className="w-full text-left">
                                         <thead>
                                             <tr className="bg-zinc-50 dark:bg-zinc-900 border-b border-zinc-200 dark:border-zinc-800">
-                                                <th className="p-3 text-[9px] font-black uppercase tracking-widest text-zinc-500">Variant</th>
-                                                <th className="p-3 text-[9px] font-black uppercase tracking-widest text-zinc-500">Price (₹)</th>
-                                                <th className="p-3 text-[9px] font-black uppercase tracking-widest text-zinc-500">Stock</th>
-                                                <th className="p-3 text-[9px] font-black uppercase tracking-widest text-zinc-500">SKU</th>
-                                                <th className="p-3 text-[9px] font-black uppercase tracking-widest text-zinc-500 text-right">Action</th>
+                                                <th className="p-3 text-[9px] uppercase tracking-widest text-zinc-500">Variant</th>
+                                                <th className="p-3 text-[9px] uppercase tracking-widest text-zinc-500">Price (₹)</th>
+                                                <th className="p-3 text-[9px] uppercase tracking-widest text-zinc-500">Stock</th>
+                                                <th className="p-3 text-[9px] uppercase tracking-widest text-zinc-500">SKU</th>
+                                                <th className="p-3 text-[9px] uppercase tracking-widest text-zinc-500 text-right">Action</th>
                                             </tr>
                                         </thead>
                                         <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800">
@@ -360,7 +360,7 @@ export default function AddProduct() {
                                                 <tr key={`${variant.size}-${variant.material}`} className="bg-white dark:bg-zinc-950">
                                                     <td className="p-3">
                                                         <div className="flex flex-col">
-                                                            <span className="text-xs font-bold text-black dark:text-white">{variant.size}</span>
+                                                            <span className="text-xs text-black dark:text-white">{variant.size}</span>
                                                             <span className="text-[10px] text-zinc-500">{variant.material}</span>
                                                         </div>
                                                     </td>
@@ -369,7 +369,7 @@ export default function AddProduct() {
                                                             type="number"
                                                             value={variant.price}
                                                             onChange={(e) => updateVariant(idx, 'price', e.target.value)}
-                                                            className="w-24 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-2 text-xs font-bold outline-none focus:border-black transition-all"
+                                                            className="w-24 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-2 text-xs outline-none focus:border-black transition-all"
                                                             placeholder="0.00"
                                                         />
                                                     </td>
@@ -378,7 +378,7 @@ export default function AddProduct() {
                                                             type="number"
                                                             value={variant.stock}
                                                             onChange={(e) => updateVariant(idx, 'stock', e.target.value)}
-                                                            className="w-20 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-2 text-xs font-bold outline-none focus:border-black transition-all"
+                                                            className="w-20 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-2 text-xs outline-none focus:border-black transition-all"
                                                         />
                                                     </td>
                                                     <td className="p-3 text-right flex items-center justify-end gap-2">
@@ -386,7 +386,7 @@ export default function AddProduct() {
                                                             type="text"
                                                             value={variant.sku}
                                                             onChange={(e) => updateVariant(idx, 'sku', e.target.value.toUpperCase())}
-                                                            className="w-32 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-2 text-[10px] font-mono font-bold outline-none focus:border-black transition-all"
+                                                            className="w-32 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-2 text-[10px] font-mono outline-none focus:border-black transition-all"
                                                             placeholder="SKU"
                                                         />
                                                         <button
@@ -409,16 +409,16 @@ export default function AddProduct() {
                 {/* Right Column: Media */}
                 <div className="space-y-8">
                     <div className="bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 p-6 space-y-6 sticky top-8">
-                        <h2 className="text-xs font-black uppercase tracking-[0.2em] text-zinc-400">Media Assets</h2>
+                        <h2 className="text-xs uppercase tracking-[0.2em] text-zinc-400">Media Assets</h2>
 
                         <div className="space-y-4">
                             <div>
-                                <label className="block text-[10px] font-black uppercase tracking-widest mb-2">Image Source URL</label>
+                                <label className="block text-[10px] uppercase tracking-widest mb-2">Image Source URL</label>
                                 <input
                                     type="text"
                                     value={imageUrl}
                                     onChange={(e) => setImageUrl(e.target.value)}
-                                    className="w-full bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-3 text-sm font-bold outline-none focus:border-black dark:focus:border-white transition-all"
+                                    className="w-full bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-3 text-sm outline-none focus:border-black dark:focus:border-white transition-all"
                                     placeholder="https://..."
                                 />
                                 <p className="text-[10px] text-zinc-400 mt-2">
@@ -434,7 +434,7 @@ export default function AddProduct() {
                                 ) : (
                                     <div className="flex flex-col items-center text-zinc-400">
                                         <Upload className="h-8 w-8 mb-2 opacity-50" />
-                                        <span className="text-[10px] font-black uppercase tracking-widest">No Preview</span>
+                                        <span className="text-[10px] uppercase tracking-widest">No Preview</span>
                                     </div>
                                 )}
                             </div>

@@ -1,11 +1,13 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+export const dynamic = 'force-dynamic';
+
+import React, { useEffect, useState, Suspense } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { CheckCircle2, Package, ArrowRight, Printer, ShoppingBag } from "lucide-react";
 
-export default function CheckoutSuccessPage() {
+function SuccessContent() {
     const searchParams = useSearchParams();
     const orderId = searchParams.get("id");
 
@@ -28,7 +30,7 @@ export default function CheckoutSuccessPage() {
                     <Package className="h-5 w-5 text-black dark:text-white mt-1" />
                     <div>
                         <p className="text-xs uppercase tracking-widest text-black dark:text-white">Processing Shipment</p>
-                        <p className="text-[10px] font-medium text-zinc-500 leading-relaxed mt-1">
+                        <p className="text-[10px] text-zinc-500 leading-relaxed mt-1">
                             Your posters are being prepared for archival-quality packaging. We will alert you once the courier is dispatched.
                         </p>
                     </div>
@@ -60,5 +62,13 @@ export default function CheckoutSuccessPage() {
                 SECURE TRANSACTION RECORDED • POSTERDAMN TERMINAL
             </div>
         </div>
+    );
+}
+
+export default function CheckoutSuccessPage() {
+    return (
+        <Suspense fallback={<div className="flex h-screen items-center justify-center text-xs uppercase tracking-widest text-zinc-400">Loading Order Manifest...</div>}>
+            <SuccessContent />
+        </Suspense>
     );
 }

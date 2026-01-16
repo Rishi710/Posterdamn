@@ -410,7 +410,7 @@ export default function AddressesPage() {
             <div className="mb-8 flex items-end justify-between border-b border-zinc-100 dark:border-zinc-800 pb-8">
                 <div>
                     <h1 className="text-3xl tracking-tighter lg:text-4xl uppercase text-black dark:text-white">Addresses</h1>
-                    <p className="text-sm font-medium text-zinc-500 dark:text-zinc-400 mt-2">Manage your delivery locations.</p>
+                    <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-2">Manage your delivery locations.</p>
                 </div>
                 {!isAdding && !editingId && (
                     <button
@@ -425,7 +425,7 @@ export default function AddressesPage() {
 
             {errorMsg && (
                 <div className="mb-8 rounded-lg bg-red-50 p-4 text-sm text-red-600 dark:bg-red-950/20 dark:text-red-400">
-                    <p className="font-medium">Error Loading Addresses:</p>
+                    <p className="font-normal">Error Loading Addresses:</p>
                     <p>{errorMsg}</p>
                     <p className="mt-2 text-xs opacity-75">Check console for more details.</p>
                 </div>
@@ -461,7 +461,7 @@ export default function AddressesPage() {
                                         className={`px-6 py-2 rounded-full text-[10px] uppercase tracking-widest transition-all
                                             ${formData.type === t
                                                 ? "bg-black text-white dark:bg-white dark:text-black"
-                                                : "bg-zinc-100 text-zinc-400 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 font-medium"}`}
+                                                : "bg-zinc-100 text-zinc-400 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700"}`}
                                     >
                                         {t}
                                     </button>
@@ -489,7 +489,7 @@ export default function AddressesPage() {
                                 Phone Number
                             </label>
                             <div className="flex items-center gap-3 border-b border-zinc-200 py-2 focus-within:border-black dark:border-zinc-800 dark:focus-within:border-white transition-colors group">
-                                <div className="flex items-center gap-1.5 px-3 py-1 rounded-md bg-zinc-50 dark:bg-zinc-800/50 text-sm font-medium text-zinc-500">
+                                <div className="flex items-center gap-1.5 px-3 py-1 rounded-md bg-zinc-50 dark:bg-zinc-800/50 text-sm text-zinc-500">
                                     <span>+{Country.getCountryByCode(formData.country)?.phonecode}</span>
                                 </div>
                                 <input
@@ -497,7 +497,7 @@ export default function AddressesPage() {
                                     placeholder="9876543210"
                                     value={formData.phone}
                                     onChange={(e) => handleChange('phone', e.target.value)}
-                                    className="flex-1 bg-transparent text-base font-medium tracking-tight text-black outline-none dark:text-white placeholder:text-zinc-300 dark:placeholder:text-zinc-700"
+                                    className="flex-1 bg-transparent text-base tracking-tight text-black outline-none dark:text-white placeholder:text-zinc-300 dark:placeholder:text-zinc-700"
                                 />
                             </div>
                         </div>
@@ -557,7 +557,7 @@ export default function AddressesPage() {
                                     placeholder="110001"
                                     value={formData.zip}
                                     onChange={(e) => handleChange('zip', e.target.value)}
-                                    className={`w - full border - b bg - transparent py - 2 text - base font - medium tracking - tight text - black outline - none transition - colors placeholder:text-zinc-300 dark:text-white dark:placeholder:text-zinc-700
+                                    className={`w - full border - b bg - transparent py - 2 text - base tracking - tight text - black outline - none transition - colors placeholder:text-zinc-300 dark:text-white dark:placeholder:text-zinc-700
                                 ${zipError ? "border-red-500 focus:border-red-500" : "border-zinc-200 focus:border-black dark:border-zinc-800 dark:focus:border-white"}`}
                                 />
                                 <div className="absolute right-0 top-1/2 -translate-y-1/2 flex items-center gap-2">
@@ -575,7 +575,7 @@ export default function AddressesPage() {
                                 </div>
                             </div>
                             {zipError && (
-                                <span className="text-[10px] font-medium text-red-500 uppercase tracking-wider">
+                                <span className="text-[10px] text-red-500 uppercase tracking-wider">
                                     ZIP not found
                                 </span>
                             )}
@@ -624,7 +624,7 @@ export default function AddressesPage() {
 
                                 <div>
                                     <h4 className="text-lg tracking-tighter uppercase text-black dark:text-white">{address.name}</h4>
-                                    <p className="mt-1 text-sm font-medium text-zinc-500 leading-relaxed">
+                                    <p className="mt-1 text-sm text-zinc-500 leading-relaxed">
                                         {address.street}
                                         {address.landmark && <><br /><span className="text-xs text-zinc-400">Near: {address.landmark}</span></>}
                                         <br />
@@ -687,7 +687,7 @@ export default function AddressesPage() {
                             <h3 className="mb-4 text-2xl tracking-tighter uppercase text-black dark:text-white">
                                 Burn this address?
                             </h3>
-                            <p className="mb-8 text-sm font-medium text-zinc-500 leading-relaxed">
+                            <p className="mb-8 text-sm text-zinc-500 leading-relaxed">
                                 This action is permanent and cannot be undone. Are you sure you want to remove this destination from your account?
                             </p>
                             <div className="flex gap-4">
@@ -737,7 +737,7 @@ function InputGroup({
                 placeholder={placeholder}
                 value={value}
                 onChange={(e) => onChange(e.target.value)}
-                className="w-full border-b border-zinc-200 bg-transparent py-2 text-base font-medium tracking-tight text-black outline-none focus:border-black dark:border-zinc-800 dark:text-white dark:focus:border-white transition-colors placeholder:text-zinc-300 dark:placeholder:text-zinc-700"
+                className="w-full border-b border-zinc-200 bg-transparent py-2 text-base tracking-tight text-black outline-none focus:border-black dark:border-zinc-800 dark:text-white dark:focus:border-white transition-colors placeholder:text-zinc-300 dark:placeholder:text-zinc-700"
             />
         </div>
     );

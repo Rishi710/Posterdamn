@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { ArrowRight, ShieldCheck, Truck, Zap, Palette } from "lucide-react";
 import CollectionsScroll from "@/components/home/CollectionsScroll";
-import CollectionsGrid from "@/components/home/CollectionsGrid";
 import FAQ from "@/components/home/FAQ";
 import ProductCard from "@/components/shop/ProductCard";
 import { supabase } from "@/lib/supabase";

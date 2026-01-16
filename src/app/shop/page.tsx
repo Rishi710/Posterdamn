@@ -1,5 +1,7 @@
 "use client";
 
+export const dynamic = 'force-dynamic';
+
 import ProductCard from "@/components/shop/ProductCard";
 import { ChevronDown, Filter, Search as SearchIcon, X } from "lucide-react";
 import { useState, useEffect, useRef, Suspense } from "react";
